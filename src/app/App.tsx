@@ -133,7 +133,7 @@ export default function App() {
                 fontFamily: SANS,
               } as const;
               const sharedClass =
-                "inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200";
+                "inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer";
               const handleEnter = (e: React.MouseEvent<HTMLElement>) =>
                 (e.currentTarget.style.background = "#a84e22");
               const handleLeave = (e: React.MouseEvent<HTMLElement>) =>
@@ -232,7 +232,6 @@ export default function App() {
 
       {/* ── ABOUT ──────────────────────────────────────────────── */}
       <section
-        id="about"
         className="relative pb-28"
         style={{
           background: "#f5ede4",
@@ -243,6 +242,7 @@ export default function App() {
         <div className="max-w-4xl mx-auto px-6 md:px-10" style={{ display: "flow-root" }}>
           {/* Squircle card — floats well above the about section into the hero */}
           <div
+            id="about"
             className="relative z-30 rounded-[2.5rem]"
             style={{
               background: "#fff",
