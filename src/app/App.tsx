@@ -8,12 +8,12 @@ const SERIF = "'Playfair Display', Georgia, serif";
 const SANS = "'DM Sans', system-ui, sans-serif";
 const EMBER = "#c4622d";
 
-const NAV_LINKS: { id: string; label: string; href?: string }[] = [
+const NAV_LINKS: { id: string; label: string; href?: string; external?: boolean }[] = [
   { id: "about", label: "About" },
   { id: "posts", label: "Posts" },
   { id: "waitlist", label: "Waitlist" },
   { id: "connect", label: "Connect" },
-  { id: "podcast", label: "Podcast" },
+  { id: "podcast", label: "Podcast", external: true },
 ];
 
 const ARTICLES = [
@@ -163,6 +163,7 @@ export default function App() {
                   style={sharedStyle}
                 >
                   {link.label}
+                  {link.external && <ArrowUpRight className="w-3.5 h-3.5" />}
                 </button>
               );
             })}
@@ -475,6 +476,7 @@ export default function App() {
                 <div className="text-[9px] uppercase tracking-[0.15em] font-medium mb-0.5" style={{ color: "#8c8480" }}>Substack</div>
                 <div className="font-semibold text-xs truncate transition-colors duration-200 group-hover:text-[#c4622d]" style={{ color: "#2a1f1a" }}>EveryWoman</div>
               </div>
+              <ArrowUpRight className="w-3.5 h-3.5 flex-shrink-0 transition-all duration-200 group-hover:text-[#c4622d] group-hover:translate-x-0.5 group-hover:-translate-y-0.5" style={{ color: "#8c8480" }} />
             </a>
 
             {/* TikTok */}
@@ -495,6 +497,7 @@ export default function App() {
                 <div className="text-[9px] uppercase tracking-[0.15em] font-medium mb-0.5" style={{ color: "#8c8480" }}>TikTok</div>
                 <div className="font-semibold text-xs truncate transition-colors duration-200 group-hover:text-[#c4622d]" style={{ color: "#2a1f1a" }}>@everywomanhealth</div>
               </div>
+              <ArrowUpRight className="w-3.5 h-3.5 flex-shrink-0 transition-all duration-200 group-hover:text-[#c4622d] group-hover:translate-x-0.5 group-hover:-translate-y-0.5" style={{ color: "#8c8480" }} />
             </a>
 
             {/* Email */}
@@ -515,6 +518,7 @@ export default function App() {
                 <div className="text-[9px] uppercase tracking-[0.15em] font-medium mb-0.5" style={{ color: "#8c8480" }}>Email</div>
                 <div className="font-semibold text-xs truncate transition-colors duration-200 group-hover:text-[#c4622d]" style={{ color: "#2a1f1a" }}>everywoman.io@gmail.com</div>
               </div>
+              <ArrowUpRight className="w-3.5 h-3.5 flex-shrink-0 transition-all duration-200 group-hover:text-[#c4622d] group-hover:translate-x-0.5 group-hover:-translate-y-0.5" style={{ color: "#8c8480" }} />
             </a>
 
             {/* Instagram */}
@@ -539,6 +543,7 @@ export default function App() {
                 <div className="text-[9px] uppercase tracking-[0.15em] font-medium mb-0.5" style={{ color: "#8c8480" }}>Instagram</div>
                 <div className="font-semibold text-xs truncate transition-colors duration-200 group-hover:text-[#c4622d]" style={{ color: "#2a1f1a" }}>everywoman.io</div>
               </div>
+              <ArrowUpRight className="w-3.5 h-3.5 flex-shrink-0 transition-all duration-200 group-hover:text-[#c4622d] group-hover:translate-x-0.5 group-hover:-translate-y-0.5" style={{ color: "#8c8480" }} />
             </a>
           </div>
         </div>
