@@ -1,8 +1,7 @@
 import { ArrowUpRight } from "lucide-react";
 import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
-import logoImage from "@/imports/image-1.png";
-import madeleineImage from "@/imports/image-3.png";
-import madeleinePortrait from "@/imports/image-5.png";
+import logoImage from "@/imports/logo.png";
+import madeleinePortrait from "@/imports/profile.png";
 
 const SERIF = "'Playfair Display', Georgia, serif";
 const SANS = "'DM Sans', system-ui, sans-serif";
@@ -89,103 +88,103 @@ export default function App() {
           }}
         />
 
-      {/* ── NAV ────────────────────────────────────────────────── */}
-      <nav className="relative z-30 flex-shrink-0">
-        <div
-          className="max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between"
-          style={{ height: "76px" }}
-        >
-          {/* Logo — circular container with cream bg + EveryWoman text */}
-          <button
-            onClick={() => scrollTo("hero")}
-            className="flex items-center gap-3 flex-shrink-0"
-            style={{ cursor: "pointer" }}
+        {/* ── NAV ────────────────────────────────────────────────── */}
+        <nav className="relative z-30 flex-shrink-0">
+          <div
+            className="max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between"
+            style={{ height: "76px" }}
           >
-            <div
-              className="flex items-center justify-center rounded-full flex-shrink-0"
+            {/* Logo — circular container with cream bg + EveryWoman text */}
+            <button
+              onClick={() => scrollTo("hero")}
+              className="flex items-center gap-3 flex-shrink-0"
+              style={{ cursor: "pointer" }}
+            >
+              <div
+                className="flex items-center justify-center rounded-full flex-shrink-0"
+                style={{
+                  background: "#f5ede4",
+                  border: "2px solid rgba(245,237,228,0.5)",
+                  width: "42px",
+                  height: "42px",
+                }}
+              >
+                <ImageWithFallback
+                  src={logoImage}
+                  alt="EveryWoman logo"
+                  className="h-7 w-7 object-contain"
+                />
+              </div>
+              <span
+                className="font-bold text-[22px] tracking-tight"
+                style={{ fontFamily: SERIF, color: "#f5ede4" }}
+              >
+                EveryWoman
+              </span>
+            </button>
+
+            {/* Pills — always visible with ember background */}
+            <div className="hidden md:flex items-center gap-2">
+              {NAV_LINKS.map((link) => {
+                const sharedStyle = {
+                  background: EMBER,
+                  color: "#f5ede4",
+                  fontFamily: SANS,
+                } as const;
+                const sharedClass =
+                  "inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer";
+                const handleEnter = (e: React.MouseEvent<HTMLElement>) =>
+                  (e.currentTarget.style.background = "#a84e22");
+                const handleLeave = (e: React.MouseEvent<HTMLElement>) =>
+                  (e.currentTarget.style.background = EMBER);
+
+                return link.href ? (
+                  <a
+                    key={link.id}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onMouseEnter={handleEnter}
+                    onMouseLeave={handleLeave}
+                    className={sharedClass}
+                    style={sharedStyle}
+                  >
+                    {link.label}
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </a>
+                ) : (
+                  <button
+                    key={link.id}
+                    onClick={() => scrollTo(link.id)}
+                    onMouseEnter={handleEnter}
+                    onMouseLeave={handleLeave}
+                    className={sharedClass}
+                    style={sharedStyle}
+                  >
+                    {link.label}
+                    {link.external && <ArrowUpRight className="w-3.5 h-3.5" />}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Subscribe CTA */}
+            <a
+              href="https://everywomanhealth.substack.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 hover:scale-[1.03] hover:shadow-lg flex-shrink-0"
               style={{
                 background: "#f5ede4",
-                border: "2px solid rgba(245,237,228,0.5)",
-                width: "42px",
-                height: "42px",
+                color: "#2a1f1a",
+                fontFamily: SANS,
               }}
             >
-              <ImageWithFallback
-                src={logoImage}
-                alt="EveryWoman logo"
-                className="h-7 w-7 object-contain"
-              />
-            </div>
-            <span
-              className="font-bold text-[22px] tracking-tight"
-              style={{ fontFamily: SERIF, color: "#f5ede4" }}
-            >
-              EveryWoman
-            </span>
-          </button>
-
-          {/* Pills — always visible with ember background */}
-          <div className="hidden md:flex items-center gap-2">
-            {NAV_LINKS.map((link) => {
-              const sharedStyle = {
-                background: EMBER,
-                color: "#f5ede4",
-                fontFamily: SANS,
-              } as const;
-              const sharedClass =
-                "inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer";
-              const handleEnter = (e: React.MouseEvent<HTMLElement>) =>
-                (e.currentTarget.style.background = "#a84e22");
-              const handleLeave = (e: React.MouseEvent<HTMLElement>) =>
-                (e.currentTarget.style.background = EMBER);
-
-              return link.href ? (
-                <a
-                  key={link.id}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onMouseEnter={handleEnter}
-                  onMouseLeave={handleLeave}
-                  className={sharedClass}
-                  style={sharedStyle}
-                >
-                  {link.label}
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </a>
-              ) : (
-                <button
-                  key={link.id}
-                  onClick={() => scrollTo(link.id)}
-                  onMouseEnter={handleEnter}
-                  onMouseLeave={handleLeave}
-                  className={sharedClass}
-                  style={sharedStyle}
-                >
-                  {link.label}
-                  {link.external && <ArrowUpRight className="w-3.5 h-3.5" />}
-                </button>
-              );
-            })}
+              Subscribe
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </a>
           </div>
-
-          {/* Subscribe CTA */}
-          <a
-            href="https://everywomanhealth.substack.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 hover:scale-[1.03] hover:shadow-lg flex-shrink-0"
-            style={{
-              background: "#f5ede4",
-              color: "#2a1f1a",
-              fontFamily: SANS,
-            }}
-          >
-            Subscribe
-            <ArrowUpRight className="w-3.5 h-3.5" />
-          </a>
-        </div>
-      </nav>
+        </nav>
 
         {/* Title block */}
         <div className="relative z-20 max-w-7xl mx-auto px-6 md:px-10 w-full pt-10 md:pt-14 flex-shrink-0">
@@ -511,7 +510,7 @@ export default function App() {
                 style={{ background: EMBER, width: "40px", height: "40px" }}
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                  <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
+                  <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" />
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
