@@ -288,7 +288,7 @@ export default function App() {
               className="text-base md:text-[17px] leading-relaxed"
               style={{ color: "#6b5f5a" }}
             >
-              Hi, I&apos;m Madeleine. For years, my symptoms were dismissed. It
+              Hi, I&apos;m Madeleine, a Certified Personal Trainer (CPT). For years, my symptoms were dismissed. It
               took an emergency appendectomy to finally reveal what had been there
               all along — advanced endometriosis, spread throughout my abdomen.
               What followed was surgeries, chronic infections, debilitating
