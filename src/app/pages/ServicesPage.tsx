@@ -1,12 +1,16 @@
 import { ArrowUpRight } from "lucide-react";
+import { CoachingQuiz } from "@/app/components/CoachingQuiz";
+import { ExternalLink } from "@/app/components/ExternalLink";
 import { PortraitPlaceholder } from "@/app/components/PortraitPlaceholder";
 import { SiteFooter } from "@/app/components/SiteFooter";
 import { SiteNav } from "@/app/components/SiteNav";
-import { TierCard } from "@/app/components/TierCard";
+import { TierComparisonGrid } from "@/app/components/TierComparisonGrid";
 import {
-  COACHING_DISCLAIMER,
+  COACHING_DISCLAIMER_PREFIX,
+  COACHING_DISCLAIMER_SUFFIX,
   COACHING_INTRO_PARAGRAPHS,
   COACHING_TIERS,
+  NASM_URL,
 } from "@/app/content/coaching";
 import { CONSULTATION_URL, EMBER, SANS, SERIF, STONE } from "@/app/constants";
 
@@ -23,8 +27,8 @@ export function ServicesPage() {
         <SiteNav variant="light" />
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 md:px-10 pt-10 pb-20">
-        <div className="flex flex-col items-center text-center mb-12">
+      <main className="max-w-7xl mx-auto px-6 md:px-10 pt-10 pb-20">
+        <div className="flex flex-col items-center text-center mb-6">
           <PortraitPlaceholder size="clamp(7rem, 14vw, 10rem)" className="mb-8" />
 
           <h1
@@ -39,7 +43,7 @@ export function ServicesPage() {
           </h1>
 
           <h2
-            className="font-semibold mb-6 max-w-2xl"
+            className="font-semibold max-w-2xl mb-0"
             style={{
               fontFamily: SANS,
               color: "#6b5f5a",
@@ -49,8 +53,23 @@ export function ServicesPage() {
           >
             Strength training built for your body, your health, and your life.
           </h2>
+        </div>
 
-          <div className="max-w-2xl space-y-4 mb-8">
+        <div className="max-w-2xl w-full mx-auto">
+          <div className="flex justify-center mb-12 md:mb-16">
+            <a
+              href={CONSULTATION_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-full text-sm font-semibold transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+              style={{ background: EMBER, color: "#f5ede4", fontFamily: SANS }}
+            >
+              Schedule free consultation
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </a>
+          </div>
+
+          <div className="space-y-4 text-left">
             {COACHING_INTRO_PARAGRAPHS.map((paragraph, i) => (
               <p
                 key={i}
@@ -61,30 +80,23 @@ export function ServicesPage() {
               </p>
             ))}
           </div>
-
-          <a
-            href={CONSULTATION_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-7 py-3 rounded-full text-sm font-semibold transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
-            style={{ background: EMBER, color: "#f5ede4", fontFamily: SANS }}
-          >
-            Schedule free consultation
-            <ArrowUpRight className="w-3.5 h-3.5" />
-          </a>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-5 items-stretch mb-16 pt-4">
-          {COACHING_TIERS.map((tier) => (
-            <TierCard key={tier.id} tier={tier} />
-          ))}
+        <div className="my-14 md:my-16">
+          <CoachingQuiz />
         </div>
+
+        <TierComparisonGrid tiers={COACHING_TIERS} />
 
         <p
           className="text-sm leading-relaxed max-w-3xl mx-auto text-center italic"
-          style={{ color: STONE }}
+          style={{ color: STONE, fontFamily: SANS }}
         >
-          {COACHING_DISCLAIMER}
+          {COACHING_DISCLAIMER_PREFIX}
+          <ExternalLink href={NASM_URL} variant="light" className="italic">
+            NASM
+          </ExternalLink>
+          {COACHING_DISCLAIMER_SUFFIX}
         </p>
 
         {/* Testimonials — add section here when copy is ready */}

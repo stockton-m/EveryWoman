@@ -25,15 +25,11 @@ _Note:_ There is a second author, Will Carhart, who also works on the site. He i
    ```
    cd ~/.../EveryWoman
    ```
-2. Install dependencies (only needed once, or after pulling new changes):
-   ```
-   pnpm install
-   ```
-3. Start the local preview server:
+2. Start the local preview server:
    ```
    pnpm dev
    ```
-4. Open your browser to `http://localhost:5173` to see the site. Visit `http://localhost:5173/services` for the services page.
+3. Open your browser to `http://localhost:5173` to see the site. Visit `http://localhost:5173/services` for the services page.
 
 ### How to build for deployment
 ```
@@ -49,7 +45,7 @@ npx netlify-cli deploy --dir=dist --prod
 ### Where everything lives
 - **Entry point:** `src/main.tsx` → renders `<App />` from `src/app/App.tsx` (React Router)
 - **Pages:** `src/app/pages/HomePage.tsx`, `src/app/pages/ServicesPage.tsx`
-- **Shared UI:** `src/app/components/SiteNav.tsx`, `SiteFooter.tsx`, `PortraitPlaceholder.tsx`, `TierCard.tsx`
+- **Shared UI:** `src/app/components/SiteNav.tsx`, `SiteFooter.tsx`, `PortraitPlaceholder.tsx`, `TierComparisonGrid.tsx`
 - **Copy / tiers:** `src/app/content/coaching.ts`, `src/app/content/articles.ts`
 - **Constants (URLs, colors):** `src/app/constants.ts`
 - **Images:** `src/imports/` — `logo.png` (nav/footer) and `profile.png` (about card portrait). Services sections use `PortraitPlaceholder` until a dedicated photo is added.
