@@ -4,6 +4,7 @@ import { ExternalLink } from "@/app/components/ExternalLink";
 import { PortraitPlaceholder } from "@/app/components/PortraitPlaceholder";
 import { SiteFooter } from "@/app/components/SiteFooter";
 import { SiteNav } from "@/app/components/SiteNav";
+import { TestimonialMarquee } from "@/app/components/TestimonialMarquee";
 import { TierComparisonGrid } from "@/app/components/TierComparisonGrid";
 import {
   COACHING_DISCLAIMER_PREFIX,
@@ -16,7 +17,14 @@ import { CONSULTATION_URL, SANS, SERIF, STONE } from "@/app/constants";
 
 export function ServicesPage() {
   return (
-    <div style={{ fontFamily: SANS, minHeight: "100vh", background: "#f5ede4" }}>
+    <div
+      style={{
+        fontFamily: SANS,
+        minHeight: "100vh",
+        background: "#f5ede4",
+        overflowX: "clip",
+      }}
+    >
       <header
         className="border-b"
         style={{
@@ -88,6 +96,8 @@ export function ServicesPage() {
 
         <TierComparisonGrid tiers={COACHING_TIERS} />
 
+        <TestimonialMarquee />
+
         <p
           className="text-sm leading-relaxed max-w-3xl mx-auto text-center italic"
           style={{ color: STONE, fontFamily: SANS }}
@@ -98,8 +108,6 @@ export function ServicesPage() {
           </ExternalLink>
           {COACHING_DISCLAIMER_SUFFIX}
         </p>
-
-        {/* Testimonials — add section here when copy is ready */}
       </main>
 
       <SiteFooter />
