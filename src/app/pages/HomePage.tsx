@@ -1,8 +1,10 @@
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { ExternalLink } from "@/app/components/ExternalLink";
 import { SiteFooter } from "@/app/components/SiteFooter";
 import { SiteNav } from "@/app/components/SiteNav";
 import { ARTICLES } from "@/app/content/articles";
+import { NASM_URL } from "@/app/content/coaching";
 import {
   BLUSH,
   BROWN,
@@ -48,7 +50,7 @@ export function HomePage() {
             style={{
               fontFamily: SERIF,
               color: "#f5ede4",
-              fontSize: "clamp(2.8rem, 6.5vw, 5.25rem)",
+              fontSize: "clamp(2.8rem, 8.5vw, 7.25rem)",
             }}
           >
             Your diagnosis
@@ -134,29 +136,57 @@ export function HomePage() {
                 />
               </div>
             </div>
-            <p
+            <div
               className="text-base md:text-[17px] leading-relaxed"
               style={{ color: "#6b5f5a" }}
             >
-              Hi, I&apos;m Madeleine, a Certified Personal Trainer (CPT). For
-              years, my symptoms were dismissed. It took an emergency
-              appendectomy to finally reveal what had been there all along —
-              advanced endometriosis, spread throughout my abdomen. What
-              followed was surgeries, chronic infections, debilitating fatigue,
-              and a medical system that kept sending me home with no answers.
-              <br />
-              <br />
-              I know I&apos;m not alone in that.
-              <br />
-              <br />
-              Every woman has been told her pain is normal. Every woman has left
-              a doctor&apos;s office feeling invisible. EveryWoman exists
-              because that&apos;s not good enough — a women&apos;s health and
-              fitness platform built around strength training and movement for
-              those living with endometriosis, PCOS, pre/postpartum symptoms,
-              and those navigating perimenopause and menopause, grounded in real
-              diagnostic experience.
-            </p>
+              <p>
+                <span
+                  className="font-bold"
+                  style={{
+                    fontFamily: SERIF,
+                    color: EMBER,
+                    fontSize: "clamp(1.125rem, 2vw, 1.35rem)",
+                  }}
+                >
+                  Hi, I&apos;m Madeleine
+                </span>
+                , a Certified Personal Trainer (
+                <ExternalLink
+                  href={NASM_URL}
+                  variant="light"
+                  className="align-baseline"
+                >
+                  NASM-CPT
+                </ExternalLink>
+                ). For years, my symptoms were
+                dismissed. It took an emergency appendectomy to finally reveal
+                what had been there all along:{" "}
+                <em style={{ fontStyle: "italic" }}>
+                  advanced endometriosis spreading throughout my abdomen.
+                </em>{" "}
+                What followed was surgeries, chronic
+                infections, debilitating fatigue, and a medical system that kept
+                sending me home with no answers.
+              </p>
+              <p className="mt-6">
+                <strong style={{ color: "#2a1f1a", fontWeight: 700 }}>
+                  I know I&apos;m not alone in that.
+                </strong>
+              </p>
+              <p className="mt-6">
+                <em style={{ fontStyle: "italic" }}>Every woman</em> has been
+                told her pain is normal.{" "}
+                <em style={{ fontStyle: "italic" }}>Every woman</em> has left a
+                doctor&apos;s office feeling invisible.{" "}
+                <em style={{ fontStyle: "italic" }}>EveryWoman</em>{" "}
+                exists because that&apos;s not good enough — a women&apos;s
+                health and fitness platform built around strength training and
+                movement for those living with endometriosis, PCOS,
+                pre/postpartum symptoms, and those navigating perimenopause and
+                menopause, grounded in real diagnostic experience.
+              </p>
+            </div>
           </div>
         </div>
       </section>
