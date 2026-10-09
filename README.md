@@ -13,6 +13,7 @@ This is a **static multi-page React website** (client-side routing). There is no
 
 **Routes:**
 - `/` — Home (hero, about, services teaser, latest from me)
+- `/about` — Madeleine's story, influences, and personal photo collage
 - `/services` — Coaching tiers and consultation CTA
 
 ### Who the author is
@@ -29,7 +30,7 @@ _Note:_ There is a second author, Will Carhart, who also works on the site. He i
    ```
    pnpm dev
    ```
-3. Open your browser to `http://localhost:5173` to see the site. Visit `http://localhost:5173/services` for the services page.
+3. Open your browser to `http://localhost:5173` to see the site. Visit `http://localhost:5173/about` for the About page or `http://localhost:5173/services` for the services page.
 
 ### How to build for deployment
 ```
@@ -44,7 +45,7 @@ npx netlify-cli deploy --dir=dist --prod
 
 ### Where everything lives
 - **Entry point:** `src/main.tsx` → renders `<App />` from `src/app/App.tsx` (React Router)
-- **Pages:** `src/app/pages/HomePage.tsx`, `src/app/pages/ServicesPage.tsx`
+- **Pages:** `src/app/pages/HomePage.tsx`, `src/app/pages/AboutPage.tsx`, `src/app/pages/ServicesPage.tsx`
 - **Shared UI:** `src/app/components/SiteNav.tsx`, `SiteFooter.tsx`, `PortraitPlaceholder.tsx`, `TierComparisonGrid.tsx`
 - **Copy / tiers:** `src/app/content/coaching.ts`, `src/app/content/articles.ts`
 - **Constants (URLs, colors):** `src/app/constants.ts`

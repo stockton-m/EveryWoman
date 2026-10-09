@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ExternalLink } from "@/app/components/ExternalLink";
 import { SiteFooter } from "@/app/components/SiteFooter";
@@ -75,7 +75,7 @@ export function HomePage() {
               }}
             >
               Work with me
-              <ArrowUpRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>

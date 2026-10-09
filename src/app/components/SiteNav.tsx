@@ -15,7 +15,7 @@ const NAV_ITEMS: {
   hash?: string;
   placeholder?: boolean;
 }[] = [
-  { label: "About", hash: "about" },
+  { label: "About", to: "/about" },
   { label: "Services", to: "/services" },
   { label: "Connect", hash: "connect" },
   { label: "Podcast", placeholder: true },
