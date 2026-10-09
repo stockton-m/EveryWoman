@@ -1,13 +1,7 @@
 import { ArrowUpRight } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
-import {
-  EMBER,
-  PODCAST_URL,
-  SANS,
-  SERIF,
-  SUBSTACK_URL,
-} from "@/app/constants";
+import { SANS, SERIF, SUBSTACK_URL } from "@/app/constants";
 import logoImage from "@/imports/logo.png";
 
 type SiteNavProps = {
@@ -19,13 +13,16 @@ const NAV_ITEMS: {
   label: string;
   to?: string;
   hash?: string;
-  externalHref?: string;
+  placeholder?: boolean;
 }[] = [
   { label: "About", hash: "about" },
   { label: "Services", to: "/services" },
   { label: "Connect", hash: "connect" },
-  { label: "Podcast", externalHref: PODCAST_URL },
+  { label: "Podcast", placeholder: true },
 ];
+
+const navPillClass =
+  "pill-btn pill-btn--ember inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium";
 
 export function SiteNav({ variant = "hero" }: SiteNavProps) {
   const location = useLocation();
@@ -37,18 +34,6 @@ export function SiteNav({ variant = "hero" }: SiteNavProps) {
   const logoBorder = isHero
     ? "2px solid rgba(245,237,228,0.5)"
     : "2px solid rgba(42,31,26,0.08)";
-
-  const pillStyle = {
-    background: EMBER,
-    color: "#f5ede4",
-    fontFamily: SANS,
-  } as const;
-  const pillClass =
-    "inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer";
-  const handleEnter = (e: React.MouseEvent<HTMLElement>) =>
-    (e.currentTarget.style.background = "#a84e22");
-  const handleLeave = (e: React.MouseEvent<HTMLElement>) =>
-    (e.currentTarget.style.background = EMBER);
 
   const hashLink = (hash: string) => (onHome ? `#${hash}` : `/#${hash}`);
 
@@ -88,21 +73,17 @@ export function SiteNav({ variant = "hero" }: SiteNavProps) {
 
         <div className="hidden md:flex items-center gap-2">
           {NAV_ITEMS.map((item) => {
-            if (item.externalHref) {
+            if (item.placeholder) {
               return (
-                <a
+                <span
                   key={item.label}
-                  href={item.externalHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onMouseEnter={handleEnter}
-                  onMouseLeave={handleLeave}
-                  className={pillClass}
-                  style={pillStyle}
+                  className={navPillClass}
+                  style={{ fontFamily: SANS }}
+                  aria-disabled="true"
                 >
                   {item.label}
                   <ArrowUpRight className="w-3.5 h-3.5" />
-                </a>
+                </span>
               );
             }
             if (item.to) {
@@ -110,10 +91,8 @@ export function SiteNav({ variant = "hero" }: SiteNavProps) {
                 <Link
                   key={item.label}
                   to={item.to}
-                  onMouseEnter={handleEnter}
-                  onMouseLeave={handleLeave}
-                  className={pillClass}
-                  style={{ ...pillStyle, textDecoration: "none" }}
+                  className={navPillClass}
+                  style={{ fontFamily: SANS, textDecoration: "none" }}
                 >
                   {item.label}
                 </Link>
@@ -124,10 +103,8 @@ export function SiteNav({ variant = "hero" }: SiteNavProps) {
                 <Link
                   key={item.label}
                   to={hashLink(item.hash)}
-                  onMouseEnter={handleEnter}
-                  onMouseLeave={handleLeave}
-                  className={pillClass}
-                  style={{ ...pillStyle, textDecoration: "none" }}
+                  className={navPillClass}
+                  style={{ fontFamily: SANS, textDecoration: "none" }}
                 >
                   {item.label}
                 </Link>
@@ -141,13 +118,10 @@ export function SiteNav({ variant = "hero" }: SiteNavProps) {
           href={SUBSTACK_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 hover:scale-[1.03] hover:shadow-lg flex-shrink-0"
-          style={{
-            background: isHero ? "#f5ede4" : "#fff",
-            color: "#2a1f1a",
-            fontFamily: SANS,
-            border: isHero ? undefined : "1px solid rgba(42,31,26,0.08)",
-          }}
+          className={`pill-btn flex items-center gap-1.5 px-5 py-2 rounded-full text-sm font-semibold flex-shrink-0 ${
+            isHero ? "pill-btn--subscribe-hero" : "pill-btn--subscribe-light"
+          }`}
+          style={{ fontFamily: SANS }}
         >
           Subscribe
           <ArrowUpRight className="w-3.5 h-3.5" />

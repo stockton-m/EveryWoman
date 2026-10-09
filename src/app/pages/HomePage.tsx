@@ -66,11 +66,8 @@ export function HomePage() {
             </p>
             <Link
               to="/services"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 hover:scale-[1.03] hover:shadow-lg hover:bg-white/20"
+              className="pill-btn pill-btn--cream-glass inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold"
               style={{
-                background: "rgba(245,237,228,0.14)",
-                color: "#f5ede4",
-                border: "1px solid rgba(245,237,228,0.28)",
                 fontFamily: SANS,
                 textDecoration: "none",
               }}
@@ -252,10 +249,12 @@ export function HomePage() {
                     {card.text}
                   </p>
                   <span
-                    className="inline-flex items-center gap-2 self-start px-6 py-3 rounded-full text-base font-semibold mt-8"
+                    className={`pill-btn inline-flex items-center gap-2 self-start px-6 py-3 rounded-full text-base font-semibold mt-8 ${
+                      card.buttonBg === CREAM
+                        ? "pill-btn--cream-solid"
+                        : "pill-btn--brown-solid"
+                    }`}
                     style={{
-                      background: card.buttonBg,
-                      color: card.buttonColor,
                       fontFamily: SANS,
                     }}
                   >

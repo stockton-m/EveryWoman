@@ -1,0 +1,109 @@
+.pill-btn {
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+.pill-btn--ember {
+  background-color: var(--ember);
+  color: var(--cream);
+}
+
+.pill-btn--ember:hover,
+.pill-btn--ember:focus-visible {
+  background-color: var(--ember-hover);
+}
+
+.pill-btn--subscribe-hero {
+  background-color: var(--cream);
+  color: var(--brown);
+}
+
+.pill-btn--subscribe-hero:hover,
+.pill-btn--subscribe-hero:focus-visible {
+  background-color: color-mix(in srgb, var(--cream) 88%, black);
+}
+
+.pill-btn--subscribe-light {
+  background-color: #fff;
+  color: var(--brown);
+  border: 1px solid rgba(42, 31, 26, 0.08);
+}
+
+.pill-btn--subscribe-light:hover,
+.pill-btn--subscribe-light:focus-visible {
+  background-color: color-mix(in srgb, #fff 88%, black);
+}
+
+.pill-btn--cream-glass {
+  background-color: rgba(245, 237, 228, 0.14);
+  color: var(--cream);
+  border: 1px solid rgba(245, 237, 228, 0.28);
+}
+
+.pill-btn--cream-glass:hover,
+.pill-btn--cream-glass:focus-visible {
+  background-color: rgba(245, 237, 228, 0.24);
+  border-color: rgba(245, 237, 228, 0.36);
+}
+
+.pill-btn--cream-solid {
+  background-color: var(--cream);
+  color: var(--brown);
+}
+
+.pill-btn--cream-solid:hover,
+.pill-btn--cream-solid:focus-visible {
+  background-color: color-mix(in srgb, var(--cream) 88%, black);
+}
+
+.pill-btn--brown-solid {
+  background-color: var(--brown);
+  color: var(--cream);
+}
+
+.pill-btn--brown-solid:hover,
+.pill-btn--brown-solid:focus-visible {
+  /* Dark fills need to lighten on hover; mixing with black is imperceptible */
+  background-color: color-mix(in srgb, var(--brown) 72%, var(--cream));
+}
+
+.pill-btn--sage-solid {
+  background-color: var(--sage);
+  color: var(--cream);
+}
+
+.pill-btn--sage-solid:hover,
+.pill-btn--sage-solid:focus-visible {
+  background-color: color-mix(in srgb, var(--sage) 88%, black);
+}
+
+.pill-btn--outline-cream {
+  background-color: transparent;
+  color: var(--cream);
+  border: 1px solid rgba(245, 237, 228, 0.45);
+}
+
+.pill-btn--outline-cream:hover,
+.pill-btn--outline-cream:focus-visible {
+  background-color: rgba(245, 237, 228, 0.12);
+}
+
+.pill-btn--icon {
+  cursor: pointer;
+  background-color: transparent;
+  transition: background-color 180ms ease;
+}
+
+.pill-btn--icon:hover,
+.pill-btn--icon:focus-visible {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill-btn,
+  .pill-btn--icon {
+    transition-duration: 1ms;
+  }
+}

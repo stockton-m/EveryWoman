@@ -121,7 +121,7 @@ export function CoachingQuizModal({
           ref={closeButtonRef}
           type="button"
           onClick={onClose}
-          className="absolute right-5 top-5 z-20 rounded-full p-2 transition-colors hover:bg-black/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 md:right-8 md:top-8"
+          className="pill-btn pill-btn--icon absolute right-5 top-5 z-20 rounded-full p-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 md:right-8 md:top-8"
           style={{ color: CREAM }}
           aria-label="Close tier quiz"
         >
@@ -132,11 +132,7 @@ export function CoachingQuizModal({
           <button
             type="button"
             onClick={onStartOver}
-            className="absolute right-16 top-5 z-20 inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition-colors hover:bg-black/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 md:right-20 md:top-8 md:text-sm"
-            style={{
-              border: "1px solid rgba(245,237,228,0.45)",
-              color: CREAM,
-            }}
+            className="pill-btn pill-btn--outline-cream absolute right-16 top-5 z-20 inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 md:right-20 md:top-8 md:text-sm"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Start over
@@ -188,8 +184,7 @@ export function CoachingQuizModal({
               <button
                 type="button"
                 onClick={onStart}
-                className="inline-flex items-center gap-3 rounded-full px-7 py-3.5 text-base font-semibold transition-transform hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
-                style={{ background: CREAM, color: BROWN }}
+                className="pill-btn pill-btn--cream-solid inline-flex items-center gap-3 rounded-full px-7 py-3.5 text-base font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
               >
                 Start
                 <ArrowRight className="h-4 w-4" style={{ color: EMBER }} />
@@ -203,11 +198,7 @@ export function CoachingQuizModal({
             <button
               type="button"
               onClick={onBack}
-              className="mb-7 inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-black/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-              style={{
-                border: "1px solid rgba(245,237,228,0.45)",
-                color: CREAM,
-              }}
+              className="pill-btn pill-btn--outline-cream mb-7 inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               Back
@@ -255,15 +246,6 @@ export function CoachingQuizModal({
                     className={`coaching-quiz-answer ${
                       isSelected ? "is-selected" : ""
                     } ${isAnimating ? "is-animating" : ""}`}
-                    style={{
-                      borderColor: isSelected
-                        ? CREAM
-                        : "rgba(245,237,228,0.55)",
-                      color: isSelected ? BROWN : CREAM,
-                      background: isSelected
-                        ? CREAM
-                        : "rgba(245,237,228,0.08)",
-                    }}
                     aria-pressed={isSelected}
                   >
                     {option.label}

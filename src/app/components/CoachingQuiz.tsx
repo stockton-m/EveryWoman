@@ -5,7 +5,7 @@ import {
   type CoachingQuizAnswers,
   scoreCoachingQuiz,
 } from "@/app/lib/coachingQuizScoring";
-import { CREAM, EMBER, SAGE, SANS } from "@/app/constants";
+import { CREAM, EMBER, SANS } from "@/app/constants";
 
 export type CoachingQuizPhase = "intro" | "question" | "result";
 
@@ -85,9 +85,9 @@ export function CoachingQuiz() {
     <div className="flex justify-center">
       <button
         type="button"
-        className="coaching-quiz-trigger group"
+        className="coaching-quiz-trigger pill-btn group"
         onClick={() => setIsOpen(true)}
-        style={{ background: SAGE, color: CREAM, fontFamily: SANS }}
+        style={{ fontFamily: SANS }}
       >
         <span
           className="coaching-quiz-trigger-icon"

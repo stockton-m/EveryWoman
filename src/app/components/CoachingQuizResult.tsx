@@ -138,8 +138,7 @@ export function CoachingQuizResult({
           href={CONSULTATION_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="ml-auto inline-flex shrink-0 items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-all hover:-translate-y-0.5 hover:brightness-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
-          style={{ background: EMBER, color: CREAM }}
+          className="pill-btn pill-btn--ember ml-auto inline-flex shrink-0 items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
         >
           Get started
           <ArrowUpRight className="h-4 w-4" />

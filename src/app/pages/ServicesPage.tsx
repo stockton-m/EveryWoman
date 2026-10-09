@@ -12,7 +12,7 @@ import {
   COACHING_TIERS,
   NASM_URL,
 } from "@/app/content/coaching";
-import { CONSULTATION_URL, EMBER, SANS, SERIF, STONE } from "@/app/constants";
+import { CONSULTATION_URL, SANS, SERIF, STONE } from "@/app/constants";
 
 export function ServicesPage() {
   return (
@@ -61,8 +61,8 @@ export function ServicesPage() {
               href={CONSULTATION_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-7 py-3 rounded-full text-sm font-semibold transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
-              style={{ background: EMBER, color: "#f5ede4", fontFamily: SANS }}
+              className="pill-btn pill-btn--ember inline-flex items-center gap-2 px-7 py-3 rounded-full text-sm font-semibold"
+              style={{ fontFamily: SANS }}
             >
               Schedule free consultation
               <ArrowUpRight className="w-3.5 h-3.5" />
