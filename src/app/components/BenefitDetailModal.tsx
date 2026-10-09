@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import { useEffect } from "react";
+import { TierIconNameTooltip } from "@/app/components/TierIconNameTooltip";
 import { TierPatternIcon } from "@/app/components/TierPatternIcon";
 import {
   BENEFIT_MODAL_PLACEHOLDER,
@@ -102,19 +103,21 @@ export function BenefitDetailModal({
             return (
               <li key={tier.id} className="flex items-center gap-2">
                 <span className="sr-only">{tier.name}</span>
-                <span
-                  aria-hidden
-                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
-                  style={{
-                    background: included ? CREAM : EXCLUDED_DISC,
-                    color: included ? EMBER : STONE,
-                    border: included
-                      ? INCLUDED_DISC_BORDER
-                      : "1px solid transparent",
-                  }}
-                >
-                  <TierPatternIcon tierId={tier.id} className="h-4 w-4" />
-                </span>
+                <TierIconNameTooltip label={tier.name}>
+                  <span
+                    aria-hidden
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
+                    style={{
+                      background: included ? CREAM : EXCLUDED_DISC,
+                      color: included ? EMBER : STONE,
+                      border: included
+                        ? INCLUDED_DISC_BORDER
+                        : "1px solid transparent",
+                    }}
+                  >
+                    <TierPatternIcon tierId={tier.id} className="h-4 w-4" />
+                  </span>
+                </TierIconNameTooltip>
                 <span
                   className="text-xs font-normal"
                   style={{

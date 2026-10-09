@@ -281,8 +281,25 @@ export function getInactiveDisplayTitle(benefit: CoachingBenefit): string {
 export const BENEFIT_MODAL_PLACEHOLDER =
   "More detail about this benefit is coming soon.";
 
+/** Modal heading, independent of how the benefit is worded on each tier. */
+const BENEFIT_MODAL_TITLES: Record<string, string> = {
+  "custom-program": "Custom Strength Program",
+  "coachrx-app": "CoachRx App",
+  "program-cadence": "Program Refreshes",
+  "check-in": "Check-ins",
+  messaging: "Direct Messaging",
+  "one-on-one-calls": "One-on-one Calls",
+  "health-personalization": "Health History Personalization",
+  "video-form-reviews": "Video Form Review",
+  "habit-lifestyle": "Lifestyle Coaching",
+  "flare-up-adjustments": "Adaptive Programming",
+  "mobility-core": "Mobility Support",
+  "phase-planning": "Phase Planning",
+  "provider-coordination": "Coordinated Care",
+};
+
 export function getBenefitModalTitle(benefit: CoachingBenefit): string {
-  return getInactiveDisplayTitle(benefit);
+  return BENEFIT_MODAL_TITLES[benefit.id] ?? getInactiveDisplayTitle(benefit);
 }
 
 /** Short status when the same benefit is worded differently across tiers. */
