@@ -285,12 +285,37 @@ export function getBenefitModalTitle(benefit: CoachingBenefit): string {
   return getInactiveDisplayTitle(benefit);
 }
 
-export function getBenefitIncludedTierLabels(
+/** Short status when the same benefit is worded differently across tiers. */
+const BENEFIT_TIER_STATUS_OVERRIDES: Record<
+  string,
+  Partial<Record<CoachingTierId, string>>
+> = {
+  "program-cadence": {
+    foundation: "Monthly",
+    signature: "Weekly",
+    elevated: "Weekly",
+  },
+  "check-in": {
+    foundation: "Monthly",
+    signature: "Weekly",
+    elevated: "Weekly",
+  },
+  messaging: {
+    signature: "Daily",
+    elevated: "Priority",
+  },
+  "one-on-one-calls": {
+    signature: "Biweekly",
+    elevated: "Weekly",
+  },
+};
+
+export function getBenefitTierStatusLabel(
   benefit: CoachingBenefit,
-): string[] {
-  return COACHING_TIERS.filter((tier) => benefit[tier.id] !== undefined).map(
-    (tier) => tier.name,
-  );
+  tierId: CoachingTierId,
+): string {
+  if (!isBenefitIncluded(benefit, tierId)) return "Not included";
+  return BENEFIT_TIER_STATUS_OVERRIDES[benefit.id]?.[tierId] ?? "Included";
 }
 
 /** Description for structured rows — used for reserved height when inactive. */
