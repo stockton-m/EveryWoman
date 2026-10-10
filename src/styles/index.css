@@ -1,3 +1,11 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+@import './pillButtons.css';
+@import './coachingQuiz.css';
+@import './about.css';
+@import './posts.css';
+@import './services.css';
+@import './contact.css';
+@import './notFound.css';
+@import './testimonials.css';
