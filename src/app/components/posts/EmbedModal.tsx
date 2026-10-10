@@ -35,6 +35,7 @@ type EmbedModalProps = {
   onClose: () => void;
   onNext: () => void;
   onPrevious: () => void;
+  showAllPostsLink?: boolean;
 };
 
 function stopOverlayClose(event: MouseEvent) {
@@ -264,6 +265,7 @@ export function EmbedModal({
   onClose,
   onNext,
   onPrevious,
+  showAllPostsLink = false,
 }: EmbedModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -442,7 +444,19 @@ export function EmbedModal({
               className="embed-modal__side"
               onMouseDown={stopOverlayClose}
             >
-              <TextPane post={post} />
+              <div className="embed-modal__copy-stack">
+                {showAllPostsLink ? (
+                  <Link
+                    to="/posts"
+                    className="pill-btn pill-btn--ember embed-modal__all-posts inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
+                    style={{ fontFamily: SANS, textDecoration: "none" }}
+                  >
+                    See all posts
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                ) : null}
+                <TextPane post={post} />
+              </div>
               <PlatformToggles
                 members={members}
                 selectedId={post.id}

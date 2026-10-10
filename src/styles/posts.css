@@ -184,6 +184,32 @@
   height: 3.375rem;
 }
 
+.follow-squircle--compact {
+  gap: 0;
+  padding: 0.4rem;
+  border-radius: 1.15rem;
+}
+
+.follow-squircle--compact .follow-squircle__icon {
+  width: 2.15rem;
+  height: 2.15rem;
+}
+
+.follow-squircle--compact .follow-squircle__icon svg {
+  width: 1.7rem;
+  height: 1.7rem;
+}
+
+.follow-squircle--compact .follow-squircle__icon--emphasis {
+  width: 2.85rem;
+  height: 2.85rem;
+}
+
+.follow-squircle--compact .follow-squircle__icon--emphasis svg {
+  width: 2.55rem;
+  height: 2.55rem;
+}
+
 .embed-modal {
   position: fixed;
   inset: 0;
@@ -329,6 +355,14 @@
   min-width: 0;
   align-items: flex-start;
   gap: clamp(0.55rem, 1.1vw, 1.1rem);
+}
+
+.embed-modal__copy-stack {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
 }
 
 .embed-modal__copy {

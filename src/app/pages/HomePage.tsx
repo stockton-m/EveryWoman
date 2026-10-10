@@ -1,10 +1,15 @@
+import { useState } from "react";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { AboutImagePlaceholder } from "@/app/components/about/AboutImagePlaceholder";
 import { ExternalLink } from "@/app/components/ExternalLink";
+import { EmbedModal } from "@/app/components/posts/EmbedModal";
+import { FollowColumn } from "@/app/components/posts/FollowColumn";
+import { PostCard } from "@/app/components/posts/PostCard";
 import { SiteFooter } from "@/app/components/SiteFooter";
 import { SiteNav } from "@/app/components/SiteNav";
-import { ARTICLES } from "@/app/content/articles";
 import { NASM_URL } from "@/app/content/coaching";
+import { getPostLabel, posts } from "@/app/content/posts";
 import {
   BLUSH,
   BROWN,
@@ -19,8 +24,13 @@ import { useScrollToHash } from "@/app/hooks/useScrollToHash";
 import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import madeleinePortrait from "@/imports/profile.png";
 
+const latestPosts = posts.slice(0, 3);
+
 export function HomePage() {
   useScrollToHash();
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const activePost =
+    activeIndex === null ? null : (latestPosts[activeIndex] ?? null);
 
   return (
     <div style={{ fontFamily: SANS, minHeight: "100vh" }}>
@@ -193,7 +203,7 @@ export function HomePage() {
 
       <section
         id="services-teaser"
-        className="relative pt-16 pb-28 overflow-hidden"
+        className="relative pt-16 pb-40 overflow-hidden"
         style={{ background: "#2a1f1a", display: "flow-root" }}
       >
         <div className="max-w-5xl mx-auto px-6 md:px-10">
@@ -298,72 +308,119 @@ export function HomePage() {
         </div>
       </section>
 
-      <section
-        id="connect"
-        className="py-24"
-        style={{ background: "#2a1f1a" }}
-      >
+      <section id="connect" className="py-24" style={{ background: CREAM }}>
         <div className="max-w-7xl mx-auto px-6 md:px-10">
           <h2
-            className="font-bold mb-10"
+            className="mb-0 font-bold"
             style={{
               fontFamily: SERIF,
-              color: "#f5ede4",
+              color: BROWN,
               fontSize: "clamp(1.75rem, 3vw, 2.5rem)",
             }}
           >
             Latest from me
           </h2>
+          <p
+            className="mb-10 text-sm md:text-base"
+            style={{ fontFamily: MONO }}
+          >
+            <span style={{ color: SAGE }}>@everywomanhealth</span>
+            <span style={{ color: "#000" }}> / </span>
+            <span style={{ color: EMBER }}>@everywoman.io</span>
+          </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {ARTICLES.map((article, i) => (
-              <a
-                key={i}
-                href={article.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group block rounded-[2rem] p-8 transition-all duration-300 hover:-translate-y-2"
-                style={{
-                  background: "#1e1510",
-                  border: "1px solid rgba(245,237,228,0.06)",
-                  boxShadow: "0 2px 12px rgba(0,0,0,0.2)",
-                }}
-              >
-                <span
-                  className="inline-block text-[10px] font-semibold uppercase tracking-[0.18em] mb-5"
-                  style={{ color: article.accent }}
-                >
-                  Substack
-                </span>
-                <h3
-                  className="font-bold leading-snug mb-3"
-                  style={{
-                    fontFamily: SERIF,
-                    color: "#f5ede4",
-                    fontSize: "clamp(0.95rem, 1.1vw, 1.05rem)",
-                  }}
-                >
-                  {article.title}
-                </h3>
-                <p
-                  className="text-sm leading-relaxed mb-7"
-                  style={{ color: "#8c8480" }}
-                >
-                  {article.subtitle}
-                </p>
-                <div
-                  className="flex items-center gap-1.5 text-sm font-medium"
-                  style={{ color: article.accent }}
-                >
-                  Read more
-                  <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </div>
-              </a>
+            {latestPosts.map((post, index) => (
+              <PostCard
+                key={post.id}
+                label={getPostLabel(post)}
+                members={[post]}
+                onOpen={() => setActiveIndex(index)}
+                publishedAt={post.publishedAt}
+                thumbnailPost={post}
+                variant="featured"
+              />
             ))}
+          </div>
+          <div className="mt-10 flex justify-center">
+            <Link
+              to="/posts"
+              className="pill-btn pill-btn--ember inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-semibold"
+              style={{ fontFamily: SANS, textDecoration: "none" }}
+            >
+              Read more
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section
+        className="pb-12 pt-20 md:pb-14 md:pt-28"
+        style={{ background: EMBER }}
+        aria-labelledby="get-in-touch-heading"
+      >
+        <div className="max-w-7xl mx-auto px-6 md:px-10">
+          <h2
+            id="get-in-touch-heading"
+            className="home-contact-title mb-6 md:mb-2"
+            style={{ color: CREAM }}
+          >
+            Get in touch
+          </h2>
+          <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-3 md:gap-10">
+            <div className="home-contact-portrait-wrap">
+              <AboutImagePlaceholder
+                accent={CREAM}
+                shape="circle"
+                className="home-contact-portrait"
+                label="Placeholder portrait"
+              />
+            </div>
+            <div className="home-contact-copy">
+              <p
+                className="text-base leading-relaxed md:text-[17px]"
+                style={{ color: CREAM }}
+              >
+                I can&apos;t wait to hear from you. My goal is to provide
+                tailored coaching for every woman based on her lifestyle,
+                diagnoses, and training history. Please reach out to me to get
+                started.
+              </p>
+              <Link
+                to="/contact"
+                className="pill-btn pill-btn--cream-solid mt-6 inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-semibold"
+                style={{ fontFamily: SANS, textDecoration: "none" }}
+              >
+                Contact me
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <div className="flex justify-center">
+              <FollowColumn compact headingColor={CREAM} layout="grid" />
+            </div>
           </div>
         </div>
       </section>
 
       <SiteFooter />
+      <EmbedModal
+        filter={null}
+        hasNext={activeIndex !== null && activeIndex < latestPosts.length - 1}
+        hasPrevious={activeIndex !== null && activeIndex > 0}
+        members={activePost ? [activePost] : []}
+        onClose={() => setActiveIndex(null)}
+        onNext={() =>
+          setActiveIndex((index) =>
+            index === null ? index : Math.min(index + 1, latestPosts.length - 1),
+          )
+        }
+        onPrevious={() =>
+          setActiveIndex((index) =>
+            index === null ? index : Math.max(index - 1, 0),
+          )
+        }
+        showAllPostsLink
+      />
     </div>
   );
 }

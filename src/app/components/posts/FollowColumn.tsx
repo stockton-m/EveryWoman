@@ -14,11 +14,12 @@ import {
 } from "@/app/constants";
 
 type FollowLink = {
+  emphasizeIcon?: boolean;
+  external: boolean;
   href: string;
   icon: ReactNode;
   label: string;
   name: string;
-  external: boolean;
 };
 
 function EmailIcon() {
@@ -58,6 +59,7 @@ const links: FollowLink[] = [
     href: INSTAGRAM_URL,
     icon: <InstagramIcon />,
     external: true,
+    emphasizeIcon: true,
   },
   {
     name: "TikTok",
@@ -65,6 +67,7 @@ const links: FollowLink[] = [
     href: TIKTOK_URL,
     icon: <TikTokIcon />,
     external: true,
+    emphasizeIcon: true,
   },
   {
     name: "Email",
@@ -72,38 +75,69 @@ const links: FollowLink[] = [
     href: `mailto:${EMAIL_ADDRESS}`,
     icon: <EmailIcon />,
     external: false,
+    emphasizeIcon: true,
   },
 ];
 
-export function FollowColumn() {
+type FollowColumnProps = {
+  compact?: boolean;
+  headingColor?: string;
+  layout?: "stack" | "grid";
+};
+
+export function FollowColumn({
+  compact = false,
+  headingColor = BROWN,
+  layout = "stack",
+}: FollowColumnProps = {}) {
+  const isGrid = layout === "grid";
+
   return (
     <aside
       aria-labelledby="follow-me-heading"
-      className="w-full max-w-40 shrink-0 lg:w-40"
+      className={
+        isGrid
+          ? "w-full max-w-[13.5rem] shrink-0"
+          : "w-full max-w-40 shrink-0 lg:w-40"
+      }
     >
       <h2
         id="follow-me-heading"
         className="mb-4 font-bold"
         style={{
-          color: BROWN,
+          color: headingColor,
           fontFamily: SERIF,
           fontSize: "clamp(1.15rem, 2vw, 1.5rem)",
         }}
       >
         Follow me
       </h2>
-      <div className="grid grid-cols-1 gap-3">
+      <div
+        className={
+          isGrid ? "grid grid-cols-2 gap-2.5" : "grid grid-cols-1 gap-3"
+        }
+      >
         {links.map((link) => (
           <a
             key={link.name}
             href={link.href}
-            className="follow-squircle"
+            className={
+              compact ? "follow-squircle follow-squircle--compact" : "follow-squircle"
+            }
             aria-label={`${link.name}, ${link.label}`}
             {...(link.external
               ? { target: "_blank", rel: "noopener noreferrer" }
               : {})}
           >
-            <span className="follow-squircle__icon">{link.icon}</span>
+            <span
+              className={
+                compact && link.emphasizeIcon
+                  ? "follow-squircle__icon follow-squircle__icon--emphasis"
+                  : "follow-squircle__icon"
+              }
+            >
+              {link.icon}
+            </span>
           </a>
         ))}
       </div>

@@ -89,7 +89,7 @@ See `.github/workflows/sync-content.yml` for the scheduled GitHub Action. The ac
 - **Entry point:** `src/main.tsx` → renders `<App />` from `src/app/App.tsx` (React Router)
 - **Pages:** `src/app/pages/HomePage.tsx`, `src/app/pages/AboutPage.tsx`, `src/app/pages/ServicesPage.tsx`, `src/app/pages/PostsPage.tsx`, `src/app/pages/PostPage.tsx`, `src/app/pages/ContactPage.tsx`, `src/app/pages/NotFoundPage.tsx`
 - **Shared UI:** `src/app/components/SiteNav.tsx`, `SiteFooter.tsx`, `PortraitPlaceholder.tsx`, `TierComparisonGrid.tsx`
-- **Copy / tiers:** `src/app/content/coaching.ts`, `src/app/content/articles.ts`
+- **Copy / tiers:** `src/app/content/coaching.ts`
 - **External content archive:** `src/data/content-archive.json`
 - **Content synchronizer:** `scripts/content/`
 - **Constants (URLs, colors):** `src/app/constants.ts`
