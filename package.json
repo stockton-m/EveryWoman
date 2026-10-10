@@ -10,7 +10,7 @@
     "build": "vite build",
     "content:sync": "tsx scripts/content/sync.ts",
     "dev": "vite",
-    "test": "tsx --test scripts/content/__tests__/*.test.ts",
+    "test": "tsx --test scripts/content/__tests__/*.test.ts scripts/seo/__tests__/*.test.ts",
     "typecheck:content": "tsc -p tsconfig.content.json"
   },
   "dependencies": {

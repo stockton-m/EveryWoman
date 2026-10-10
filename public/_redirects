@@ -1,10 +1,2 @@
-/about      /index.html  200
-/about/     /index.html  200
-/contact    /index.html  200
-/contact/   /index.html  200
-/services   /index.html  200
-/services/  /index.html  200
-/posts      /index.html  200
-/posts/     /index.html  200
-/posts/*    /index.html  200
-/*          /404.html    404
+# Real HTML files for each route take precedence. Unknown paths serve the not-found page.
+/*    /404.html    404
