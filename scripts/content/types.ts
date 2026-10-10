@@ -1,6 +1,6 @@
 export const ARCHIVE_SCHEMA_VERSION = 1 as const;
 
-export type ContentSource = "instagram" | "substack";
+export type ContentSource = "instagram" | "substack" | "tiktok";
 export type InstagramMediaType = "CAROUSEL_ALBUM" | "IMAGE" | "VIDEO";
 export type ImageSizeName = "full" | "large" | "medium" | "small";
 
@@ -70,7 +70,19 @@ export interface InstagramPost extends ArchivePostBase {
   source: "instagram";
 }
 
-export type ArchivePost = InstagramPost | SubstackPost;
+export interface TikTokPost extends ArchivePostBase {
+  metadata: {
+    author: string;
+    caption?: string;
+    durationSeconds?: number;
+    hashtags?: string[];
+    prunedCaption?: string;
+    thumbnailPath?: string;
+  };
+  source: "tiktok";
+}
+
+export type ArchivePost = InstagramPost | SubstackPost | TikTokPost;
 
 export interface ContentArchive {
   schemaVersion: typeof ARCHIVE_SCHEMA_VERSION;

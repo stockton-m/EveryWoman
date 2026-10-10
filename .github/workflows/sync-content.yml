@@ -41,12 +41,17 @@ jobs:
       - name: Synchronize external content
         run: pnpm content:sync
         env:
+          APIFY_TASK_ID: ${{ secrets.APIFY_TASK_ID }}
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
           BEHOLD_FEED_URL: ${{ secrets.BEHOLD_FEED_URL }}
 
       - name: Detect archive changes
         id: changes
         run: |
           git add -- src/data/content-archive.json
+          if compgen -G "public/tiktok/*" > /dev/null; then
+            git add -- public/tiktok
+          fi
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "The content archive is already current."

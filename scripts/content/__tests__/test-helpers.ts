@@ -3,6 +3,7 @@ import {
   type ContentArchive,
   type InstagramPost,
   type SubstackPost,
+  type TikTokPost,
 } from "../types.js";
 
 export function emptyArchive(): ContentArchive {
@@ -56,6 +57,29 @@ export function makeInstagramPost(
       caption: "An Instagram caption #health",
       mediaType: "IMAGE",
       prunedCaption: "An Instagram caption",
+    },
+    ...overrides,
+  };
+}
+
+export function makeTikTokPost(
+  overrides: Partial<TikTokPost> = {},
+): TikTokPost {
+  const sourceId = overrides.sourceId ?? "7685236720534637837";
+  return {
+    id: `tiktok:${sourceId}`,
+    source: "tiktok",
+    sourceId,
+    sourceUrl: `https://www.tiktok.com/@everywomanhealth/video/${sourceId}`,
+    publishedAt: "2026-09-14T04:04:00.000Z",
+    description: "Feeling initimadated by the weight room, ladies?",
+    media: [],
+    metadata: {
+      author: "everywomanhealth",
+      caption: "Feeling initimadated by the weight room, ladies? #womenshealth",
+      durationSeconds: 66,
+      hashtags: ["womenshealth"],
+      prunedCaption: "Feeling initimadated by the weight room, ladies?",
     },
     ...overrides,
   };

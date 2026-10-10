@@ -17,6 +17,7 @@ import {
   type ReconciliationResult,
   type SourceReconciliationStats,
   type SubstackPost,
+  type TikTokPost,
 } from "./types.js";
 
 function emptySourceStats(): SourceReconciliationStats {
@@ -153,6 +154,26 @@ function mergeInstagramMedia(
   });
 }
 
+function mergeTikTokPost(
+  existing: TikTokPost,
+  incoming: TikTokPost,
+): TikTokPost {
+  const merged: TikTokPost = {
+    ...existing,
+    ...incoming,
+    media: mergeInstagramMedia(existing.media, incoming.media),
+    metadata: mergeDefined(existing.metadata, incoming.metadata),
+  };
+  if (incoming.description === undefined) {
+    if (existing.description === undefined) {
+      delete merged.description;
+    } else {
+      merged.description = existing.description;
+    }
+  }
+  return merged;
+}
+
 function mergePost(existing: ArchivePost, incoming: ArchivePost): ArchivePost {
   if (existing.source !== incoming.source) {
     throw new Error(
@@ -164,6 +185,9 @@ function mergePost(existing: ArchivePost, incoming: ArchivePost): ArchivePost {
   }
   if (existing.source === "instagram" && incoming.source === "instagram") {
     return mergeInstagramPost(existing, incoming);
+  }
+  if (existing.source === "tiktok" && incoming.source === "tiktok") {
+    return mergeTikTokPost(existing, incoming);
   }
   throw new Error(`Unable to reconcile post "${incoming.id}".`);
 }
@@ -217,6 +241,7 @@ export function reconcile(
   const bySource: Record<ContentSource, SourceReconciliationStats> = {
     instagram: emptySourceStats(),
     substack: emptySourceStats(),
+    tiktok: emptySourceStats(),
   };
   const seenIncoming = new Map<string, ArchivePost>();
 
@@ -271,8 +296,14 @@ export function reconcile(
     archive,
     stats: {
       bySource,
-      totalAdded: bySource.instagram.added + bySource.substack.added,
-      totalUpdated: bySource.instagram.updated + bySource.substack.updated,
+      totalAdded:
+        bySource.instagram.added +
+        bySource.substack.added +
+        bySource.tiktok.added,
+      totalUpdated:
+        bySource.instagram.updated +
+        bySource.substack.updated +
+        bySource.tiktok.updated,
       totalRecords: archive.posts.length,
     },
   };

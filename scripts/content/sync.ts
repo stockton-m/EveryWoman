@@ -2,10 +2,16 @@ import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { loadEnvFile } from "node:process";
 
+import { serializeArchive, writeArchiveAtomic } from "./archive.js";
 import { getSyncConfiguration } from "./config.js";
 import { fetchBeholdPosts } from "./providers/behold.js";
 import { fetchSubstackPosts } from "./providers/substack.js";
+import { fetchTikTokPosts } from "./providers/tiktok.js";
 import { synchronizeContent } from "./sync-service.js";
+import {
+  downloadMissingTikTokThumbnails,
+  tiktokPostsMissingThumbnails,
+} from "./tiktok-thumbnails.js";
 import type {
   ContentSource,
   SourceReconciliationStats,
@@ -18,6 +24,7 @@ const ARCHIVE_PATH = join(
   "data",
   "content-archive.json",
 );
+const TIKTOK_THUMBNAIL_DIRECTORY = join(REPOSITORY_ROOT, "public", "tiktok");
 
 function loadLocalEnvironment(): void {
   try {
@@ -58,7 +65,14 @@ function printSourceSummary(
 }
 
 function sourceLabel(source: ContentSource): string {
-  return source === "substack" ? "Substack" : "Instagram";
+  switch (source) {
+    case "substack":
+      return "Substack";
+    case "instagram":
+      return "Instagram";
+    case "tiktok":
+      return "TikTok";
+  }
 }
 
 async function main(): Promise<void> {
@@ -66,7 +80,7 @@ async function main(): Promise<void> {
   loadLocalEnvironment();
 
   // Validate private configuration before reading or modifying the archive and
-  // before either provider makes a request.
+  // before any provider makes a request.
   const configuration = getSyncConfiguration(process.env);
 
   console.log(
@@ -87,10 +101,18 @@ async function main(): Promise<void> {
         source: "instagram",
         fetchPosts: () => fetchBeholdPosts(configuration.beholdFeedUrl),
       },
+      {
+        source: "tiktok",
+        fetchPosts: () =>
+          fetchTikTokPosts({
+            taskId: configuration.apifyTaskId,
+            token: configuration.apifyToken,
+          }),
+      },
     ],
   });
 
-  for (const source of ["substack", "instagram"] as const) {
+  for (const source of ["substack", "instagram", "tiktok"] as const) {
     printSourceSummary(sourceLabel(source), result.stats.bySource[source]);
   }
 
@@ -100,12 +122,42 @@ async function main(): Promise<void> {
   console.log(`  Updated: ${result.stats.totalUpdated}`);
   console.log("  Removed: 0");
 
-  if (!result.changed) {
-    console.log("\nContent archive is already current.");
-  } else if (dryRun) {
-    console.log("\nDry run complete; the archive was not modified.");
+  const missingThumbnails = tiktokPostsMissingThumbnails(result.archive);
+  let thumbnailsWritten = false;
+  if (dryRun) {
+    console.log(
+      `\nTikTok thumbnails: ${missingThumbnails.length} posts still need a thumbnail. Dry run did not download them.`,
+    );
+  } else if (missingThumbnails.length === 0) {
+    console.log("\nTikTok thumbnails are already saved.");
   } else {
+    console.log(
+      `\nTikTok thumbnails: found ${missingThumbnails.length} posts without a thumbnail. Downloading them now (this may take a few seconds)...`,
+    );
+    const thumbnails = await downloadMissingTikTokThumbnails({
+      archive: result.archive,
+      thumbnailDirectory: TIKTOK_THUMBNAIL_DIRECTORY,
+    });
+    const serializedArchive = serializeArchive(thumbnails.archive);
+    if (serializedArchive !== serializeArchive(result.archive)) {
+      await writeArchiveAtomic(ARCHIVE_PATH, serializedArchive);
+      thumbnailsWritten = true;
+    }
+    console.log(
+      `\nTikTok thumbnails: downloaded ${thumbnails.downloaded}, failed ${thumbnails.failed}.`,
+    );
+  }
+
+  if (dryRun) {
+    console.log(
+      result.changed
+        ? "\nDry run complete; the archive was not modified."
+        : "\nContent archive is already current.",
+    );
+  } else if (result.changed || thumbnailsWritten) {
     console.log("\nContent archive updated.");
+  } else {
+    console.log("\nContent archive is already current.");
   }
 }
 

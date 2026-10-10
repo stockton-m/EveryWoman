@@ -177,6 +177,27 @@ function assertMedia(
   }
 }
 
+function assertTikTokThumbnailPath(
+  thumbnailPath: unknown,
+  sourceId: string,
+  field: string,
+): void {
+  if (thumbnailPath === undefined) {
+    return;
+  }
+
+  const allowedPaths = new Set([
+    `tiktok/${sourceId}.jpg`,
+    `tiktok/${sourceId}.png`,
+    `tiktok/${sourceId}.webp`,
+  ]);
+  if (typeof thumbnailPath !== "string" || !allowedPaths.has(thumbnailPath)) {
+    throw new Error(
+      `Invalid content archive: ${field}.metadata.thumbnailPath must match the post sourceId.`,
+    );
+  }
+}
+
 function assertStringArray(value: unknown, field: string): void {
   if (
     !Array.isArray(value) ||
@@ -200,7 +221,11 @@ export function assertArchivePost(
   assertIsoTimestamp(value.publishedAt, `${field}.publishedAt`);
   assertOptionalString(value.description, `${field}.description`);
 
-  if (value.source !== "instagram" && value.source !== "substack") {
+  if (
+    value.source !== "instagram" &&
+    value.source !== "substack" &&
+    value.source !== "tiktok"
+  ) {
     throw new Error(`Invalid content archive: ${field}.source is invalid.`);
   }
   if (value.id !== `${value.source}:${value.sourceId}`) {
@@ -226,6 +251,39 @@ export function assertArchivePost(
     assertNonemptyString(value.title, `${field}.title`);
     assertNonemptyString(value.bodyHtml, `${field}.bodyHtml`);
     assertOptionalString(value.metadata.author, `${field}.metadata.author`);
+    return;
+  }
+
+  if (value.source === "tiktok") {
+    assertNonemptyString(value.metadata.author, `${field}.metadata.author`);
+    assertOptionalString(value.metadata.caption, `${field}.metadata.caption`);
+    assertOptionalString(
+      value.metadata.prunedCaption,
+      `${field}.metadata.prunedCaption`,
+    );
+    const durationSeconds = value.metadata.durationSeconds;
+    if (durationSeconds !== undefined) {
+      if (
+        typeof durationSeconds !== "number" ||
+        !Number.isFinite(durationSeconds) ||
+        durationSeconds < 0
+      ) {
+        throw new Error(
+          `Invalid content archive: ${field}.metadata.durationSeconds must be zero or greater.`,
+        );
+      }
+    }
+    if (value.metadata.hashtags !== undefined) {
+      assertStringArray(
+        value.metadata.hashtags,
+        `${field}.metadata.hashtags`,
+      );
+    }
+    assertTikTokThumbnailPath(
+      value.metadata.thumbnailPath,
+      value.sourceId,
+      field,
+    );
     return;
   }
 
