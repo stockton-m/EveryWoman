@@ -17,6 +17,7 @@ const NAV_ITEMS: {
 }[] = [
   { label: "About", to: "/about" },
   { label: "Services", to: "/services" },
+  { label: "Posts", to: "/posts" },
   { label: "Connect", hash: "connect" },
   { label: "Podcast", placeholder: true },
 ];

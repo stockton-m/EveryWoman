@@ -102,6 +102,7 @@ See `.github/workflows/sync-content.yml` for the scheduled GitHub Action. The ac
 | Accent (ember) | `#c4622d` |
 | Background cream | `#f5ede4` |
 | Sage green (hero) | `#7a9e7e` |
+| Pink (blush) | `#e8c4b0` |
 | Dark brown | `#2a1f1a` |
 | Heading font | Playfair Display (serif) |
 | Body font | DM Sans (sans-serif) |
