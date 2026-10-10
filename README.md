@@ -43,11 +43,46 @@ npx netlify-cli deploy --dir=dist --prod
 
 **Netlify SPA routing:** `public/_redirects` is copied into `dist/` on build so direct links like `/services` resolve to `index.html`.
 
+### External content synchronization
+We build static content from a single content archive file, `src/data/content-archive.json`. This is an append-only compilation of Substack, Instagram, and TikTok (manual) from the relevant EveryWoman accounts. We use this archive to build `/posts` and `/posts/:id` pages.
+
+A GitHub Action runs once per day to update the archive. You can run it manually via `pnpm content:sync [--dry-run]`. Data sources:
+* Substack: https://everywomanhealth.substack.com/feed
+* Instagram: [Behold](https://behold.so/)
+* TikTok: hardcoded, since TikTok doesn't have a RSS or a third-party automated feed service
+
+For testing locally, create an `.env` file and set your `BEHOLD_FEED_URL`, it will look something like `https://feeds.behold.so/YOUR_FEED_ID`. When the real pipeline runs, `BEHOLD_FEED_URL` needs to be set an environment variable. The URL itself is the only identifier needed - Behold updates the feed on their backend, and the URL can be access by anyone. You should still treat the URL as a secret because under Behold's free tier the URL only allows 1200 view per month.
+
+The synchronizer performs no Git operations. It validates both sources before reconciling in memory, writes once only after both providers succeed, keeps records that are no longer in either recent-content feed, and preserves an archived Substack slug when upstream titles or URLs change. Keep in mind that additions and edits to known Substack posts will update the archive, but deletion is manual - the compilation logic is _greedy_. When a post falls off one of the content sources, it isn't automatically deleted from the checked-in archive.
+
+Recommended local validation:
+
+```bash
+# Create .env and add the real Behold feed URL
+
+# validate env
+pnpm test
+pnpm typecheck:content
+
+# dry run
+pnpm content:sync --dry-run
+cat src/data/content-archive.json
+
+# update for realz
+pnpm content:sync
+git diff -- src/data/content-archive.json
+# if you run pnpm content:sync again within a few seconds, there should be no diff
+```
+
+See `.github/workflows/sync-content.yml` for scheduled GitHub Action. The action only commits the archive JSON when there are changes, and then a subsequent Netlify build will deploy updates to the site. GitHub will need a repository secret named `BEHOLD_FEED_URL` in order for this action to run.
+
 ### Where everything lives
 - **Entry point:** `src/main.tsx` → renders `<App />` from `src/app/App.tsx` (React Router)
 - **Pages:** `src/app/pages/HomePage.tsx`, `src/app/pages/AboutPage.tsx`, `src/app/pages/ServicesPage.tsx`
 - **Shared UI:** `src/app/components/SiteNav.tsx`, `SiteFooter.tsx`, `PortraitPlaceholder.tsx`, `TierComparisonGrid.tsx`
 - **Copy / tiers:** `src/app/content/coaching.ts`, `src/app/content/articles.ts`
+- **External content archive:** `src/data/content-archive.json`
+- **Content synchronizer:** `scripts/content/`
 - **Constants (URLs, colors):** `src/app/constants.ts`
 - **Images:** `src/imports/` — `logo.png` (nav/footer) and `profile.png` (about card portrait). Services sections use `PortraitPlaceholder` until a dedicated photo is added.
 - **Styles:** `src/styles/` — `index.css` imports `fonts.css`, `tailwind.css`, and `theme.css`. Brand colors are defined as CSS variables in `theme.css` and applied as inline `style` props in components.

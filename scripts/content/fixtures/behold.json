@@ -1,0 +1,138 @@
+{
+  "username": "everywoman.io",
+  "posts": [
+    {
+      "id": "video-123",
+      "timestamp": "2026-09-21T10:30:00+0000",
+      "permalink": "https://www.instagram.com/reel/video-123/",
+      "mediaType": "VIDEO",
+      "isReel": true,
+      "mediaUrl": "https://cdn.example.com/video-123.mp4",
+      "thumbnailUrl": "https://cdn.example.com/video-123-thumbnail.jpg",
+      "caption": "A reel caption #strength",
+      "prunedCaption": "A reel caption",
+      "altText": "A woman demonstrating an exercise",
+      "hashtags": ["strength"],
+      "mentions": [],
+      "likeCount": 24,
+      "commentsCount": 3,
+      "colorPalette": {
+        "dominant": "100,110,120"
+      },
+      "sizes": {
+        "small": {
+          "mediaUrl": "https://behold.pictures/video-123/small.webp",
+          "height": 400,
+          "width": 225
+        },
+        "medium": {
+          "mediaUrl": "https://behold.pictures/video-123/medium.webp",
+          "height": 700,
+          "width": 394
+        },
+        "large": {
+          "mediaUrl": "https://behold.pictures/video-123/large.webp",
+          "height": 1000,
+          "width": 563
+        },
+        "full": {
+          "mediaUrl": "https://behold.pictures/video-123/full.webp",
+          "height": 1920,
+          "width": 1080
+        }
+      }
+    },
+    {
+      "id": "carousel-456",
+      "timestamp": "2026-09-20T09:15:00+0000",
+      "permalink": "https://www.instagram.com/p/carousel-456/",
+      "mediaType": "CAROUSEL_ALBUM",
+      "mediaUrl": "https://cdn.example.com/carousel-456.jpg",
+      "caption": "Two useful slides #health",
+      "prunedCaption": "Two useful slides",
+      "hashtags": ["health"],
+      "mentions": ["everywoman.io"],
+      "sizes": {
+        "small": {
+          "mediaUrl": "https://behold.pictures/carousel-456/small.webp",
+          "height": 400,
+          "width": 400
+        },
+        "medium": {
+          "mediaUrl": "https://behold.pictures/carousel-456/medium.webp",
+          "height": 700,
+          "width": 700
+        },
+        "large": {
+          "mediaUrl": "https://behold.pictures/carousel-456/large.webp",
+          "height": 1000,
+          "width": 1000
+        },
+        "full": {
+          "mediaUrl": "https://behold.pictures/carousel-456/full.webp",
+          "height": 1080,
+          "width": 1080
+        }
+      },
+      "children": [
+        {
+          "id": "carousel-child-image",
+          "mediaType": "IMAGE",
+          "mediaUrl": "https://cdn.example.com/carousel-child-image.jpg",
+          "altText": "The first slide",
+          "sizes": {
+            "small": {
+              "mediaUrl": "https://behold.pictures/carousel-child-image/small.webp",
+              "height": 400,
+              "width": 400
+            },
+            "medium": {
+              "mediaUrl": "https://behold.pictures/carousel-child-image/medium.webp",
+              "height": 700,
+              "width": 700
+            },
+            "large": {
+              "mediaUrl": "https://behold.pictures/carousel-child-image/large.webp",
+              "height": 1000,
+              "width": 1000
+            },
+            "full": {
+              "mediaUrl": "https://behold.pictures/carousel-child-image/full.webp",
+              "height": 1080,
+              "width": 1080
+            }
+          }
+        },
+        {
+          "id": "carousel-child-video",
+          "mediaType": "VIDEO",
+          "mediaUrl": "https://cdn.example.com/carousel-child-video.mp4",
+          "thumbnailUrl": "https://cdn.example.com/carousel-child-video.jpg",
+          "altText": "The second slide",
+          "sizes": {
+            "small": {
+              "mediaUrl": "https://behold.pictures/carousel-child-video/small.webp",
+              "height": 400,
+              "width": 400
+            },
+            "medium": {
+              "mediaUrl": "https://behold.pictures/carousel-child-video/medium.webp",
+              "height": 700,
+              "width": 700
+            },
+            "large": {
+              "mediaUrl": "https://behold.pictures/carousel-child-video/large.webp",
+              "height": 1000,
+              "width": 1000
+            },
+            "full": {
+              "mediaUrl": "https://behold.pictures/carousel-child-video/full.webp",
+              "height": 1080,
+              "width": 1080
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
