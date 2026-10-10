@@ -9,6 +9,11 @@ import {
 } from "@/app/content/posts";
 import { BROWN, CREAM, EMBER, SANS, SERIF, STONE } from "@/app/constants";
 
+const substackLinkClass =
+  "pill-btn pill-btn--ember inline-flex items-center gap-1.5 rounded-full border border-transparent px-5 py-2 text-sm font-semibold";
+
+const pillLinkStyle = { fontFamily: SANS, textDecoration: "none" };
+
 export function PostPage() {
   const { id } = useParams();
   const post = id ? findSubstackPost(id) : undefined;
@@ -32,14 +37,28 @@ export function PostPage() {
       </header>
 
       <main className="mx-auto max-w-3xl px-6 pb-20 pt-10 md:px-10 md:pt-14">
-        <Link
-          to="/posts"
-          className="mb-8 inline-flex items-center gap-1.5 text-sm font-medium"
-          style={{ color: BROWN, fontFamily: SANS, textDecoration: "none" }}
-        >
-          <ArrowLeft className="h-4 w-4" />
-          All posts
-        </Link>
+        <div className="mb-14 flex items-center justify-between gap-4">
+          <Link
+            to="/posts"
+            className="pill-btn pill-btn--subscribe-light inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium"
+            style={pillLinkStyle}
+          >
+            <ArrowLeft className="h-4 w-4" />
+            All posts
+          </Link>
+          {post ? (
+            <a
+              href={post.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${substackLinkClass} shrink-0`}
+              style={pillLinkStyle}
+            >
+              Read on Substack
+              <ArrowUpRight className="h-4 w-4" />
+            </a>
+          ) : null}
+        </div>
 
         {post ? (
           <article>
@@ -77,16 +96,18 @@ export function PostPage() {
               className="post-body mt-10"
               dangerouslySetInnerHTML={{ __html: post.bodyHtml }}
             />
-            <a
-              href={post.sourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-12 inline-flex items-center gap-1.5 text-sm font-semibold"
-              style={{ color: EMBER, fontFamily: SANS, textDecoration: "none" }}
-            >
-              Read on Substack
-              <ArrowUpRight className="h-4 w-4" />
-            </a>
+            <div className="mt-12 flex justify-center">
+              <a
+                href={post.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={substackLinkClass}
+                style={pillLinkStyle}
+              >
+                Read on Substack
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
+            </div>
           </article>
         ) : (
           <div>
