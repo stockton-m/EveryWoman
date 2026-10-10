@@ -15,8 +15,10 @@ This is a **static multi-page React website** (client-side routing). There is no
 - `/` — Home (hero, about, services teaser, latest from me)
 - `/about` — Madeleine's story, influences, and personal photo collage
 - `/services` — Coaching tiers and consultation CTA
+- `/contact` — How to reach Madeleine
 - `/posts` — Recent posts and the full archive (Substack articles, Instagram, and TikTok)
-- `/posts/:id` — A Substack article rendered from the content archive
+- `/posts/:id` — A Substack article rendered from the content archive. An unknown id shows the not-found page.
+- Any other path — Not-found page
 
 ### Who the author is
 Madeleine Stockton is the founder and is **not technical**. She communicates changes conversationally (e.g. "make the photo smaller", "change this text to..."). All code changes should be made by the AI agent — she should never need to edit code manually.
@@ -43,7 +45,7 @@ This creates a `dist/` folder. Drag that folder onto Netlify, or deploy via the 
 npx netlify-cli deploy --dir=dist --prod
 ```
 
-**Netlify SPA routing:** `public/_redirects` is copied into `dist/` on build so direct links like `/services` resolve to `index.html`.
+**Netlify routing:** `public/_redirects` is copied into `dist/` on build. Known routes such as `/services` rewrite to `index.html` with status 200. Any other path serves `dist/404.html` (a copy of the built `index.html`) with status 404, and the app renders the not-found page. `pnpm dev` shows that same page for unknown paths through the client-side catch-all route.
 
 ### External content synchronization
 We build static content from a single content archive file, `src/data/content-archive.json`. This is an append-only compilation of Substack, Instagram, and TikTok from the relevant EveryWoman accounts. We use this archive to build `/posts` and `/posts/:id` pages.
@@ -85,7 +87,7 @@ See `.github/workflows/sync-content.yml` for the scheduled GitHub Action. The ac
 
 ### Where everything lives
 - **Entry point:** `src/main.tsx` → renders `<App />` from `src/app/App.tsx` (React Router)
-- **Pages:** `src/app/pages/HomePage.tsx`, `src/app/pages/AboutPage.tsx`, `src/app/pages/ServicesPage.tsx`, `src/app/pages/PostsPage.tsx`, `src/app/pages/PostPage.tsx`
+- **Pages:** `src/app/pages/HomePage.tsx`, `src/app/pages/AboutPage.tsx`, `src/app/pages/ServicesPage.tsx`, `src/app/pages/PostsPage.tsx`, `src/app/pages/PostPage.tsx`, `src/app/pages/ContactPage.tsx`, `src/app/pages/NotFoundPage.tsx`
 - **Shared UI:** `src/app/components/SiteNav.tsx`, `SiteFooter.tsx`, `PortraitPlaceholder.tsx`, `TierComparisonGrid.tsx`
 - **Copy / tiers:** `src/app/content/coaching.ts`, `src/app/content/articles.ts`
 - **External content archive:** `src/data/content-archive.json`
