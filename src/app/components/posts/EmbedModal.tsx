@@ -13,12 +13,14 @@ import { newerPost } from "@/app/content/postGroups";
 import {
   formatPostDate,
   getEmbedUrl,
+  getPlatformColor,
   getPlatformLabel,
   getPostLabel,
   getPostPlainText,
   getPostThumbnail,
   isSubstackPost,
   type ArchivePost,
+  type PostSource,
   type SubstackArticle,
 } from "@/app/content/posts";
 import { EMBER, SANS, SERIF, STONE } from "@/app/constants";
@@ -26,6 +28,7 @@ import { EMBER, SANS, SERIF, STONE } from "@/app/constants";
 const TITLE_ID = "post-embed-modal-title";
 
 type EmbedModalProps = {
+  filter: PostSource | null;
   hasNext: boolean;
   hasPrevious: boolean;
   members: ArchivePost[];
@@ -254,6 +257,7 @@ function ChevronButton({
 }
 
 export function EmbedModal({
+  filter,
   hasNext,
   hasPrevious,
   members,
@@ -276,10 +280,10 @@ export function EmbedModal({
   hasNextRef.current = hasNext;
   hasPreviousRef.current = hasPrevious;
 
-  const groupKey = members
+  const groupKey = `${members
     .map((member) => member.id)
     .sort()
-    .join("|");
+    .join("|")}:${filter ?? ""}`;
   const [selection, setSelection] = useState<{
     groupKey: string;
     postId: string | null;
@@ -290,8 +294,12 @@ export function EmbedModal({
     setSelection({ groupKey, postId: null });
   }
 
+  const filteredMember = filter
+    ? members.find((member) => member.source === filter)
+    : undefined;
   const post =
     members.find((member) => member.id === selectedId) ??
+    filteredMember ??
     (members.length > 0 ? newerPost(members) : null);
   const isOpen = post !== null;
 
@@ -385,16 +393,27 @@ export function EmbedModal({
       role="presentation"
       onMouseDown={onClose}
     >
-      <button
-        ref={closeButtonRef}
-        type="button"
-        onClick={onClose}
-        onMouseDown={stopOverlayClose}
-        className="embed-modal__close"
-        aria-label="Close"
-      >
-        <X className="h-6 w-6" />
-      </button>
+      <div className="embed-modal__toolbar">
+        {filter ? (
+          <p className="embed-modal__filter-pill" style={{ fontFamily: SANS }}>
+            Filtering to{" "}
+            <span style={{ color: getPlatformColor(filter) }}>
+              {getPlatformLabel(filter)}
+            </span>{" "}
+            posts only
+          </p>
+        ) : null}
+        <button
+          ref={closeButtonRef}
+          type="button"
+          onClick={onClose}
+          onMouseDown={stopOverlayClose}
+          className="embed-modal__close"
+          aria-label="Close"
+        >
+          <X className="h-6 w-6" />
+        </button>
+      </div>
       <div
         role="dialog"
         aria-modal="true"

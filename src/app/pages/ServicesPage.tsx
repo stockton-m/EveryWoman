@@ -2,6 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import { CoachingQuiz } from "@/app/components/CoachingQuiz";
 import { ExternalLink } from "@/app/components/ExternalLink";
 import { PortraitPlaceholder } from "@/app/components/PortraitPlaceholder";
+import { ServicesGuideLine } from "@/app/components/services/ServicesGuideLine";
 import { SiteFooter } from "@/app/components/SiteFooter";
 import { SiteNav } from "@/app/components/SiteNav";
 import { TestimonialMarquee } from "@/app/components/TestimonialMarquee";
@@ -18,6 +19,7 @@ import { CONSULTATION_URL, SANS, SERIF, STONE } from "@/app/constants";
 export function ServicesPage() {
   return (
     <div
+      className="services-page"
       style={{
         fontFamily: SANS,
         minHeight: "100vh",
@@ -25,17 +27,16 @@ export function ServicesPage() {
         overflowX: "clip",
       }}
     >
+      <ServicesGuideLine />
+
       <header
-        className="border-b"
-        style={{
-          background: "#f5ede4",
-          borderColor: "rgba(42,31,26,0.06)",
-        }}
+        className="services-page__header border-b"
+        style={{ borderColor: "rgba(42,31,26,0.06)" }}
       >
         <SiteNav variant="light" />
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 md:px-10 pt-10 pb-20">
+      <main className="services-page__main max-w-7xl mx-auto px-6 md:px-10 pt-10 pb-20">
         <div className="flex flex-col items-center text-center mb-6">
           <PortraitPlaceholder size="clamp(7rem, 14vw, 10rem)" className="mb-8" />
 
@@ -110,7 +111,9 @@ export function ServicesPage() {
         </p>
       </main>
 
-      <SiteFooter />
+      <div className="services-page__footer">
+        <SiteFooter />
+      </div>
     </div>
   );
 }
