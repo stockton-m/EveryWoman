@@ -83,7 +83,7 @@ git diff -- src/data/content-archive.json public/tiktok
 # if you run pnpm content:sync again within a few seconds, there should be no diff
 ```
 
-See `.github/workflows/sync-content.yml` for the scheduled GitHub Action. The action commits the archive JSON and any new TikTok thumbnails when there are changes, and then a subsequent Netlify build will deploy updates to the site. GitHub needs repository secrets named `BEHOLD_FEED_URL`, `APIFY_TOKEN`, and `APIFY_TASK_ID`. Set `APIFY_TASK_ID` to `everywoman~everywoman-tiktok`. The pipeline is diagrammed in [docs/content-archive-pipeline.md](docs/content-archive-pipeline.md).
+See `.github/workflows/sync-content.yml` for the scheduled GitHub Action. The action commits the archive JSON and any new TikTok thumbnails when there are changes, and then a subsequent Netlify build will deploy updates to the site. GitHub needs repository secrets named `BEHOLD_FEED_URL`, `APIFY_TOKEN`, and `APIFY_TASK_ID`. Set `APIFY_TASK_ID` to `everywoman~everywoman-tiktok`. The pipeline is diagrammed in [docs/content-archive-pipeline.md](docs/content-archive-pipeline.md). `.github/workflows/ci.yml` runs `pnpm test`, `pnpm typecheck:content`, and `pnpm build` on pull requests and pushes to the default branch, and it does not use those content-sync secrets.
 
 ### Where everything lives
 - **Entry point:** `src/main.tsx` → renders `<App />` from `src/app/App.tsx` (React Router)
