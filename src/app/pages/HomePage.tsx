@@ -44,7 +44,7 @@ export function HomePage() {
 
         <SiteNav variant="hero" />
 
-        <div className="relative z-20 max-w-7xl mx-auto px-6 md:px-10 w-full pt-10 md:pt-14 flex-shrink-0">
+        <div className="relative z-20 max-w-7xl mx-auto px-6 md:px-10 w-full pt-16 md:pt-24 flex-shrink-0">
           <h1
             className="font-bold text-center leading-[0.9]"
             style={{
@@ -58,7 +58,7 @@ export function HomePage() {
             <em style={{ fontStyle: "italic" }}>isn&apos;t your ceiling.</em>
           </h1>
 
-          <div className="text-center mt-6 pb-32">
+          <div className="text-center mt-10 pb-32">
             <p
               className="text-base leading-relaxed mb-6 mx-auto"
               style={{ color: "rgba(245,237,228,0.78)", maxWidth: "480px" }}

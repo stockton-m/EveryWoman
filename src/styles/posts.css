@@ -309,6 +309,10 @@
   object-fit: cover;
 }
 
+.embed-modal__player iframe {
+  height: calc(100% + 2px);
+}
+
 .embed-modal__player-empty {
   display: flex;
   height: 100%;

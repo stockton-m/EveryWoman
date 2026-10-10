@@ -1,5 +1,5 @@
 import { ArrowUpRight } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import { SANS, SERIF, SUBSTACK_URL } from "@/app/constants";
 import logoImage from "@/imports/logo.png";
@@ -12,13 +12,12 @@ type SiteNavProps = {
 const NAV_ITEMS: {
   label: string;
   to?: string;
-  hash?: string;
   placeholder?: boolean;
 }[] = [
   { label: "About", to: "/about" },
   { label: "Services", to: "/services" },
   { label: "Posts", to: "/posts" },
-  { label: "Connect", hash: "connect" },
+  { label: "Contact", to: "/contact" },
   { label: "Podcast", placeholder: true },
 ];
 
@@ -26,8 +25,6 @@ const navPillClass =
   "pill-btn pill-btn--ember inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium";
 
 export function SiteNav({ variant = "hero" }: SiteNavProps) {
-  const location = useLocation();
-  const onHome = location.pathname === "/";
   const isHero = variant === "hero";
 
   const logoColor = isHero ? "#f5ede4" : "#2a1f1a";
@@ -35,8 +32,6 @@ export function SiteNav({ variant = "hero" }: SiteNavProps) {
   const logoBorder = isHero
     ? "2px solid rgba(245,237,228,0.5)"
     : "2px solid rgba(42,31,26,0.08)";
-
-  const hashLink = (hash: string) => (onHome ? `#${hash}` : `/#${hash}`);
 
   return (
     <nav className="relative z-30 flex-shrink-0">
@@ -92,18 +87,6 @@ export function SiteNav({ variant = "hero" }: SiteNavProps) {
                 <Link
                   key={item.label}
                   to={item.to}
-                  className={navPillClass}
-                  style={{ fontFamily: SANS, textDecoration: "none" }}
-                >
-                  {item.label}
-                </Link>
-              );
-            }
-            if (item.hash) {
-              return (
-                <Link
-                  key={item.label}
-                  to={hashLink(item.hash)}
                   className={navPillClass}
                   style={{ fontFamily: SANS, textDecoration: "none" }}
                 >
