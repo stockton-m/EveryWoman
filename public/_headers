@@ -1,0 +1,37 @@
+/
+  Link: </llms.txt>; rel="describedby"
+
+/about
+  Link: </llms.txt>; rel="describedby"
+
+/about/
+  Link: </llms.txt>; rel="describedby"
+
+/services
+  Link: </llms.txt>; rel="describedby"
+
+/services/
+  Link: </llms.txt>; rel="describedby"
+
+/contact
+  Link: </llms.txt>; rel="describedby"
+
+/contact/
+  Link: </llms.txt>; rel="describedby"
+
+/posts
+  Link: </llms.txt>; rel="describedby"
+
+/posts/
+  Link: </llms.txt>; rel="describedby"
+
+/posts/*
+  Link: </llms.txt>; rel="describedby"
+
+/*.md
+  Content-Type: text/markdown; charset=utf-8
+  X-Robots-Tag: noindex
+
+/posts/*.md
+  Content-Type: text/markdown; charset=utf-8
+  X-Robots-Tag: noindex

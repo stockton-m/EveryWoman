@@ -1,9 +1,27 @@
 import {
+  CONSULTATION_URL,
+  CONTACT_INTRO,
   EMAIL_ADDRESS,
   INSTAGRAM_URL,
   SUBSTACK_URL,
   TIKTOK_URL,
 } from "../constants";
+import {
+  ABOUT_BACKGROUND,
+  ABOUT_COLLAGE_ITEMS,
+  ABOUT_ETHOS_INTRO,
+  ABOUT_PROFILES,
+} from "../content/about";
+import {
+  COACHING_BENEFITS,
+  COACHING_DISCLAIMER_PREFIX,
+  COACHING_DISCLAIMER_SUFFIX,
+  COACHING_INTRO_PARAGRAPHS,
+  COACHING_TIERS,
+  NASM_URL,
+  type CoachingTierId,
+  type TierBenefitCopy,
+} from "../content/coaching";
 
 export const SITE_URL = "https://everywoman.io";
 export const SITE_NAME = "EveryWoman";
@@ -27,6 +45,18 @@ const NOT_FOUND_TITLE = `Page not found · ${SITE_NAME}`;
 const NOT_FOUND_DESCRIPTION =
   "The link may be out of date, or the page may have moved.";
 const ARTICLE_DESCRIPTION_FALLBACK = "An essay from EveryWoman.";
+const SERVICE_SCHEMA_DESCRIPTION =
+  "Strength training coaching for women navigating endometriosis, PMOS, pre/postpartum recovery, and hormonal transitions. Tiers are Foundation, Signature, and Elevated. Coaching is from a NASM Certified Personal Trainer and is not a substitute for medical care.";
+const FACTS_PATHS = new Set(["/", "/about", "/services", "/contact"]);
+const LLMS_PAGE_NOTES: Record<string, string> = {
+  "/": `${HOME_DESCRIPTION} Includes coaching tiers, credentials, and how to get in touch.`,
+  "/about": "Madeleine Stockton's story.",
+  "/services":
+    "Who coaching is for, and the Foundation, Signature, and Elevated tiers.",
+  "/contact": "Email Madeleine Stockton, or book a free consultation.",
+  "/posts":
+    "Essays on endometriosis, pelvic health, and training, plus Instagram and TikTok.",
+};
 
 const SAME_AS = [SUBSTACK_URL, INSTAGRAM_URL, TIKTOK_URL];
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -99,12 +129,12 @@ export function articlesFromArchive(archive: ArchiveInput): SeoArticle[] {
 }
 
 export function indexablePages(articles: SeoArticle[]): SeoPage[] {
-  return [...staticPages(), ...articles.map(articlePage)];
+  return [...staticPages(articles), ...articles.map(articlePage)];
 }
 
 export function pageForPath(pathname: string, articles: SeoArticle[]): SeoPage {
   const path = normalizePath(pathname);
-  const staticPage = staticPages().find((page) => page.path === path);
+  const staticPage = staticPages(articles).find((page) => page.path === path);
   if (staticPage) return staticPage;
 
   const slug = slugFromPath(path);
@@ -186,13 +216,14 @@ export function renderSitemap(pages: SeoPage[]): string {
 }
 
 export function renderLlmsTxt(articles: SeoArticle[]): string {
-  const pages = staticPages();
+  const pages = staticPages(articles);
   const pageLines = pages.map(
-    (page) => `- [${linkText(page.documentTitle)}](${canonicalUrl(page.path)}): ${oneLine(page.description)}`,
+    (page) =>
+      `- [${linkText(page.documentTitle)}](${markdownUrl(page.path)}): ${LLMS_PAGE_NOTES[page.path] ?? oneLine(page.description)}`,
   );
   const articleLines = articles.map((article) => {
     const description = article.description || ARTICLE_DESCRIPTION_FALLBACK;
-    return `- [${linkText(article.title)}](${canonicalUrl(`/posts/${article.slug}`)}): ${oneLine(description)}`;
+    return `- [${linkText(article.title)}](${markdownUrl(`/posts/${article.slug}`)}): ${oneLine(description)}`;
   });
 
   return [
@@ -200,7 +231,14 @@ export function renderLlmsTxt(articles: SeoArticle[]): string {
     "",
     `> ${HOME_DESCRIPTION}`,
     "",
-    `${FOUNDER_NAME} founded ${SITE_NAME} to coach strength training and movement for women living with endometriosis, PMOS, pre/postpartum symptoms, and hormonal transitions.`,
+    `${FOUNDER_NAME} coaches strength training for women with endometriosis, PMOS, pre/postpartum recovery, and hormonal transitions. She is a NASM Certified Personal Trainer. Coaching is not medical care.`,
+    "",
+    "ARE YOU AN AGENT?",
+    "Most content of the site is mirrored in markdown for your ease of access. Where to look:",
+    `* [Coaching services](${markdownUrl("/services")}) for who it is for and the three tiers`,
+    `* [About](${markdownUrl("/about")}) for information on Madeleine's background and her story`,
+    `* [Contact](${markdownUrl("/contact")}) for email and the free consultation`,
+    `* [Posts](${markdownUrl("/posts")}) for essays and social media posts`,
     "",
     "## Pages",
     "",
@@ -213,9 +251,47 @@ export function renderLlmsTxt(articles: SeoArticle[]): string {
   ].join("\n");
 }
 
-function staticPages(): SeoPage[] {
+export function markdownUrl(pagePath: string): string {
+  if (pagePath === "/") return `${SITE_URL}/index.md`;
+  return `${SITE_URL}${pagePath}.md`;
+}
+
+export function markdownForUrl(url: string, articles: SeoArticle[]): string | undefined {
+  const pathOnly = url.split("?")[0]?.split("#")[0] ?? "";
+  if (!pathOnly.endsWith(".md")) return undefined;
+  const stem = pathOnly.slice(0, -".md".length).replace(/\/$/, "");
+  const pagePath = stem === "/index" ? "/" : normalizePath(stem);
+  const page = pageForPath(pagePath, articles);
+  if (page.robots.includes("noindex")) return undefined;
+  if (markdownUrl(page.path) !== `${SITE_URL}${pathOnly}`) return undefined;
+  return renderPageMarkdown(page, articles);
+}
+
+export function renderPageMarkdown(page: SeoPage, articles: SeoArticle[]): string {
+  if (page.type === "article") return articleMarkdown(page, articles);
+
+  const lines = [
+    `# ${linkText(page.documentTitle)}`,
+    "",
+    `> ${oneLine(page.description)}`,
+    "",
+    `Markdown alternate of ${canonicalUrl(page.path)}.`,
+    "",
+  ];
+
+  if (page.path === "/about") lines.push(aboutStoryMarkdown(), "");
+  if (page.path === "/contact") lines.push(contactLeadMarkdown(), "");
+  if (page.path === "/posts") lines.push(postsIndexMarkdown(articles), "");
+  if (FACTS_PATHS.has(page.path)) {
+    lines.push(coachingFactsMarkdown({ benefits: page.path === "/services" }));
+  }
+
+  return `${lines.join("\n").trim()}\n`;
+}
+
+function staticPages(articles: SeoArticle[]): SeoPage[] {
   return STATIC_PAGE_COPY.map((page) => ({
-    crawlableHtml: crawlableSummary(page.headlineHtml, page.description),
+    crawlableHtml: crawlablePageHtml(page, articles),
     description: page.description,
     documentTitle: page.documentTitle,
     jsonLd: page.jsonLd,
@@ -284,7 +360,7 @@ const STATIC_PAGE_COPY: StaticPageCopy[] = [
       "@type": "Service",
       name: "EveryWoman coaching",
       serviceType: "Strength training coaching",
-      description: SERVICES_DESCRIPTION,
+      description: SERVICE_SCHEMA_DESCRIPTION,
       url: `${SITE_URL}/services/`,
       provider: {
         "@type": "Organization",
@@ -375,12 +451,273 @@ function crawlableSummary(headlineHtml: string, description: string): string {
   return `<main><h1>${headlineHtml}</h1><p>${escapeHtml(description)}</p></main>`;
 }
 
+function crawlablePageHtml(page: StaticPageCopy, articles: SeoArticle[]): string {
+  const chunks = [
+    `<h1>${page.headlineHtml}</h1>`,
+    `<p>${escapeHtml(page.description)}</p>`,
+  ];
+  if (page.path === "/about") chunks.push(aboutStoryHtml());
+  if (page.path === "/contact") chunks.push(contactLeadHtml());
+  if (page.path === "/posts") chunks.push(postsIndexHtml(articles));
+  if (FACTS_PATHS.has(page.path)) {
+    chunks.push(coachingFactsHtml({ benefits: page.path === "/services" }));
+  }
+  return `<main>${chunks.join("")}</main>`;
+}
+
+function coachingFactsHtml(options: { benefits: boolean }): string {
+  const tiers = COACHING_TIERS.map((tier) => {
+    const benefits = options.benefits
+      ? `<ul>${tierBenefitTexts(tier.id)
+          .map((benefit) => `<li>${escapeHtml(benefit)}</li>`)
+          .join("")}</ul>`
+      : "";
+    return `<section><h3>${escapeHtml(tier.name)}</h3><p>${escapeHtml(tier.tagline)}</p>${tier.intro
+      .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
+      .join("")}${benefits}</section>`;
+  }).join("");
+
+  return [
+    "<section>",
+    "<h2>Who this coaching is for</h2>",
+    ...COACHING_INTRO_PARAGRAPHS.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`),
+    disclaimerHtml(),
+    "<h2>Coaching tiers</h2>",
+    tiers,
+    "<h2>Contact</h2>",
+    contactDetailsHtml(),
+    "</section>",
+  ].join("");
+}
+
+function coachingFactsMarkdown(options: { benefits: boolean }): string {
+  const tiers = COACHING_TIERS.map((tier) => {
+    const lines = [
+      `### ${tier.name}`,
+      "",
+      tier.tagline,
+      "",
+      ...tier.intro.flatMap((paragraph) => [paragraph, ""]),
+    ];
+    if (options.benefits) {
+      lines.push(...tierBenefitTexts(tier.id).map((benefit) => `- ${benefit}`), "");
+    }
+    return lines.join("\n").trim();
+  }).join("\n\n");
+
+  return [
+    "## Who this coaching is for",
+    "",
+    ...COACHING_INTRO_PARAGRAPHS,
+    "",
+    disclaimerText(),
+    "",
+    "## Coaching tiers",
+    "",
+    tiers,
+    "",
+    "## Contact",
+    "",
+    contactDetailsMarkdown(),
+  ].join("\n");
+}
+
+function aboutStoryHtml(): string {
+  const lead = `${ABOUT_BACKGROUND.lead.before}<em>${escapeHtml(ABOUT_BACKGROUND.lead.emphasis)}</em>${escapeHtml(ABOUT_BACKGROUND.lead.after)}`;
+  const paragraphs = [...ABOUT_BACKGROUND.left, ...ABOUT_BACKGROUND.right]
+    .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
+    .join("");
+  const profiles = ABOUT_PROFILES.map(
+    (profile) =>
+      `<section><h3>${escapeHtml(profile.name)}</h3><p>${escapeHtml(profile.role)}</p><p>${escapeHtml(profile.description)}</p></section>`,
+  ).join("");
+  const collage = ABOUT_COLLAGE_ITEMS.map(
+    (item) =>
+      `<li><strong>${escapeHtml(item.title)}</strong> ${escapeHtml(item.description)}</li>`,
+  ).join("");
+  return [
+    "<section>",
+    `<p>${lead}</p>`,
+    paragraphs,
+    `<p>${escapeHtml(ABOUT_BACKGROUND.signoff)}</p>`,
+    `<p>${escapeHtml(ABOUT_ETHOS_INTRO)}</p>`,
+    profiles,
+    `<ul>${collage}</ul>`,
+    "</section>",
+  ].join("");
+}
+
+function aboutStoryMarkdown(): string {
+  const lead = `${ABOUT_BACKGROUND.lead.before}${ABOUT_BACKGROUND.lead.emphasis}${ABOUT_BACKGROUND.lead.after}`;
+  const profiles = ABOUT_PROFILES.map(
+    (profile) => `### ${profile.name}\n\n${profile.role}\n\n${profile.description}`,
+  ).join("\n\n");
+  const collage = ABOUT_COLLAGE_ITEMS.map(
+    (item) => `- **${item.title}** ${item.description}`,
+  ).join("\n");
+  return [
+    "## Madeleine",
+    "",
+    lead,
+    "",
+    ABOUT_BACKGROUND.left.join("\n\n"),
+    "",
+    ABOUT_BACKGROUND.right.join("\n\n"),
+    "",
+    ABOUT_BACKGROUND.signoff,
+    "",
+    ABOUT_ETHOS_INTRO,
+    "",
+    profiles,
+    "",
+    collage,
+  ].join("\n");
+}
+
+function contactLeadHtml(): string {
+  return `<p>${escapeHtml(CONTACT_INTRO)}</p>`;
+}
+
+function contactLeadMarkdown(): string {
+  return CONTACT_INTRO;
+}
+
+function contactDetailsHtml(): string {
+  return [
+    `<p>Email <a href="mailto:${escapeHtml(EMAIL_ADDRESS)}">${escapeHtml(EMAIL_ADDRESS)}</a></p>`,
+    `<p><a href="${escapeHtml(CONSULTATION_URL)}">Free consultation</a></p>`,
+    "<ul>",
+    `<li><a href="${escapeHtml(SUBSTACK_URL)}">Substack</a></li>`,
+    `<li><a href="${escapeHtml(INSTAGRAM_URL)}">Instagram</a></li>`,
+    `<li><a href="${escapeHtml(TIKTOK_URL)}">TikTok</a></li>`,
+    "</ul>",
+  ].join("");
+}
+
+function contactDetailsMarkdown(): string {
+  return [
+    `- Email: [${EMAIL_ADDRESS}](mailto:${EMAIL_ADDRESS})`,
+    `- Free consultation: ${CONSULTATION_URL}`,
+    `- [Substack](${SUBSTACK_URL})`,
+    `- [Instagram](${INSTAGRAM_URL})`,
+    `- [TikTok](${TIKTOK_URL})`,
+  ].join("\n");
+}
+
+function postsIndexHtml(articles: SeoArticle[]): string {
+  if (articles.length === 0) return "";
+  const items = articles
+    .map(
+      (article) =>
+        `<li><a href="${escapeHtml(canonicalUrl(`/posts/${article.slug}`))}">${escapeHtml(article.title)}</a></li>`,
+    )
+    .join("");
+  return `<section><h2>Articles</h2><ul>${items}</ul></section>`;
+}
+
+function postsIndexMarkdown(articles: SeoArticle[]): string {
+  const items = articles.map((article) => {
+    const description = article.description || ARTICLE_DESCRIPTION_FALLBACK;
+    return `- [${linkText(article.title)}](${markdownUrl(`/posts/${article.slug}`)}): ${oneLine(description)}`;
+  });
+  return ["## Articles", "", ...items].join("\n");
+}
+
+function articleMarkdown(page: SeoPage, articles: SeoArticle[]): string {
+  const slug = slugFromPath(page.path);
+  const article = articles.find((item) => item.slug === slug);
+  const published = page.publishedAt ? formatPublishedDate(page.publishedAt) : "";
+  const author = articleAuthor(article?.author);
+  const meta = [published, author].filter(Boolean).join(" · ");
+  return [
+    `# ${linkText(page.documentTitle.replace(` · ${SITE_NAME}`, ""))}`,
+    "",
+    `> ${oneLine(page.description)}`,
+    "",
+    `Markdown alternate of ${canonicalUrl(page.path)}.`,
+    meta ? `\n${meta}\n` : "",
+    article ? htmlToMarkdown(article.bodyHtml) : "",
+    "",
+  ]
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()
+    .concat("\n");
+}
+
+function disclaimerHtml(): string {
+  return `<p>${escapeHtml(COACHING_DISCLAIMER_PREFIX)}<a href="${escapeHtml(NASM_URL)}">NASM</a>${escapeHtml(COACHING_DISCLAIMER_SUFFIX)}</p>`;
+}
+
+function disclaimerText(): string {
+  return `${COACHING_DISCLAIMER_PREFIX}NASM${COACHING_DISCLAIMER_SUFFIX}`;
+}
+
+function tierBenefitTexts(tierId: CoachingTierId): string[] {
+  return COACHING_BENEFITS.flatMap((benefit) => {
+    const copy = benefit[tierId];
+    return copy ? [benefitPlainText(copy)] : [];
+  });
+}
+
+function benefitPlainText(copy: TierBenefitCopy): string {
+  if (copy.kind === "structured") return `${copy.title}: ${copy.description}`;
+  if (copy.kind === "coachrx") return `${copy.before}CoachRx${copy.after}`;
+  if ("text" in copy) return copy.text;
+  return copy.parts.map((part) => part.text).join("");
+}
+
+function htmlToMarkdown(html: string): string {
+  const withoutMedia = html
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<figure[\s\S]*?<\/figure>/gi, "")
+    .replace(/<hr\s*\/?>/gi, "\n\n---\n\n")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<h([1-6])[^>]*>/gi, (_, level: string) => `\n\n${"#".repeat(Number(level))} `)
+    .replace(/<\/h[1-6]>/gi, "\n\n")
+    .replace(/<li[^>]*>/gi, "\n- ")
+    .replace(/<\/li>/gi, "")
+    .replace(/<\/(p|div|blockquote|ul|ol)>/gi, "\n\n")
+    .replace(/<(p|div|blockquote|ul|ol)[^>]*>/gi, "")
+    .replace(
+      /<a\s+[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi,
+      (_, href: string, label: string) => {
+        const text = label.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+        const target = decodeHtmlEntities(href);
+        return text ? `[${text}](${target})` : target;
+      },
+    )
+    .replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi, "**$1**")
+    .replace(/<em[^>]*>([\s\S]*?)<\/em>/gi, "*$1*")
+    .replace(/<[^>]+>/g, "");
+  return decodeHtmlEntities(withoutMedia).replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+function decodeHtmlEntities(value: string): string {
+  return value
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&#(\d+);/g, (_, digits: string) => String.fromCodePoint(Number(digits)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex: string) => String.fromCodePoint(parseInt(hex, 16)));
+}
+
 function renderHead(page: SeoPage): string {
   const canonical = canonicalUrl(page.path);
   const tags = [
     `<title>${escapeHtml(page.documentTitle)}</title>`,
     `<meta name="description" content="${escapeHtml(page.description)}" />`,
     `<link rel="canonical" href="${escapeHtml(canonical)}" />`,
+    `<link rel="describedby" href="${escapeHtml(`${SITE_URL}/llms.txt`)}" />`,
+    ...(page.robots.includes("noindex")
+      ? []
+      : [
+          `<link rel="alternate" type="text/markdown" href="${escapeHtml(markdownUrl(page.path))}" />`,
+        ]),
     `<meta name="robots" content="${page.robots}" />`,
     `<meta property="og:title" content="${escapeHtml(page.documentTitle)}" />`,
     `<meta property="og:description" content="${escapeHtml(page.description)}" />`,

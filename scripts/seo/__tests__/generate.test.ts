@@ -131,11 +131,73 @@ test("generator writes sitemap, page metadata, article HTML, and a noindex 404",
 
     const llms = await readFile(path.join(outDir, "llms.txt"), "utf8");
     assert.match(llms, /# EveryWoman/);
+    assert.match(llms, /endometriosis, PMOS, pre\/postpartum recovery/);
+    assert.match(llms, /NASM Certified Personal Trainer/);
+    assert.match(llms, /Coaching is not medical care/);
+    assert.match(llms, /ARE YOU AN AGENT\?/);
     assert.match(
       llms,
-      /- \[Hello & World\]\(https:\/\/everywoman\.io\/posts\/hello-world\/\): A short <essay>/,
+      /\* \[About\]\(https:\/\/everywoman\.io\/about\.md\) for information on Madeleine's background and her story/,
+    );
+    assert.match(
+      llms,
+      /\* \[Posts\]\(https:\/\/everywoman\.io\/posts\.md\) for essays and social media posts/,
+    );
+    assert.match(
+      llms,
+      /- \[Hello & World\]\(https:\/\/everywoman\.io\/posts\/hello-world\.md\): A short <essay>/,
     );
     assert.doesNotMatch(llms, /instagram|no-body|secret/);
+    assert.doesNotMatch(llms, /posts\/hello-world\/\)/);
+
+    for (const [file, markdown] of [
+      ["index.html", "https://everywoman.io/index.md"],
+      ["about/index.html", "https://everywoman.io/about.md"],
+      ["services/index.html", "https://everywoman.io/services.md"],
+      ["contact/index.html", "https://everywoman.io/contact.md"],
+      ["posts/index.html", "https://everywoman.io/posts.md"],
+      ["posts/hello-world/index.html", "https://everywoman.io/posts/hello-world.md"],
+    ] as const) {
+      const html = await readFile(path.join(outDir, file), "utf8");
+      assert.match(
+        html,
+        /<link rel="describedby" href="https:\/\/everywoman\.io\/llms\.txt" \/>/,
+      );
+      assert.match(
+        html,
+        new RegExp(
+          `<link rel="alternate" type="text/markdown" href="${markdown.replaceAll(".", "\\.")}" />`,
+        ),
+      );
+    }
+
+    const services = await readFile(path.join(outDir, "services/index.html"), "utf8");
+    const servicesNoscript = services.match(/<noscript>([\s\S]*)<\/noscript>/)?.[1] ?? "";
+    assert.match(servicesNoscript, /endometriosis/);
+    assert.match(servicesNoscript, /Foundation/);
+    assert.match(servicesNoscript, /Signature/);
+    assert.match(servicesNoscript, /Elevated/);
+    assert.match(servicesNoscript, /not a substitute for medical care/);
+    assert.match(servicesNoscript, /everywoman\.io@gmail\.com/);
+    const servicesLd = jsonLd(services) as { description: string };
+    assert.match(servicesLd.description, /endometriosis/);
+    assert.match(servicesLd.description, /Foundation, Signature, and Elevated/);
+
+    const servicesMarkdown = await readFile(path.join(outDir, "services.md"), "utf8");
+    assert.match(servicesMarkdown, /endometriosis/);
+    assert.match(servicesMarkdown, /### Foundation/);
+    assert.match(servicesMarkdown, /### Signature/);
+    assert.match(servicesMarkdown, /### Elevated/);
+    assert.match(servicesMarkdown, /NASM/);
+    assert.match(servicesMarkdown, /everywoman\.io@gmail\.com/);
+    assert.match(servicesMarkdown, /Custom strength program designed for your goals/);
+
+    const articleMarkdown = await readFile(
+      path.join(outDir, "posts/hello-world.md"),
+      "utf8",
+    );
+    assert.match(articleMarkdown, /Body & more/);
+    assert.doesNotMatch(articleMarkdown, /<p>/);
   } finally {
     await rm(outDir, { recursive: true, force: true });
   }
@@ -154,6 +216,11 @@ test("robots.txt allows training and search crawlers", async () => {
   const source = await readFile(new URL("../../../index.html", import.meta.url), "utf8");
   assert.doesNotMatch(source, /noindex/);
   assert.match(source, /content="index, follow"/);
+
+  const headers = await readFile(new URL("../../../public/_headers", import.meta.url), "utf8");
+  assert.match(headers, /Link: <\/llms\.txt>; rel="describedby"/);
+  assert.match(headers, /Content-Type: text\/markdown; charset=utf-8/);
+  assert.match(headers, /X-Robots-Tag: noindex/);
 });
 
 function jsonLd(html: string): unknown {

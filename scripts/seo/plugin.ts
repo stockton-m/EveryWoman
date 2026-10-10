@@ -7,6 +7,7 @@ import {
   applySeo,
   articlesFromArchive,
   indexablePages,
+  markdownForUrl,
   pageForPath,
   renderLlmsTxt,
   renderSitemap,
@@ -57,6 +58,13 @@ export function seoPlugins(): Plugin[] {
           if (url === "/llms.txt") {
             res.setHeader("Content-Type", "text/plain; charset=utf-8");
             res.end(renderLlmsTxt(loadArticles()));
+            return;
+          }
+          const markdown = url ? markdownForUrl(url, loadArticles()) : undefined;
+          if (markdown) {
+            res.setHeader("Content-Type", "text/markdown; charset=utf-8");
+            res.setHeader("X-Robots-Tag", "noindex");
+            res.end(markdown);
             return;
           }
           next();

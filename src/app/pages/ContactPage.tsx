@@ -12,6 +12,7 @@ import { SiteNav } from "@/app/components/SiteNav";
 import {
   BROWN,
   CREAM,
+  CONTACT_INTRO,
   EMAIL_ADDRESS,
   EMBER,
   INSTAGRAM_URL,
@@ -59,8 +60,7 @@ export function ContactPage() {
           </h1>
 
           <p className="contact-hero__intro" style={{ color: BROWN }}>
-            Please reach out to me if you&apos;d like to chat. I&apos;m looking
-            forward to connecting with you.
+            {CONTACT_INTRO}
           </p>
 
           <div className="contact-hero__actions">

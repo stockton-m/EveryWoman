@@ -7,6 +7,7 @@ import {
   indexablePages,
   notFoundPage,
   renderLlmsTxt,
+  renderPageMarkdown,
   renderSitemap,
   type ArchiveInput,
 } from "../../src/app/seo/metadata.ts";
@@ -23,6 +24,10 @@ export function writeSeoBuild(options: {
     const filePath = htmlOutputPath(options.outDir, page.path);
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(filePath, applySeo(options.html, page));
+
+    const markdownPath = markdownOutputPath(options.outDir, page.path);
+    fs.mkdirSync(path.dirname(markdownPath), { recursive: true });
+    fs.writeFileSync(markdownPath, renderPageMarkdown(page, articles));
   }
 
   fs.writeFileSync(
@@ -36,4 +41,9 @@ export function writeSeoBuild(options: {
 function htmlOutputPath(outDir: string, pagePath: string): string {
   if (pagePath === "/") return path.join(outDir, "index.html");
   return path.join(outDir, pagePath.slice(1), "index.html");
+}
+
+function markdownOutputPath(outDir: string, pagePath: string): string {
+  if (pagePath === "/") return path.join(outDir, "index.md");
+  return path.join(outDir, `${pagePath.slice(1)}.md`);
 }
