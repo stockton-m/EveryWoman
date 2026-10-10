@@ -1,7 +1,12 @@
 import { ArrowUpRight } from "lucide-react";
-import { CoachingQuiz } from "@/app/components/CoachingQuiz";
+import { useCallback, useRef, useState } from "react";
+import {
+  CoachingQuiz,
+  type CoachingQuizHandle,
+} from "@/app/components/CoachingQuiz";
 import { ExternalLink } from "@/app/components/ExternalLink";
 import { PortraitPlaceholder } from "@/app/components/PortraitPlaceholder";
+import { QuizTierCallout } from "@/app/components/services/QuizTierCallout";
 import { ServicesGuideLine } from "@/app/components/services/ServicesGuideLine";
 import { SiteFooter } from "@/app/components/SiteFooter";
 import { SiteNav } from "@/app/components/SiteNav";
@@ -17,6 +22,13 @@ import {
 import { CONSULTATION_URL, SANS, SERIF, STONE } from "@/app/constants";
 
 export function ServicesPage() {
+  const quizRef = useRef<CoachingQuizHandle>(null);
+  const tiersRef = useRef<HTMLDivElement>(null);
+  const [quizOpen, setQuizOpen] = useState(false);
+  const handleQuizOpenChange = useCallback((open: boolean) => {
+    setQuizOpen(open);
+  }, []);
+
   return (
     <div
       className="services-page"
@@ -92,10 +104,12 @@ export function ServicesPage() {
         </div>
 
         <div className="my-14 md:my-16">
-          <CoachingQuiz />
+          <CoachingQuiz ref={quizRef} onOpenChange={handleQuizOpenChange} />
         </div>
 
-        <TierComparisonGrid tiers={COACHING_TIERS} />
+        <div ref={tiersRef}>
+          <TierComparisonGrid tiers={COACHING_TIERS} />
+        </div>
 
         <TestimonialMarquee />
 
@@ -114,6 +128,12 @@ export function ServicesPage() {
       <div className="services-page__footer">
         <SiteFooter />
       </div>
+
+      <QuizTierCallout
+        targetRef={tiersRef}
+        quizOpen={quizOpen}
+        onOpen={() => quizRef.current?.open()}
+      />
     </div>
   );
 }

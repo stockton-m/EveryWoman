@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { CoachingQuizModal } from "@/app/components/CoachingQuizModal";
 import { COACHING_QUIZ_QUESTIONS } from "@/app/content/coachingQuiz";
 import {
@@ -9,7 +15,16 @@ import { CREAM, EMBER, SANS } from "@/app/constants";
 
 export type CoachingQuizPhase = "intro" | "question" | "result";
 
-export function CoachingQuiz() {
+export type CoachingQuizHandle = {
+  open: () => void;
+};
+
+type CoachingQuizProps = {
+  onOpenChange?: (open: boolean) => void;
+};
+
+export const CoachingQuiz = forwardRef<CoachingQuizHandle, CoachingQuizProps>(
+  function CoachingQuiz({ onOpenChange }, ref) {
   const [isOpen, setIsOpen] = useState(false);
   const [phase, setPhase] = useState<CoachingQuizPhase>("intro");
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -28,6 +43,14 @@ export function CoachingQuiz() {
   };
 
   useEffect(() => clearAdvanceTimer, []);
+
+  useEffect(() => {
+    onOpenChange?.(isOpen);
+  }, [isOpen, onOpenChange]);
+
+  useImperativeHandle(ref, () => ({
+    open: () => setIsOpen(true),
+  }));
 
   const closeQuiz = () => {
     clearAdvanceTimer();
@@ -116,4 +139,5 @@ export function CoachingQuiz() {
       />
     </div>
   );
-}
+},
+);
