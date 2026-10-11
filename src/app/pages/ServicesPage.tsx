@@ -42,7 +42,7 @@ export function ServicesPage() {
       <ServicesGuideLine />
 
       <header
-        className="services-page__header border-b"
+        className="services-page__header md:border-b"
         style={{ borderColor: "rgba(42,31,26,0.06)" }}
       >
         <SiteNav variant="light" />

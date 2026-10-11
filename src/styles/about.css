@@ -134,6 +134,30 @@
   }
 }
 
+@media (max-width: 767px) {
+  .home-contact-title {
+    margin-right: auto;
+    margin-bottom: 1.5rem;
+    margin-left: auto;
+    text-align: center;
+    transform: translateY(-1.75rem);
+  }
+
+  .home-contact-portrait {
+    transform: none;
+  }
+
+  .home-contact-copy .pill-btn {
+    display: flex;
+    width: fit-content;
+    margin-inline: auto;
+  }
+
+  .home-contact-follow {
+    margin-top: 1.25rem;
+  }
+}
+
 .about-hero {
   display: grid;
   grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);

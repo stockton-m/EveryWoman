@@ -14,7 +14,7 @@ export function NotFoundPage() {
       <NotFoundGuideLine />
 
       <header
-        className="not-found-page__header border-b"
+        className="not-found-page__header md:border-b"
         style={{ borderColor: "rgba(42,31,26,0.06)" }}
       >
         <SiteNav variant="light" />

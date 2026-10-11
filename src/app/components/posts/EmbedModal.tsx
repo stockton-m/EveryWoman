@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Loader2, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
@@ -47,31 +47,45 @@ function blurFocus() {
   if (active instanceof HTMLElement) active.blur();
 }
 
+function PlayerSpinner() {
+  return (
+    <div className="embed-modal__spinner" aria-hidden="true">
+      <Loader2 />
+    </div>
+  );
+}
+
 function Player({ post, label }: { post: ArchivePost; label: string }) {
   const embedUrl = getEmbedUrl(post);
   if (embedUrl) {
     return (
-      <iframe
-        key={embedUrl}
-        src={embedUrl}
-        title={label}
-        scrolling="no"
-        className="h-full w-full"
-        style={{ border: 0, overflow: "hidden" }}
-        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-        allowFullScreen
-      />
+      <>
+        <PlayerSpinner />
+        <iframe
+          key={embedUrl}
+          src={embedUrl}
+          title={label}
+          scrolling="no"
+          className="h-full w-full"
+          style={{ border: 0, overflow: "hidden" }}
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+          allowFullScreen
+        />
+      </>
     );
   }
 
   const thumbnail = getPostThumbnail(post);
   if (thumbnail) {
     return (
-      <ImageWithFallback
-        src={thumbnail}
-        alt=""
-        className="h-full w-full object-cover"
-      />
+      <>
+        <PlayerSpinner />
+        <ImageWithFallback
+          src={thumbnail}
+          alt=""
+          className="h-full w-full object-cover"
+        />
+      </>
     );
   }
 

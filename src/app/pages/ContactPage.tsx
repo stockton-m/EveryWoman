@@ -37,7 +37,7 @@ export function ContactPage() {
       <ContactGuideLine />
 
       <header
-        className="contact-page__header border-b"
+        className="contact-page__header md:border-b"
         style={{ borderColor: "rgba(42,31,26,0.06)" }}
       >
         <SiteNav variant="light" />

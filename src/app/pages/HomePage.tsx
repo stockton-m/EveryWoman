@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AboutImagePlaceholder } from "@/app/components/about/AboutImagePlaceholder";
@@ -6,10 +6,11 @@ import { ExternalLink } from "@/app/components/ExternalLink";
 import { EmbedModal } from "@/app/components/posts/EmbedModal";
 import { FollowColumn } from "@/app/components/posts/FollowColumn";
 import { PostCard } from "@/app/components/posts/PostCard";
+import { ShortsPreview } from "@/app/components/posts/ShortsPreview";
 import { SiteFooter } from "@/app/components/SiteFooter";
 import { SiteNav } from "@/app/components/SiteNav";
 import { NASM_URL } from "@/app/content/coaching";
-import { getPostLabel, posts } from "@/app/content/posts";
+import { getPostLabel, getPostThumbnail, posts } from "@/app/content/posts";
 import {
   BLUSH,
   BROWN,
@@ -20,14 +21,104 @@ import {
   SANS,
   SERIF,
 } from "@/app/constants";
+import { useMediaQuery } from "@/app/hooks/useMediaQuery";
 import { useScrollToHash } from "@/app/hooks/useScrollToHash";
 import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import madeleinePortrait from "@/imports/profile.png";
 
 const latestPosts = posts.slice(0, 3);
 
+const GROWTH_CARDS = [
+  {
+    key: "left",
+    text: "Learn to exercise with endometriosis or PMOS",
+    wrapClass: "md:-rotate-[10deg] md:-mr-14 md:mt-16 z-20",
+    background: EMBER,
+    textColor: CREAM,
+    buttonBg: CREAM,
+    angle: "0deg",
+  },
+  {
+    key: "middle",
+    text: "Get stronger and move better",
+    wrapClass: "z-30",
+    background: BLUSH,
+    textColor: BROWN,
+    buttonBg: BROWN,
+    angle: "120deg",
+  },
+  {
+    key: "right",
+    text: "Train during postpartum recovery",
+    wrapClass: "md:rotate-[10deg] md:-ml-14 md:mt-16 z-20",
+    background: SAGE,
+    textColor: CREAM,
+    buttonBg: CREAM,
+    angle: "240deg",
+  },
+] as const;
+
+function GrowthOrbit() {
+  return (
+    <div className="home-orbit md:hidden">
+      <div className="home-orbit__note" aria-hidden="true">
+        <span className="home-orbit__note-text">tap one</span>
+        <svg
+          className="home-orbit__note-arrow"
+          viewBox="0 0 86 64"
+          fill="none"
+        >
+          <path
+            d="M6 20C20 6 32 14 40 26c8 12 12 16 28 24"
+            stroke="currentColor"
+            strokeWidth="2.6"
+            strokeLinecap="round"
+          />
+          <path
+            d="M58 36C62 41 65 47 68 50"
+            stroke="currentColor"
+            strokeWidth="2.6"
+            strokeLinecap="round"
+          />
+          <path
+            d="M51 55C58 55 63 53 68 50"
+            stroke="currentColor"
+            strokeWidth="2.6"
+            strokeLinecap="round"
+          />
+        </svg>
+      </div>
+      <div className="home-orbit__stage">
+        <div className="home-orbit__ring">
+          {GROWTH_CARDS.map((card) => (
+            <div
+              key={card.key}
+              className="home-orbit__slot"
+              style={{ "--angle": card.angle } as CSSProperties}
+            >
+              <div className="home-orbit__counter">
+                <Link
+                  to="/services"
+                  className="home-orbit__circle"
+                  style={{
+                    background: card.background,
+                    color: card.textColor,
+                  }}
+                >
+                  <span className="home-orbit__label">{card.text}</span>
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function HomePage() {
   useScrollToHash();
+  const isMobile = useMediaQuery("(max-width: 767px)");
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const activePost =
     activeIndex === null ? null : (latestPosts[activeIndex] ?? null);
@@ -36,7 +127,7 @@ export function HomePage() {
     <div style={{ fontFamily: SANS, minHeight: "100vh" }}>
       <section
         id="hero"
-        className="relative overflow-hidden flex flex-col"
+        className="relative overflow-clip flex flex-col"
         style={{
           background:
             "radial-gradient(ellipse at 50% 46%, #93b896 0%, #7a9e7e 38%, #567a5a 100%)",
@@ -68,7 +159,7 @@ export function HomePage() {
             <em style={{ fontStyle: "italic" }}>isn&apos;t your ceiling.</em>
           </h1>
 
-          <div className="text-center mt-10 pb-32">
+          <div className="text-center mt-10 pb-48 md:pb-32">
             <p
               className="text-base leading-relaxed mb-6 mx-auto"
               style={{ color: "rgba(245,237,228,0.78)", maxWidth: "480px" }}
@@ -92,7 +183,7 @@ export function HomePage() {
       </section>
 
       <section
-        className="relative pb-28"
+        className="relative pb-10 md:pb-28"
         style={{
           background: "#f5ede4",
           zIndex: 10,
@@ -114,9 +205,19 @@ export function HomePage() {
                 "0 32px 80px rgba(42,31,26,0.13), 0 4px 20px rgba(42,31,26,0.07)",
             }}
           >
-            <div className="flex items-start justify-between gap-6 mb-6">
+            <div className="home-about__header mb-6">
+              <div
+                className="home-about__portrait"
+                style={{ background: EMBER }}
+              >
+                <ImageWithFallback
+                  src={madeleinePortrait}
+                  alt="Madeleine Stockton portrait"
+                  className="w-full h-full object-cover"
+                />
+              </div>
               <h2
-                className="font-bold leading-tight"
+                className="home-about__title home-about__title--mobile font-bold md:hidden"
                 style={{
                   fontFamily: SERIF,
                   color: "#2a1f1a",
@@ -129,22 +230,20 @@ export function HomePage() {
                 <br />
                 <span style={{ color: EMBER }}>Thrive</span> beyond it.
               </h2>
-
-              <div
-                className="flex-shrink-0 rounded-full overflow-hidden"
+              <h2
+                className="home-about__title home-about__title--desktop hidden font-bold leading-tight md:block"
                 style={{
-                  width: "clamp(6rem, 12vw, 9rem)",
-                  height: "clamp(6rem, 12vw, 9rem)",
-                  background: EMBER,
-                  marginTop: "0.25rem",
+                  fontFamily: SERIF,
+                  color: "#2a1f1a",
+                  fontSize: "clamp(1.6rem, 3.2vw, 2.25rem)",
                 }}
               >
-                <ImageWithFallback
-                  src={madeleinePortrait}
-                  alt="Madeleine Stockton portrait"
-                  className="w-full h-full object-cover"
-                />
-              </div>
+                <span style={{ color: EMBER }}>Train</span> through it.
+                <br />
+                <span style={{ color: EMBER }}>Recover</span> from it.
+                <br />
+                <span style={{ color: EMBER }}>Thrive</span> beyond it.
+              </h2>
             </div>
             <div
               className="text-base md:text-[17px] leading-relaxed"
@@ -203,11 +302,11 @@ export function HomePage() {
 
       <section
         id="services-teaser"
-        className="relative pt-16 pb-40 overflow-hidden"
+        className="relative overflow-clip pt-16 pb-10 md:pb-40"
         style={{ background: "#2a1f1a", display: "flow-root" }}
       >
         <div className="max-w-5xl mx-auto px-6 md:px-10">
-          <div className="text-center mb-12">
+          <div className="home-grow__intro text-center mb-12">
             <span
               className="inline-block px-4 py-1.5 rounded-full text-[11px] md:text-xs mb-5"
               style={{
@@ -230,40 +329,9 @@ export function HomePage() {
             </h2>
           </div>
 
-          <div className="relative flex flex-col md:flex-row items-center justify-center gap-8 md:gap-0 mx-auto md:min-h-[480px] max-w-[980px]">
-            {(
-              [
-                {
-                  key: "left",
-                  text: "Learn to exercise with endometriosis or PMOS",
-                  wrapClass:
-                    "md:-rotate-[10deg] md:-mr-14 md:mt-16 z-20",
-                  background: EMBER,
-                  textColor: CREAM,
-                  buttonBg: CREAM,
-                  buttonColor: BROWN,
-                },
-                {
-                  key: "middle",
-                  text: "Get stronger and move better",
-                  wrapClass: "z-30",
-                  background: BLUSH,
-                  textColor: BROWN,
-                  buttonBg: BROWN,
-                  buttonColor: CREAM,
-                },
-                {
-                  key: "right",
-                  text: "Train during postpartum recovery",
-                  wrapClass:
-                    "md:rotate-[10deg] md:-ml-14 md:mt-16 z-20",
-                  background: SAGE,
-                  textColor: CREAM,
-                  buttonBg: CREAM,
-                  buttonColor: BROWN,
-                },
-              ] as const
-            ).map((card) => (
+          <GrowthOrbit />
+          <div className="relative mx-auto hidden max-w-[980px] items-center justify-center md:flex md:min-h-[480px] md:flex-row md:gap-0">
+            {GROWTH_CARDS.map((card) => (
               <div
                 key={card.key}
                 className={`group/card flex-shrink-0 w-full max-w-[360px] md:w-[clamp(260px,32vw,340px)] transition-[transform,z-index] duration-300 hover:!z-40 ${card.wrapClass}`}
@@ -308,14 +376,13 @@ export function HomePage() {
         </div>
       </section>
 
-      <section id="connect" className="py-24" style={{ background: CREAM }}>
+      <section id="connect" className="pt-8 pb-10 md:py-24" style={{ background: CREAM }}>
         <div className="max-w-7xl mx-auto px-6 md:px-10">
           <h2
-            className="mb-0 font-bold"
+            className="home-latest__title mb-0 font-bold"
             style={{
               fontFamily: SERIF,
               color: BROWN,
-              fontSize: "clamp(1.75rem, 3vw, 2.5rem)",
             }}
           >
             Latest from me
@@ -328,7 +395,29 @@ export function HomePage() {
             <span style={{ color: "#000" }}> / </span>
             <span style={{ color: EMBER }}>@everywoman.io</span>
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="home-latest__row grid grid-cols-3 gap-0.5 md:hidden">
+            {latestPosts.map((post, index) => {
+              const thumbnail = getPostThumbnail(post);
+              return (
+                <button
+                  key={post.id}
+                  type="button"
+                  className="home-latest__thumb"
+                  aria-label={getPostLabel(post)}
+                  onClick={() => setActiveIndex(index)}
+                >
+                  {thumbnail ? (
+                    <ImageWithFallback
+                      src={thumbnail}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
+          <div className="hidden md:grid md:grid-cols-3 md:gap-5">
             {latestPosts.map((post, index) => (
               <PostCard
                 key={post.id}
@@ -347,7 +436,7 @@ export function HomePage() {
               className="pill-btn pill-btn--ember inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-semibold"
               style={{ fontFamily: SANS, textDecoration: "none" }}
             >
-              Read more
+              See more
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -395,7 +484,7 @@ export function HomePage() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-            <div className="flex justify-center">
+            <div className="home-contact-follow flex justify-center">
               <FollowColumn compact headingColor={CREAM} layout="grid" />
             </div>
           </div>
@@ -403,24 +492,35 @@ export function HomePage() {
       </section>
 
       <SiteFooter />
-      <EmbedModal
-        filter={null}
-        hasNext={activeIndex !== null && activeIndex < latestPosts.length - 1}
-        hasPrevious={activeIndex !== null && activeIndex > 0}
-        members={activePost ? [activePost] : []}
-        onClose={() => setActiveIndex(null)}
-        onNext={() =>
-          setActiveIndex((index) =>
-            index === null ? index : Math.min(index + 1, latestPosts.length - 1),
-          )
-        }
-        onPrevious={() =>
-          setActiveIndex((index) =>
-            index === null ? index : Math.max(index - 1, 0),
-          )
-        }
-        showAllPostsLink
-      />
+      {isMobile ? (
+        <ShortsPreview
+          activeIndex={activeIndex}
+          onChange={setActiveIndex}
+          onClose={() => setActiveIndex(null)}
+          posts={latestPosts}
+        />
+      ) : (
+        <EmbedModal
+          filter={null}
+          hasNext={activeIndex !== null && activeIndex < latestPosts.length - 1}
+          hasPrevious={activeIndex !== null && activeIndex > 0}
+          members={activePost ? [activePost] : []}
+          onClose={() => setActiveIndex(null)}
+          onNext={() =>
+            setActiveIndex((index) =>
+              index === null
+                ? index
+                : Math.min(index + 1, latestPosts.length - 1),
+            )
+          }
+          onPrevious={() =>
+            setActiveIndex((index) =>
+              index === null ? index : Math.max(index - 1, 0),
+            )
+          }
+          showAllPostsLink
+        />
+      )}
     </div>
   );
 }

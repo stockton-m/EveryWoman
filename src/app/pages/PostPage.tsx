@@ -32,7 +32,7 @@ export function PostPage() {
       }}
     >
       <header
-        className="border-b"
+        className="md:border-b"
         style={{
           background: CREAM,
           borderColor: "rgba(42,31,26,0.06)",
