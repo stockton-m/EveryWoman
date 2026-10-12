@@ -904,6 +904,11 @@
   height: 1.35rem;
 }
 
+.shorts-preview__open--substack svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
 .shorts-preview__close:focus,
 .shorts-preview__close:focus-visible,
 .shorts-preview__caret:focus,
@@ -975,5 +980,212 @@
   .posts-pager__button,
   .shorts-preview__track--settling {
     transition-duration: 1ms;
+  }
+}
+
+.posts-section-title {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+.posts-thumb-row {
+  width: calc(100% + 3rem);
+  margin-inline: -1.5rem;
+}
+
+.posts-thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 19.5;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: rgba(42, 31, 26, 0.08);
+  cursor: pointer;
+  touch-action: pan-y;
+}
+
+.posts-thumb:focus,
+.posts-thumb:focus-visible {
+  outline: none;
+}
+
+.shorts-preview__article {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  bottom: calc(max(1.15rem, env(safe-area-inset-bottom)) + 9.15rem);
+  left: 0;
+  box-sizing: border-box;
+  padding: max(1.1rem, env(safe-area-inset-top)) 4.75rem 0 1.15rem;
+  pointer-events: none;
+}
+
+.shorts-preview__article-text {
+  margin: 0;
+  overflow: hidden;
+  color: #fff;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 12;
+}
+
+.shorts-preview__keep-reading {
+  position: absolute;
+  z-index: 2;
+  left: 1.15rem;
+  right: 4.75rem;
+  bottom: calc(max(1.15rem, env(safe-area-inset-bottom)) + 5.65rem);
+  pointer-events: none;
+}
+
+.posts-filter-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgba(42, 31, 26, 0.55);
+}
+
+.posts-filter-modal__dialog {
+  width: min(22rem, 100%);
+  border-radius: 1.5rem;
+  background: var(--cream);
+  padding: 1.15rem 1.15rem 1.2rem;
+  box-shadow: 0 24px 70px rgba(42, 31, 26, 0.28);
+}
+
+.posts-filter-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.posts-filter-modal__title {
+  margin: 0;
+  color: var(--brown);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.posts-filter-modal__intro {
+  margin: 0.7rem 0 0;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.posts-filter-modal__close {
+  display: flex;
+  flex: none;
+  margin: -0.15rem -0.15rem 0 0;
+  padding: 0.15rem;
+  border: 0;
+  background: transparent;
+  color: var(--brown);
+  cursor: pointer;
+}
+
+.posts-filter-modal__close:focus,
+.posts-filter-modal__close:focus-visible {
+  outline: none;
+}
+
+.posts-filter-modal__options {
+  display: flex;
+  gap: 0.65rem;
+  margin: 1.15rem 0 1.25rem;
+}
+
+.posts-filter-modal .platform-filter {
+  flex: 1;
+  width: auto;
+  height: 3.25rem;
+  border-radius: 1.16rem;
+}
+
+.posts-filter-modal .platform-filter svg {
+  width: 1.55rem;
+  height: 1.55rem;
+}
+
+.posts-filter-modal .platform-filter--substack svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.posts-filter-modal .platform-filter:hover {
+  background: transparent;
+  border-color: var(--platform-color);
+  color: var(--platform-color);
+}
+
+.posts-filter-modal .platform-filter--selected:hover {
+  background: var(--platform-color);
+  border-color: var(--platform-color);
+  color: var(--cream);
+}
+
+.posts-filter-modal__save {
+  width: 100%;
+}
+
+@media (max-width: 767px) {
+  .posts-section-title {
+    font-size: 2.5rem;
+  }
+
+  .posts-page .platform-filters {
+    display: none;
+  }
+
+  .posts-follow-row {
+    width: calc(100% + 3rem);
+    max-width: none;
+    align-self: stretch;
+    margin-inline: -1.5rem;
+    padding-inline: 0.75rem;
+  }
+
+  .posts-all-header {
+    align-items: flex-start;
+  }
+
+  .follow-squircle--row {
+    width: 80%;
+    margin-inline: auto;
+    gap: 0;
+    padding: 0.44rem;
+    border-radius: 1rem;
+  }
+
+  .follow-squircle--row .follow-squircle__icon {
+    width: 2.12rem;
+    height: 2.12rem;
+  }
+
+  .follow-squircle--row .follow-squircle__icon svg {
+    width: 1.72rem;
+    height: 1.72rem;
+  }
+
+  .follow-squircle--row .follow-squircle__icon--substack,
+  .follow-squircle--row .follow-squircle__icon--substack svg {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .posts-thumb-row {
+    width: auto;
+    margin-inline: 0;
   }
 }

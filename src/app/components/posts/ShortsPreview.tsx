@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp, Volume2, X } from "lucide-react";
+import { ArrowRight, ChevronDown, ChevronUp, Volume2, X } from "lucide-react";
 import {
   useEffect,
   useLayoutEffect,
@@ -8,6 +8,7 @@ import {
   type TransitionEvent,
 } from "react";
 import { createPortal } from "react-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import {
   InstagramIcon,
@@ -18,9 +19,12 @@ import {
   getEmbedUrl,
   getPlatformLabel,
   getPostLabel,
+  getPostPlainText,
   getPostThumbnail,
+  isSubstackPost,
   type ArchivePost,
   type PostSource,
+  type SubstackArticle,
 } from "@/app/content/posts";
 import { SANS } from "@/app/constants";
 import logoImage from "@/imports/logo.png";
@@ -33,6 +37,7 @@ const SNAP_MS = 280;
 
 type ShortsPreviewProps = {
   activeIndex: number | null;
+  mediaWindow?: number;
   onChange: (index: number) => void;
   onClose: () => void;
   posts: ArchivePost[];
@@ -113,12 +118,64 @@ function mediaRef<T extends HTMLElement>(store: Map<string, T>, id: string) {
   };
 }
 
+function mountsMedia(index: number, activeIndex: number, mediaWindow: number | undefined) {
+  if (mediaWindow === undefined) return true;
+  return Math.abs(index - activeIndex) <= mediaWindow;
+}
+
+function SubstackExcerpt({ post }: { post: SubstackArticle }) {
+  const excerptRef = useRef<HTMLParagraphElement>(null);
+  const text = getPostPlainText(post.bodyHtml);
+
+  useLayoutEffect(() => {
+    const excerpt = excerptRef.current;
+    const article = excerpt?.parentElement;
+    if (!excerpt || !article) return;
+
+    const fit = () => {
+      excerpt.style.webkitLineClamp = "80";
+      const excerptStyle = getComputedStyle(excerpt);
+      const lineHeight = parseFloat(excerptStyle.lineHeight);
+      if (!lineHeight) return;
+      const articleStyle = getComputedStyle(article);
+      const padding =
+        parseFloat(articleStyle.paddingTop) + parseFloat(articleStyle.paddingBottom);
+      const available = article.clientHeight - padding;
+      const lines = Math.max(1, Math.floor((available + 1) / lineHeight));
+      excerpt.style.webkitLineClamp = String(lines);
+    };
+
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(article);
+    window.addEventListener("resize", fit);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", fit);
+    };
+  }, [post.id]);
+
+  return (
+    <div className="shorts-preview__article">
+      <p
+        ref={excerptRef}
+        className="shorts-preview__article-text"
+        style={{ fontFamily: SANS }}
+      >
+        {text}
+      </p>
+    </div>
+  );
+}
+
 export function ShortsPreview({
   activeIndex,
+  mediaWindow,
   onChange,
   onClose,
   posts,
 }: ShortsPreviewProps) {
+  const navigate = useNavigate();
   const closeRef = useRef<HTMLButtonElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -422,6 +479,19 @@ export function ShortsPreview({
     if (drag.moved) beginSnap(0, null);
   };
 
+  const keepReadingSlugAt = (x: number, y: number) => {
+    const links = overlayRef.current?.querySelectorAll<HTMLElement>(
+      ".shorts-preview__keep-reading",
+    );
+    if (!links) return null;
+    for (const link of links) {
+      const box = link.getBoundingClientRect();
+      if (x < box.left || x > box.right || y < box.top || y > box.bottom) continue;
+      return link.dataset.slug ?? null;
+    }
+    return null;
+  };
+
   const onPointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
     const drag = dragRef.current;
     if (drag.pointerId !== event.pointerId) return;
@@ -436,6 +506,11 @@ export function ShortsPreview({
     const deltaX = event.clientX - drag.startX;
     const deltaY = event.clientY - drag.startY;
     if (!drag.moved) {
+      const slug = keepReadingSlugAt(event.clientX, event.clientY);
+      if (slug) {
+        navigate(`/posts/${slug}`);
+        return;
+      }
       onTap();
       return;
     }
@@ -496,13 +571,17 @@ export function ShortsPreview({
           {posts.map((item, index) => {
             const label = getPostLabel(item);
             const thumbnail = getPostThumbnail(item);
-            const tiktok = tiktokPlayerUrl(item);
-            const videoUrl = instagramVideoUrl(item);
+            const showMedia = mountsMedia(index, activeIndex, mediaWindow);
+            const article = showMedia && isSubstackPost(item) ? item : null;
+            const tiktok = showMedia && !article ? tiktokPlayerUrl(item) : undefined;
+            const videoUrl = showMedia && !article ? instagramVideoUrl(item) : undefined;
             const useEmbed = !tiktok && videoUrl !== undefined && fallbackIds.includes(item.id);
             const embedUrl = useEmbed ? getEmbedUrl(item) : undefined;
             return (
               <div className="shorts-preview__slide" key={item.id}>
-                {tiktok ? (
+                {article ? (
+                  <SubstackExcerpt post={article} />
+                ) : tiktok ? (
                   <iframe
                     ref={bindFrame(item.id)}
                     src={tiktok}
@@ -542,6 +621,18 @@ export function ShortsPreview({
                 ) : (
                   <p className="shorts-preview__empty">This post doesn&apos;t have a preview.</p>
                 )}
+                {isSubstackPost(item) ? (
+                  <Link
+                    to={`/posts/${item.slug}`}
+                    data-slug={item.slug}
+                    tabIndex={index === activeIndex ? 0 : -1}
+                    className="pill-btn pill-btn--ember shorts-preview__keep-reading inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
+                    style={{ fontFamily: SANS, textDecoration: "none" }}
+                  >
+                    Keep reading
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </Link>
+                ) : null}
                 {item.source === "tiktok" && !unmutedIds.has(item.id) ? (
                   <div
                     className="shorts-preview__unmute"
@@ -598,7 +689,11 @@ export function ShortsPreview({
           <X className="h-7 w-7" />
         </button>
         <a
-          className="shorts-preview__open"
+          className={
+            post.source === "substack"
+              ? "shorts-preview__open shorts-preview__open--substack"
+              : "shorts-preview__open"
+          }
           href={post.sourceUrl}
           target="_blank"
           rel="noopener noreferrer"

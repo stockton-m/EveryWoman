@@ -82,39 +82,51 @@ const links: FollowLink[] = [
 type FollowColumnProps = {
   compact?: boolean;
   headingColor?: string;
-  layout?: "stack" | "grid";
+  hideHeading?: boolean;
+  layout?: "stack" | "grid" | "row";
 };
 
 export function FollowColumn({
   compact = false,
   headingColor = BROWN,
+  hideHeading = false,
   layout = "stack",
 }: FollowColumnProps = {}) {
   const isGrid = layout === "grid";
+  const isRow = layout === "row";
 
   return (
     <aside
-      aria-labelledby="follow-me-heading"
+      aria-label={hideHeading ? "Follow me" : undefined}
+      aria-labelledby={hideHeading ? undefined : "follow-me-heading"}
       className={
-        isGrid
-          ? "w-full max-w-[13.5rem] shrink-0"
-          : "w-full max-w-40 shrink-0 lg:w-40"
+        isRow
+          ? "posts-follow-row shrink-0"
+          : isGrid
+            ? "w-full max-w-[13.5rem] shrink-0"
+            : "w-full max-w-40 shrink-0 lg:w-40"
       }
     >
-      <h2
-        id="follow-me-heading"
-        className="mb-4 font-bold"
-        style={{
-          color: headingColor,
-          fontFamily: SERIF,
-          fontSize: "clamp(1.15rem, 2vw, 1.5rem)",
-        }}
-      >
-        Follow me
-      </h2>
+      {hideHeading ? null : (
+        <h2
+          id="follow-me-heading"
+          className="mb-4 font-bold"
+          style={{
+            color: headingColor,
+            fontFamily: SERIF,
+            fontSize: "clamp(1.15rem, 2vw, 1.5rem)",
+          }}
+        >
+          Follow me
+        </h2>
+      )}
       <div
         className={
-          isGrid ? "grid grid-cols-2 gap-2.5" : "grid grid-cols-1 gap-3"
+          isRow
+            ? "grid grid-cols-4 gap-2"
+            : isGrid
+              ? "grid grid-cols-2 gap-2.5"
+              : "grid grid-cols-1 gap-3"
         }
       >
         {links.map((link) => (
@@ -122,7 +134,11 @@ export function FollowColumn({
             key={link.name}
             href={link.href}
             className={
-              compact ? "follow-squircle follow-squircle--compact" : "follow-squircle"
+              isRow
+                ? "follow-squircle follow-squircle--row"
+                : compact
+                  ? "follow-squircle follow-squircle--compact"
+                  : "follow-squircle"
             }
             aria-label={`${link.name}, ${link.label}`}
             {...(link.external
@@ -131,9 +147,17 @@ export function FollowColumn({
           >
             <span
               className={
-                compact && link.emphasizeIcon
-                  ? "follow-squircle__icon follow-squircle__icon--emphasis"
-                  : "follow-squircle__icon"
+                [
+                  "follow-squircle__icon",
+                  !isRow && compact && link.emphasizeIcon
+                    ? "follow-squircle__icon--emphasis"
+                    : "",
+                  isRow && link.name === "Substack"
+                    ? "follow-squircle__icon--substack"
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")
               }
             >
               {link.icon}

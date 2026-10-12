@@ -1,4 +1,6 @@
-import { useState, type CSSProperties } from "react";
+import { Filter } from "lucide-react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import { EmbedModal } from "@/app/components/posts/EmbedModal";
 import { FollowColumn } from "@/app/components/posts/FollowColumn";
 import { PostCard } from "@/app/components/posts/PostCard";
@@ -7,7 +9,9 @@ import {
   SubstackIcon,
   TikTokIcon,
 } from "@/app/components/posts/PlatformIcons";
+import { PostsFilterModal } from "@/app/components/posts/PostsFilterModal";
 import { PostsGuideLine } from "@/app/components/posts/PostsGuideLine";
+import { ShortsPreview } from "@/app/components/posts/ShortsPreview";
 import { SiteFooter } from "@/app/components/SiteFooter";
 import { SiteNav } from "@/app/components/SiteNav";
 import {
@@ -20,19 +24,21 @@ import {
   getPlatformColor,
   getPlatformLabel,
   getPostLabel,
+  getPostThumbnail,
   posts,
   recentPosts,
   type ArchivePost,
   type PostSource,
 } from "@/app/content/posts";
 import { BROWN, CREAM, SANS, SERIF, STONE } from "@/app/constants";
+import { useMediaQuery } from "@/app/hooks/useMediaQuery";
 
-const PAGE_SIZE = 16;
+const DESKTOP_PAGE_SIZE = 16;
+const MOBILE_PAGE_SIZE = 15;
 
 const sectionTitleStyle = {
   color: BROWN,
   fontFamily: SERIF,
-  fontSize: "clamp(1.75rem, 3vw, 2.5rem)",
 } as const;
 
 const platformFilters: { source: PostSource; Icon: typeof TikTokIcon }[] = [
@@ -81,23 +87,67 @@ function matchesFilter(
   return group.members.some((member) => member.source === filter);
 }
 
+function withActiveGroup(
+  active: PostGroup<ArchivePost> | null,
+  filtered: PostGroup<ArchivePost>[],
+) {
+  if (!active || filtered.some((group) => group.id === active.id)) return filtered;
+  const insertAt = filtered.findIndex((group) => !comesBefore(group, active));
+  if (insertAt < 0) return [...filtered, active];
+  return [...filtered.slice(0, insertAt), active, ...filtered.slice(insertAt)];
+}
+
+function PostThumb({
+  label,
+  onOpen,
+  post,
+}: {
+  label: string;
+  onOpen: () => void;
+  post: ArchivePost;
+}) {
+  const thumbnail = getPostThumbnail(post);
+  return (
+    <button
+      type="button"
+      className="posts-thumb"
+      aria-label={label}
+      onClick={onOpen}
+    >
+      {thumbnail ? (
+        <ImageWithFallback
+          src={thumbnail}
+          alt=""
+          className="h-full w-full object-cover"
+        />
+      ) : null}
+    </button>
+  );
+}
+
 export function PostsPage() {
+  const isMobile = useMediaQuery("(max-width: 767px)");
   const [activeGroupId, setActiveGroupId] = useState<string | null>(null);
   const [filter, setFilter] = useState<PostSource | null>(null);
+  const [draftFilter, setDraftFilter] = useState<PostSource | null>(null);
+  const [filterOpen, setFilterOpen] = useState(false);
   const [page, setPage] = useState(0);
+  const pageSize = isMobile ? MOBILE_PAGE_SIZE : DESKTOP_PAGE_SIZE;
 
-  const filteredGroups = filter
-    ? groups.filter((group) => matchesFilter(group, filter))
-    : groups;
+  const filteredGroups = useMemo(
+    () =>
+      filter ? groups.filter((group) => matchesFilter(group, filter)) : groups,
+    [filter],
+  );
   const total = filteredGroups.length;
-  const lastPage = Math.max(0, Math.ceil(total / PAGE_SIZE) - 1);
+  const lastPage = Math.max(0, Math.ceil(total / pageSize) - 1);
   const currentPage = Math.min(page, lastPage);
   const pageGroups = filteredGroups.slice(
-    currentPage * PAGE_SIZE,
-    currentPage * PAGE_SIZE + PAGE_SIZE,
+    currentPage * pageSize,
+    currentPage * pageSize + pageSize,
   );
-  const rangeStart = total === 0 ? 0 : currentPage * PAGE_SIZE + 1;
-  const rangeEnd = total === 0 ? 0 : Math.min(total, (currentPage + 1) * PAGE_SIZE);
+  const rangeStart = total === 0 ? 0 : currentPage * pageSize + 1;
+  const rangeEnd = total === 0 ? 0 : Math.min(total, (currentPage + 1) * pageSize);
   const totalColor = filter ? getPlatformColor(filter) : STONE;
 
   const activeGroup = activeGroupId
@@ -106,6 +156,26 @@ export function PostsPage() {
   const { previous: previousGroup, next: nextGroup } = activeGroup
     ? listNeighbors(activeGroup, filteredGroups)
     : { previous: null, next: null };
+  const slideGroups = useMemo(
+    () => withActiveGroup(activeGroup, filteredGroups),
+    [activeGroup, filteredGroups],
+  );
+  const shortsPosts = useMemo(
+    () => slideGroups.map((group) => newerPost(group.members)),
+    [slideGroups],
+  );
+  const activeShortIndex =
+    activeGroup === null
+      ? null
+      : slideGroups.findIndex((group) => group.id === activeGroup.id);
+
+  useEffect(() => {
+    setPage((current) => (current > lastPage ? lastPage : current));
+  }, [lastPage]);
+
+  useEffect(() => {
+    if (!isMobile) setFilterOpen(false);
+  }, [isMobile]);
 
   function openPost(post: ArchivePost) {
     const group = groups.find((item) =>
@@ -114,13 +184,26 @@ export function PostsPage() {
     if (group) setActiveGroupId(group.id);
   }
 
-  function toggleFilter(source: PostSource) {
-    const next = filter === source ? null : source;
+  function applyFilter(next: PostSource | null) {
     setFilter(next);
     setPage(0);
     if (!next || !activeGroupId) return;
     const group = groups.find((item) => item.id === activeGroupId);
     if (!group || !matchesFilter(group, next)) setActiveGroupId(null);
+  }
+
+  function toggleFilter(source: PostSource) {
+    applyFilter(filter === source ? null : source);
+  }
+
+  function openFilterModal() {
+    setDraftFilter(filter);
+    setFilterOpen(true);
+  }
+
+  function saveFilter() {
+    applyFilter(draftFilter);
+    setFilterOpen(false);
   }
 
   return (
@@ -145,13 +228,29 @@ export function PostsPage() {
         <section aria-labelledby="recent-posts-heading">
           <h1
             id="recent-posts-heading"
-            className="mb-8 font-bold"
+            className="posts-section-title mb-3 font-bold md:mb-8"
             style={sectionTitleStyle}
           >
             Recent posts
           </h1>
+          <p
+            className="mb-6 text-base md:hidden"
+            style={{ color: BROWN, fontFamily: SANS }}
+          >
+            My most recent content across all my platforms.
+          </p>
           <div className="flex flex-col items-start gap-10 lg:flex-row lg:gap-8">
-            <div className="grid w-full min-w-0 flex-1 grid-cols-1 gap-4 sm:grid-cols-2 lg:w-auto">
+            <div className="posts-thumb-row grid grid-cols-2 gap-0.5 md:hidden">
+              {recentPosts.map((post) => (
+                <PostThumb
+                  key={post.id}
+                  label={getPostLabel(post)}
+                  onOpen={() => openPost(post)}
+                  post={post}
+                />
+              ))}
+            </div>
+            <div className="hidden w-full min-w-0 flex-1 grid-cols-2 gap-4 md:grid lg:w-auto">
               {recentPosts.map((post) => (
                 <PostCard
                   key={post.id}
@@ -164,15 +263,18 @@ export function PostsPage() {
                 />
               ))}
             </div>
-            <FollowColumn />
+            <FollowColumn
+              hideHeading={isMobile}
+              layout={isMobile ? "row" : "stack"}
+            />
           </div>
         </section>
 
         <section className="mt-16 md:mt-20" aria-labelledby="all-posts-heading">
-          <div className="mb-3 flex items-end justify-between gap-4 md:items-start">
+          <div className="posts-all-header mb-3 flex items-start justify-between gap-4">
             <h2
               id="all-posts-heading"
-              className="font-bold"
+              className="posts-section-title font-bold"
               style={sectionTitleStyle}
             >
               All posts
@@ -208,6 +310,18 @@ export function PostsPage() {
               </div>
               <div className="posts-pager">
                 <div className="posts-pager__controls">
+                  {isMobile ? (
+                    <button
+                      type="button"
+                      className="posts-pager__button"
+                      aria-label="Filter posts"
+                      aria-expanded={filterOpen}
+                      aria-pressed={filter !== null}
+                      onClick={openFilterModal}
+                    >
+                      <Filter className="h-4 w-4" aria-hidden="true" />
+                    </button>
+                  ) : null}
                   <button
                     type="button"
                     className="posts-pager__button"
@@ -243,7 +357,20 @@ export function PostsPage() {
           <p className="mb-6 text-base" style={{ color: BROWN, fontFamily: SANS }}>
             All of my posts across all my social media platforms.
           </p>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <div className="posts-thumb-row grid grid-cols-3 gap-0.5 md:hidden">
+            {pageGroups.map((group) => {
+              const lead = newerPost(group.members);
+              return (
+                <PostThumb
+                  key={group.id}
+                  label={groupLabel(group.members)}
+                  onOpen={() => openPost(lead)}
+                  post={lead}
+                />
+              );
+            })}
+          </div>
+          <div className="hidden gap-4 md:grid md:grid-cols-4">
             {pageGroups.map((group) => {
               const lead = newerPost(group.members);
               return (
@@ -265,19 +392,43 @@ export function PostsPage() {
       <div className="posts-page__footer">
         <SiteFooter />
       </div>
-      <EmbedModal
-        filter={filter}
-        hasNext={nextGroup !== null}
-        hasPrevious={previousGroup !== null}
-        members={activeGroup?.members ?? []}
-        onClose={() => setActiveGroupId(null)}
-        onNext={() => {
-          if (nextGroup) setActiveGroupId(nextGroup.id);
-        }}
-        onPrevious={() => {
-          if (previousGroup) setActiveGroupId(previousGroup.id);
-        }}
-      />
+      {isMobile ? (
+        <ShortsPreview
+          activeIndex={activeShortIndex !== null && activeShortIndex >= 0 ? activeShortIndex : null}
+          mediaWindow={1}
+          onChange={(index) => {
+            const group = slideGroups[index];
+            if (group) setActiveGroupId(group.id);
+          }}
+          onClose={() => setActiveGroupId(null)}
+          posts={shortsPosts}
+        />
+      ) : (
+        <EmbedModal
+          filter={filter}
+          hasNext={nextGroup !== null}
+          hasPrevious={previousGroup !== null}
+          members={activeGroup?.members ?? []}
+          onClose={() => setActiveGroupId(null)}
+          onNext={() => {
+            if (nextGroup) setActiveGroupId(nextGroup.id);
+          }}
+          onPrevious={() => {
+            if (previousGroup) setActiveGroupId(previousGroup.id);
+          }}
+        />
+      )}
+      {isMobile ? (
+        <PostsFilterModal
+          draft={draftFilter}
+          onClose={() => setFilterOpen(false)}
+          onSave={saveFilter}
+          onToggle={(source) =>
+            setDraftFilter((current) => (current === source ? null : source))
+          }
+          open={filterOpen}
+        />
+      ) : null}
     </div>
   );
 }
