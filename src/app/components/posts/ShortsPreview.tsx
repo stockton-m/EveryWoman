@@ -94,7 +94,7 @@ function postTikTok(
 
 function isTikTokPlayerMessage(
   data: unknown,
-): data is { type?: string; "x-tiktok-player": true } {
+): data is { type?: string; value?: unknown; "x-tiktok-player": true } {
   if (typeof data !== "object" || data === null || !("x-tiktok-player" in data)) {
     return false;
   }
@@ -321,6 +321,19 @@ export function ShortsPreview({
   }, [activeIndex]);
 
   useEffect(() => {
+    setUnmutedIds((ids) => {
+      if (ids.size === 0) return ids;
+      let changed = false;
+      const next = new Set<string>();
+      for (const id of ids) {
+        if (frameRefs.current.has(id)) next.add(id);
+        else changed = true;
+      }
+      return changed ? next : ids;
+    });
+  }, [activeIndex, posts]);
+
+  useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     const sync = () => {
       reducedMotionRef.current = media.matches;
@@ -337,7 +350,29 @@ export function ShortsPreview({
   useEffect(() => {
     const onMessage = (event: MessageEvent) => {
       if (event.origin !== "https://www.tiktok.com") return;
-      if (!isTikTokPlayerMessage(event.data) || event.data.type !== "onPlayerReady") return;
+      if (!isTikTokPlayerMessage(event.data)) return;
+      if (event.data.type === "onMute") {
+        if (typeof event.data.value !== "boolean") return;
+        const muted = event.data.value;
+        for (const [id, frame] of frameRefs.current) {
+          if (event.source !== frame.contentWindow) continue;
+          setUnmutedIds((ids) => {
+            const has = ids.has(id);
+            if (muted) {
+              if (!has) return ids;
+              const next = new Set(ids);
+              next.delete(id);
+              return next;
+            }
+            if (has) return ids;
+            const next = new Set(ids);
+            next.add(id);
+            return next;
+          });
+        }
+        return;
+      }
+      if (event.data.type !== "onPlayerReady") return;
       const index = activeIndexRef.current;
       const current = index === null ? undefined : postsRef.current[index];
       for (const [id, frame] of frameRefs.current) {
