@@ -1,4 +1,5 @@
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { SiteFooter } from "@/app/components/SiteFooter";
 import { SiteNav } from "@/app/components/SiteNav";
@@ -15,9 +16,29 @@ const substackLinkClass =
 
 const pillLinkStyle = { fontFamily: SANS, textDecoration: "none" };
 
+function openExternalLinksInNewTab(html: string): string {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  for (const anchor of doc.querySelectorAll("a[href]")) {
+    const href = anchor.getAttribute("href") ?? "";
+    if (!/^https?:\/\//i.test(href)) continue;
+    anchor.setAttribute("target", "_blank");
+    const rel = new Set(
+      (anchor.getAttribute("rel") ?? "").split(/\s+/).filter(Boolean),
+    );
+    rel.add("noopener");
+    rel.add("noreferrer");
+    anchor.setAttribute("rel", [...rel].sort().join(" "));
+  }
+  return doc.body.innerHTML;
+}
+
 export function PostPage() {
   const { id } = useParams();
   const post = id ? findSubstackPost(id) : undefined;
+  const bodyHtml = useMemo(
+    () => (post ? openExternalLinksInNewTab(post.bodyHtml) : ""),
+    [post],
+  );
 
   if (!post) {
     return <NotFoundPage />;
@@ -96,7 +117,7 @@ export function PostPage() {
           </p>
           <div
             className="post-body mt-10"
-            dangerouslySetInnerHTML={{ __html: post.bodyHtml }}
+            dangerouslySetInnerHTML={{ __html: bodyHtml }}
           />
           <div className="mt-12 flex justify-center">
             <a
