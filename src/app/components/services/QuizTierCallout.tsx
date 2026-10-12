@@ -237,11 +237,9 @@ export function QuizTierCallout({
               Not sure what tier to pick?
             </span>
             <span className="quiz-tier-callout__title-mobile">
-              Not sure
+              Not sure what
               <br />
-              what tier
-              <br />
-              to pick?
+              tier to pick?
             </span>
           </span>
           <span className="quiz-tier-callout__body">

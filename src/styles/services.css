@@ -272,6 +272,7 @@
 
   .quiz-tier-callout__title-mobile {
     display: block;
+    white-space: nowrap;
   }
 
   .quiz-tier-callout__mobile-play {
