@@ -56,9 +56,30 @@ export function SiteFooter() {
             ))}
           </div>
         </div>
-        <div className="pt-6 text-xs" style={{ color: "#8c8480" }}>
-          © {new Date().getFullYear()} EveryWoman · Madeleine Stockton ·
-          everywoman.io
+        <div
+          className="pt-6 flex flex-col items-start gap-y-1 text-xs sm:flex-row sm:items-center sm:justify-between"
+          style={{ color: "#8c8480" }}
+        >
+          <p>
+            © {new Date().getFullYear()} EveryWoman · Madeleine Stockton ·
+            everywoman.io
+          </p>
+          <p>
+            A site by{" "}
+            <a
+              href="https://miko.so"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 transition-colors duration-200 hover:text-[#f5ede4]"
+            >
+              Miko
+              <img
+                src="https://miko.so/miko.png"
+                alt=""
+                className="h-7 w-7 -translate-x-0.5 -translate-y-[3px] object-contain"
+              />
+            </a>
+          </p>
         </div>
       </div>
     </footer>
