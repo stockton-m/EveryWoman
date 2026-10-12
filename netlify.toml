@@ -1,0 +1,6 @@
+[build]
+  # Exit 0 skips a Git-triggered build. Exit 1 continues it.
+  # Content-sync commits are deployed by the build hook in
+  # .github/workflows/sync-content.yml. Build hooks are not cancelled
+  # by this command. Human commits do not match and still build from Git.
+  ignore = "git log -1 --format='%an' | grep -F -q 'github-actions[bot]'"

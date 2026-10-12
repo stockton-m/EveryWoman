@@ -53,14 +53,19 @@ flowchart TD
   thumbFail --> logoFallback["getPostThumbnail serves src/imports/logo-full.png until a later sync saves a file"]
 
   stageFiles --> hasDiff{"Staged diff empty?"}
-  hasDiff -->|yes| noCommit["No commit and no push. Netlify stays on the current deploy."]
-  hasDiff -->|no| commitPush["Commit chore(content): sync external posts and push the default branch"]
+  hasDiff -->|yes| noCommit["No commit and no push. The Netlify hook is not called."]
+  hasDiff -->|no| commitPush["Commit [AUTO] sync external posts as github-actions[bot] and push the default branch"]
 
-  commitPush --> netlify["Netlify production build, started by the push to the default branch"]
+  commitPush --> hook["POST the NETLIFY_BUILD_HOOK secret"]
+  commitPush --> gitPush["Netlify also receives the Git push"]
+  gitPush --> ignoreBot["netlify.toml ignore exits 0 and skips that Git build"]
+  hook --> netlify["Netlify production build of the default branch, started by the build hook"]
   netlify --> viteBuild["pnpm build imports the archive. public/tiktok is copied into dist."]
 ```
 
-The GitHub Action is [`.github/workflows/sync-content.yml`](../.github/workflows/sync-content.yml). It commits with `github-actions[bot]` only when the archive JSON or `public/tiktok/` changed. The workflow has no Netlify deploy hook. A push to the default branch, including this bot commit or a manual one, is what starts the production build. A sync that exits early, a dry run, or a run with an empty diff leaves the live site as it is.
+The GitHub Action is [`.github/workflows/sync-content.yml`](../.github/workflows/sync-content.yml). It commits with `github-actions[bot]` and the message `[AUTO] sync external posts` only when the archive JSON or `public/tiktok/` changed, then pushes the default branch. After that push succeeds, a second job POSTs to the `NETLIFY_BUILD_HOOK` repository secret. That secret is the bare build-hook URL from Netlify, created for the production branch (`main`). The synchronizer does not read it, and a local `pnpm content:sync` does not call it.
+
+Netlify still builds ordinary pushes through its Git connection. [`netlify.toml`](../netlify.toml) tells Netlify to skip the Git-triggered build when the commit author is `github-actions[bot]`, so a content-sync push is not built twice. The ignore command does not cancel a build started by the hook. A sync that exits early, a dry run, or a run with an empty diff does not commit and does not call the hook, so the live site stays as it is. If the hook POST fails after the push, re-run the failed job; re-running the whole workflow usually finds no new diff and will not call the hook again.
 
 ## Merge into the archive
 

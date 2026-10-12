@@ -16,6 +16,8 @@ jobs:
   sync:
     name: Synchronize archive
     runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.changes.outputs.changed }}
 
     steps:
       - name: Check out the latest default branch
@@ -66,3 +68,24 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "[AUTO] sync external posts"
           git push origin "HEAD:${{ github.event.repository.default_branch }}"
+
+  trigger-netlify:
+    name: Trigger Netlify deployment
+    needs: sync
+    if: ${{ success() && needs.sync.outputs.changed == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Netlify build hook
+        env:
+          NETLIFY_BUILD_HOOK: ${{ secrets.NETLIFY_BUILD_HOOK }}
+        run: |
+          if [ -z "${NETLIFY_BUILD_HOOK}" ]; then
+            echo "::error::The NETLIFY_BUILD_HOOK repository secret is not set."
+            exit 1
+          fi
+          curl --fail-with-body --silent --show-error \
+            --retry 3 --retry-all-errors \
+            --request POST \
+            --header "Content-Type: application/json" \
+            --data '{}' \
+            "${NETLIFY_BUILD_HOOK}"
