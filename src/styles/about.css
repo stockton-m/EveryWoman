@@ -385,9 +385,14 @@
   height: 0.72rem;
 }
 
-.about-ethos-card:hover .about-ethos-card__more,
 .about-ethos-card:focus-visible .about-ethos-card__more {
   transform: translateX(0.4rem);
+}
+
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .about-ethos-card:hover .about-ethos-card__more {
+    transform: translateX(0.4rem);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

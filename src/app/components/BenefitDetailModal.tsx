@@ -68,7 +68,7 @@ export function BenefitDetailModal({
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full transition-colors hover:bg-black/5 cursor-pointer"
+          className="absolute top-6 right-6 p-2 rounded-full transition-colors md:hover:bg-black/5 cursor-pointer"
           aria-label="Close"
         >
           <X className="w-6 h-6" style={{ color: BROWN }} />

@@ -155,8 +155,10 @@
   transition: background-color 180ms ease;
 }
 
-.group:hover .post-card__body {
-  background-color: color-mix(in srgb, #fff 88%, black);
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .group:hover .post-card__body {
+    background-color: color-mix(in srgb, #fff 88%, black);
+  }
 }
 
 .post-card-trigger:focus,
@@ -183,9 +185,14 @@
   transition: background-color 180ms ease;
 }
 
-.follow-squircle:hover,
 .follow-squircle:focus-visible {
   background-color: color-mix(in srgb, #fff 88%, black);
+}
+
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .follow-squircle:hover {
+    background-color: color-mix(in srgb, #fff 88%, black);
+  }
 }
 
 .follow-squircle__icon {
@@ -255,8 +262,10 @@
   cursor: pointer;
 }
 
-.embed-modal__close:hover {
-  background: color-mix(in srgb, var(--cream) 88%, black);
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .embed-modal__close:hover {
+    background: color-mix(in srgb, var(--cream) 88%, black);
+  }
 }
 
 .embed-modal__close:focus,
@@ -303,8 +312,10 @@
   right: 1.15rem;
 }
 
-.embed-modal__chevron:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--cream) 88%, black);
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .embed-modal__chevron:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--cream) 88%, black);
+  }
 }
 
 .embed-modal__chevron:focus,
@@ -510,8 +521,10 @@
   height: 1.4rem;
 }
 
-.embed-modal__toggle:hover {
-  background: color-mix(in srgb, var(--cream) 88%, black);
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .embed-modal__toggle:hover {
+    background: color-mix(in srgb, var(--cream) 88%, black);
+  }
 }
 
 .embed-modal__toggle:focus,
@@ -673,19 +686,21 @@
   height: 0.66rem;
 }
 
-.platform-filter:hover {
-  background: color-mix(in srgb, var(--platform-color) 14%, transparent);
-}
-
 .platform-filter--selected {
   background: var(--platform-color);
   color: var(--cream);
 }
 
-.platform-filter--selected:hover {
-  background: color-mix(in srgb, var(--platform-color) 88%, black);
-  border-color: color-mix(in srgb, var(--platform-color) 88%, black);
-  color: var(--cream);
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .platform-filter:hover {
+    background: color-mix(in srgb, var(--platform-color) 14%, transparent);
+  }
+
+  .platform-filter--selected:hover {
+    background: color-mix(in srgb, var(--platform-color) 88%, black);
+    border-color: color-mix(in srgb, var(--platform-color) 88%, black);
+    color: var(--cream);
+  }
 }
 
 .platform-filter:focus,
@@ -720,8 +735,10 @@
   transition: background-color 180ms ease;
 }
 
-.posts-pager__button:hover:not(:disabled) {
-  background: color-mix(in srgb, #fff 88%, black);
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .posts-pager__button:hover:not(:disabled) {
+    background: color-mix(in srgb, #fff 88%, black);
+  }
 }
 
 .posts-pager__button:focus,

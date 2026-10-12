@@ -143,9 +143,14 @@
   pointer-events: auto;
 }
 
-.quiz-tier-callout.is-scaled:hover .quiz-tier-callout__rays-spin path,
 .quiz-tier-callout:focus-within .quiz-tier-callout__rays-spin path {
   fill: color-mix(in srgb, var(--sage) 88%, black);
+}
+
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .quiz-tier-callout.is-scaled:hover .quiz-tier-callout__rays-spin path {
+    fill: color-mix(in srgb, var(--sage) 88%, black);
+  }
 }
 
 .quiz-tier-callout__face:focus {
@@ -207,10 +212,16 @@
     transform 140ms ease;
 }
 
-.quiz-tier-callout__face:hover .quiz-tier-callout__play,
 .quiz-tier-callout__face:focus-visible .quiz-tier-callout__play {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
+}
+
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .quiz-tier-callout__face:hover .quiz-tier-callout__play {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

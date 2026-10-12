@@ -95,9 +95,14 @@
   transition: background-color 180ms ease;
 }
 
-.contact-social:hover,
 .contact-social:focus-visible {
   background-color: color-mix(in srgb, #fff 88%, black);
+}
+
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .contact-social:hover {
+    background-color: color-mix(in srgb, #fff 88%, black);
+  }
 }
 
 .contact-social svg {
