@@ -145,7 +145,7 @@ export function TierComparisonGrid({ tiers }: TierComparisonGridProps) {
       </div>
 
       {/* Mobile: stacked tier cards */}
-      <div className="lg:hidden flex flex-col gap-10 mb-16 pt-4">
+      <div className="lg:hidden flex flex-col gap-10 mb-16">
         {TIER_IDS.map((tierId) => (
           <div key={tierId} className="relative flex flex-col items-stretch">
             {tierId === "signature" && (
@@ -166,16 +166,12 @@ export function TierComparisonGrid({ tiers }: TierComparisonGridProps) {
               />
               <BenefitsIncludesLabel />
               {COACHING_BENEFITS.map((benefit) => (
-                <div
-                  key={benefit.id}
-                  onMouseEnter={() => setHoveredBenefitId(benefit.id)}
-                  onMouseLeave={() => setHoveredBenefitId(null)}
-                >
+                <div key={benefit.id}>
                   <BenefitCell
                     benefit={benefit}
                     tierId={tierId}
-                    isHovered={hoveredBenefitId === benefit.id}
-                    onBenefitClick={openBenefit}
+                    isHovered={false}
+                    interactive={false}
                   />
                 </div>
               ))}

@@ -3,6 +3,11 @@
   isolation: isolate;
 }
 
+.services-page__portrait {
+  --portrait-size: clamp(14rem, 28vw, 20rem);
+  --portrait-mark: clamp(4rem, 10vw, 6rem);
+}
+
 .services-page__header,
 .services-page__main,
 .services-page__footer {
@@ -46,6 +51,16 @@
 @media (max-width: 640px) {
   .services-guide-line {
     opacity: 0.5;
+  }
+}
+
+@media (max-width: 1023px) {
+  .services-page__quiz {
+    display: none;
+  }
+
+  .benefit-copy__reserve {
+    display: none;
   }
 }
 
@@ -152,6 +167,7 @@
   text-align: center;
   text-wrap: balance;
   transform: rotate(-15deg);
+  transform-origin: center;
   transition: opacity 200ms ease;
 }
 
@@ -163,6 +179,11 @@
   font-size: clamp(1.15rem, 2.6vw, 1.45rem);
   font-weight: 700;
   line-height: 1.12;
+}
+
+.quiz-tier-callout__title-mobile,
+.quiz-tier-callout__mobile-play {
+  display: none;
 }
 
 .quiz-tier-callout__body {
@@ -202,5 +223,62 @@
 
   .quiz-tier-callout__rays-spin {
     animation: none;
+  }
+}
+
+@media (max-width: 1023px) {
+  .services-page__portrait {
+    --portrait-size: clamp(14rem, 28vw, 20rem);
+    --portrait-mark: clamp(4rem, 10vw, 6rem);
+  }
+
+  .quiz-tier-callout {
+    transform: translate(-1rem, 1rem) scale(0);
+  }
+
+  .quiz-tier-callout.is-scaled {
+    transform: translate(-1rem, 1rem) scale(0.85);
+  }
+
+  .services-page__tiers-heading {
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    font-size: 1.75rem;
+  }
+
+  .quiz-tier-callout.is-scaled:hover .quiz-tier-callout__rays-spin path,
+  .quiz-tier-callout:focus-within .quiz-tier-callout__rays-spin path {
+    fill: var(--sage);
+  }
+
+  .services-get-started.pill-btn--ember:hover {
+    background-color: var(--ember);
+  }
+
+  .quiz-tier-callout__title {
+    font-size: 1.12rem;
+    line-height: 1.15;
+  }
+
+  .quiz-tier-callout__title-desktop,
+  .quiz-tier-callout__body,
+  .quiz-tier-callout__play {
+    display: none;
+  }
+
+  .quiz-tier-callout__copy {
+    gap: 0.45rem;
+  }
+
+  .quiz-tier-callout__title-mobile {
+    display: block;
+  }
+
+  .quiz-tier-callout__mobile-play {
+    display: block;
+    width: 1.88rem;
+    height: 2.56rem;
+    color: var(--cream);
+    transform: translateX(0.2rem);
   }
 }

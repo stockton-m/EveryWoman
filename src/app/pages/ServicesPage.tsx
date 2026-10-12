@@ -50,7 +50,7 @@ export function ServicesPage() {
 
       <main className="services-page__main max-w-7xl mx-auto px-6 md:px-10 pt-10 pb-20">
         <div className="flex flex-col items-center text-center mb-6">
-          <PortraitPlaceholder size="clamp(7rem, 14vw, 10rem)" className="mb-8" />
+          <PortraitPlaceholder className="services-page__portrait mb-8" />
 
           <h1
             className="font-bold mb-4"
@@ -103,9 +103,16 @@ export function ServicesPage() {
           </div>
         </div>
 
-        <div className="my-14 md:my-16">
+        <div className="services-page__quiz my-14 md:my-16">
           <CoachingQuiz ref={quizRef} onOpenChange={handleQuizOpenChange} />
         </div>
+
+        <h2
+          className="services-page__tiers-heading font-bold lg:hidden"
+          style={{ fontFamily: SERIF, color: "#2a1f1a" }}
+        >
+          Coaching tiers
+        </h2>
 
         <div ref={tiersRef}>
           <TierComparisonGrid tiers={COACHING_TIERS} />

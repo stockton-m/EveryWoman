@@ -14,6 +14,7 @@ type BenefitCellProps = {
   benefit: CoachingBenefit;
   tierId: CoachingTierId;
   isHovered: boolean;
+  interactive?: boolean;
   onBenefitClick?: (benefit: CoachingBenefit) => void;
 };
 
@@ -21,6 +22,7 @@ export function BenefitCell({
   benefit,
   tierId,
   isHovered,
+  interactive = true,
   onBenefitClick,
 }: BenefitCellProps) {
   const included = isBenefitIncluded(benefit, tierId);
@@ -39,19 +41,23 @@ export function BenefitCell({
   return (
     <div className="px-4 lg:px-6 py-0.5">
       <div
-        role="button"
-        tabIndex={0}
-        className={`flex gap-2.5 text-sm rounded-xl px-2 py-2 cursor-pointer ${
-          isPlainRow ? "items-center" : "items-start"
-        }`}
+        {...(interactive
+          ? {
+              role: "button" as const,
+              tabIndex: 0,
+              onClick: () => onBenefitClick?.(benefit),
+              onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onBenefitClick?.(benefit);
+                }
+              },
+            }
+          : {})}
+        className={`flex gap-2.5 text-sm rounded-xl px-2 py-2 ${
+          interactive ? "cursor-pointer " : ""
+        }${isPlainRow ? "items-center" : "items-start"}`}
         style={{ background: pillBg }}
-        onClick={() => onBenefitClick?.(benefit)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onBenefitClick?.(benefit);
-          }
-        }}
       >
         {included ? (
           <Check

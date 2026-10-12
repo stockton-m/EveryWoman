@@ -78,7 +78,9 @@ export function BenefitCopy({
         {copy.title}
       </span>
       <span
-        className="block text-xs leading-relaxed mt-0.5 font-normal"
+        className={`block text-xs leading-relaxed mt-0.5 font-normal${
+          showDesc ? "" : " benefit-copy__reserve"
+        }`}
         style={{ fontFamily: SANS, color: descColor }}
         aria-hidden={!showDesc}
       >

@@ -159,6 +159,109 @@
   }
 }
 
+.coaching-quiz-modal {
+  min-height: min(42rem, calc(100dvh - 3rem));
+  max-height: calc(100dvh - 1.5rem);
+}
+
+.coaching-quiz-result__name {
+  font-size: clamp(2.4rem, 7vw, 5rem);
+  transform: translateY(-0.1em);
+}
+
+@media (min-width: 1024px) {
+  .coaching-quiz-result {
+    padding-top: 2.75rem;
+  }
+}
+
+@media (max-width: 1023px) {
+  .coaching-quiz-modal--question {
+    height: min(42rem, calc(100dvh - 3rem));
+    min-height: min(42rem, calc(100dvh - 3rem));
+    max-height: min(42rem, calc(100dvh - 3rem));
+  }
+
+  .coaching-quiz-modal--question,
+  .coaching-quiz-modal--result {
+    overflow: hidden;
+  }
+
+  .coaching-quiz-modal--question .coaching-quiz-question {
+    overflow: hidden;
+  }
+
+  .coaching-quiz-modal--question .coaching-quiz-question > :not(.coaching-quiz-answers) {
+    flex-shrink: 0;
+  }
+
+  .coaching-quiz-modal--question .coaching-quiz-answers {
+    flex: 0 1 auto;
+    min-height: 0;
+    align-items: start;
+    align-content: start;
+    grid-auto-rows: max-content;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    padding-inline-end: 0.85rem;
+  }
+
+  .coaching-quiz-modal--question .coaching-quiz-answer {
+    height: auto;
+    align-self: start;
+  }
+
+  .coaching-quiz-result {
+    overflow: hidden;
+    padding-top: 3.5rem;
+  }
+
+  .coaching-quiz-result__eyebrow {
+    margin-bottom: 3.5rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-align: center;
+  }
+
+  .coaching-quiz-result__icon {
+    width: 9rem;
+    height: 9rem;
+  }
+
+  .coaching-quiz-result__icon svg {
+    width: 6rem;
+    height: 6rem;
+  }
+
+  .coaching-quiz-result__identity {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
+    text-align: center;
+  }
+
+  .coaching-quiz-result__explanation {
+    margin-bottom: 0;
+  }
+
+  .coaching-quiz-result__cta-slot {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: flex-end;
+    justify-content: center;
+    min-height: 0;
+    padding-bottom: 0.35rem;
+  }
+
+  .coaching-quiz-result__name {
+    font-size: clamp(2.2rem, 12.2vw, 3rem);
+    text-align: center;
+    white-space: nowrap;
+    transform: none;
+  }
+}
+
 @media (max-width: 639px) {
   .coaching-quiz-trigger {
     min-height: 4rem;

@@ -26,6 +26,21 @@
   min-height: 320px;
 }
 
+.testimonial-track.is-drag-driven {
+  animation: none;
+}
+
+@media (max-width: 1023px) {
+  .testimonial-track {
+    touch-action: pan-y;
+  }
+
+  .testimonial-track.is-dragging {
+    cursor: grabbing;
+    user-select: none;
+  }
+}
+
 @keyframes testimonial-marquee {
   from {
     transform: translateX(0);

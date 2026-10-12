@@ -107,37 +107,48 @@ export function CoachingQuizModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={TITLE_ID}
-        className="coaching-quiz-modal relative flex w-full max-w-5xl flex-col overflow-y-auto rounded-[2rem] p-6 sm:p-8 md:rounded-[3rem] md:p-12"
+        className={`coaching-quiz-modal relative flex w-full max-w-5xl flex-col overflow-y-auto rounded-[2rem] p-6 sm:p-8 md:rounded-[3rem] md:p-12${
+          phase === "question" ? " coaching-quiz-modal--question" : ""
+        }${phase === "result" ? " coaching-quiz-modal--result" : ""}`}
         style={{
-          minHeight: "min(42rem, calc(100dvh - 3rem))",
-          maxHeight: "calc(100dvh - 1.5rem)",
           background: SAGE,
           boxShadow: "0 32px 90px rgba(42,31,26,0.3)",
           color: CREAM,
           fontFamily: SANS,
         }}
       >
-        <button
-          ref={closeButtonRef}
-          type="button"
-          onClick={onClose}
-          className="pill-btn pill-btn--icon absolute right-5 top-5 z-20 rounded-full p-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 md:right-8 md:top-8"
-          style={{ color: CREAM }}
-          aria-label="Close tier quiz"
+        <div
+          className={
+            phase === "result"
+              ? "absolute inset-x-5 top-5 z-20 flex items-center justify-between md:inset-x-8 md:top-8"
+              : "contents"
+          }
         >
-          <X className="h-6 w-6" />
-        </button>
-
-        {phase === "result" && (
+          {phase === "result" && (
+            <button
+              type="button"
+              onClick={onStartOver}
+              className="pill-btn pill-btn--outline-cream inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 md:text-sm"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Start over
+            </button>
+          )}
           <button
+            ref={closeButtonRef}
             type="button"
-            onClick={onStartOver}
-            className="pill-btn pill-btn--outline-cream absolute right-16 top-5 z-20 inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 md:right-20 md:top-8 md:text-sm"
+            onClick={onClose}
+            className={`pill-btn pill-btn--icon z-20 rounded-full p-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2${
+              phase === "result"
+                ? ""
+                : " absolute right-5 top-5 md:right-8 md:top-8"
+            }`}
+            style={{ color: CREAM }}
+            aria-label="Close tier quiz"
           >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Start over
+            <X className="h-6 w-6" />
           </button>
-        )}
+        </div>
 
         {phase === "intro" && (
           <div className="flex min-h-[30rem] flex-1 flex-col">
@@ -194,7 +205,7 @@ export function CoachingQuizModal({
         )}
 
         {phase === "question" && (
-          <div className="flex min-h-[34rem] flex-1 flex-col">
+          <div className="coaching-quiz-question flex min-h-0 flex-1 flex-col lg:min-h-[34rem]">
             <button
               type="button"
               onClick={onBack}
@@ -230,7 +241,7 @@ export function CoachingQuizModal({
             </div>
 
             <div
-              className="grid gap-3 sm:grid-cols-2"
+              className="coaching-quiz-answers grid gap-3 sm:grid-cols-2"
               aria-label={`Answers for question ${questionIndex + 1}`}
             >
               {question.options.map((option) => {

@@ -233,12 +233,31 @@ export function QuizTierCallout({
             className="quiz-tier-callout__title"
             style={{ fontFamily: SERIF }}
           >
-            Not sure what tier to pick?
+            <span className="quiz-tier-callout__title-desktop">
+              Not sure what tier to pick?
+            </span>
+            <span className="quiz-tier-callout__title-mobile">
+              Not sure
+              <br />
+              what tier
+              <br />
+              to pick?
+            </span>
           </span>
           <span className="quiz-tier-callout__body">
             Answer some quick questions to find out what coaching tier works
             best for you.
           </span>
+          <svg
+            className="quiz-tier-callout__mobile-play"
+            viewBox="8.2 5.6 9.4 12.8"
+            aria-hidden="true"
+          >
+            <path
+              fill="currentColor"
+              d="M11.5 7.85 L14.3 9.75 Q17.6 12 14.3 14.25 L11.5 16.15 Q8.2 18.4 8.2 14.4 L8.2 9.6 Q8.2 5.6 11.5 7.85 Z"
+            />
+          </svg>
         </span>
         <Play
           className="quiz-tier-callout__play"

@@ -107,29 +107,30 @@ export function CoachingQuizResult({
   if (!tier || !activeArchetype) return null;
 
   return (
-    <div className="flex min-h-[34rem] flex-1 flex-col">
+    <div className="coaching-quiz-result flex min-h-0 flex-1 flex-col lg:min-h-[34rem]">
       <p
-        className="mb-5 pr-12 text-left text-xs font-semibold uppercase tracking-[0.18em] md:text-sm"
+        className="coaching-quiz-result__eyebrow mb-3 text-left text-xs font-semibold uppercase tracking-[0.18em] lg:mb-5 lg:pr-12 md:text-sm"
         style={{ color: "rgba(245,237,228,0.78)", fontFamily: SANS }}
       >
         Your suggested coaching tier is
       </p>
 
-      <div className="mb-4 flex w-full max-w-3xl flex-wrap items-center gap-4">
+      <div className="coaching-quiz-result__identity mb-6 flex w-full max-w-3xl items-center gap-2 lg:mb-4 lg:flex-wrap lg:gap-4">
         <span
-          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full md:h-20 md:w-20"
+          className="coaching-quiz-result__icon flex h-12 w-12 shrink-0 items-center justify-center rounded-full lg:h-20 lg:w-20"
           style={{ background: CREAM, color: EMBER }}
         >
-          <TierPatternIcon tierId={tier.id} className="h-11 w-11 md:h-14 md:w-14" />
+          <TierPatternIcon
+            tierId={tier.id}
+            className="h-8 w-8 lg:h-14 lg:w-14"
+          />
         </span>
         <h2
           id={titleId}
-          className="font-bold leading-none"
+          className="coaching-quiz-result__name font-bold leading-none"
           style={{
             color: CREAM,
             fontFamily: SERIF,
-            fontSize: "clamp(2.4rem, 7vw, 5rem)",
-            transform: "translateY(-0.1em)",
           }}
         >
           {tier.name}
@@ -138,7 +139,7 @@ export function CoachingQuizResult({
           href={CONSULTATION_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="pill-btn pill-btn--ember ml-auto inline-flex shrink-0 items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+          className="services-get-started pill-btn pill-btn--ember ml-auto hidden shrink-0 items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 lg:inline-flex"
         >
           Get started
           <ArrowUpRight className="h-4 w-4" />
@@ -146,19 +147,31 @@ export function CoachingQuizResult({
       </div>
 
       <p
-        className="mb-2 max-w-3xl text-base font-semibold leading-relaxed"
+        className="mb-2 max-w-3xl text-sm font-semibold leading-snug lg:text-base lg:leading-relaxed"
         style={{ color: CREAM }}
       >
         {COACHING_TIER_BEST_FOR[tier.id]}
       </p>
       <p
-        className="mb-5 max-w-3xl text-sm leading-relaxed md:text-base"
+        className="coaching-quiz-result__explanation mb-3 max-w-3xl text-sm leading-snug lg:mb-5 lg:leading-relaxed md:text-base"
         style={{ color: "rgba(245,237,228,0.82)" }}
       >
         {result.explanation}
       </p>
 
-      <div ref={containerRef} className="relative mt-auto">
+      <div className="coaching-quiz-result__cta-slot lg:hidden">
+        <a
+          href={CONSULTATION_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="services-get-started coaching-quiz-result__cta pill-btn pill-btn--ember inline-flex w-fit shrink-0 items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+        >
+          Get started
+          <ArrowUpRight className="h-4 w-4" />
+        </a>
+      </div>
+
+      <div ref={containerRef} className="relative mt-auto hidden lg:block">
         {connector && (
           <svg
             className="pointer-events-none absolute inset-0 z-20 h-full w-full overflow-visible"
