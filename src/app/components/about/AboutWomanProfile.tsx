@@ -19,27 +19,13 @@ export function getAboutEthosCardStyle(index: number) {
   return ABOUT_ETHOS_CARD_STYLES[index % ABOUT_ETHOS_CARD_STYLES.length];
 }
 
-type AboutWomanProfileProps = {
+type AboutEthosCardBodyProps = {
   profile: AboutProfile;
-  index: number;
-  onOpen: () => void;
 };
 
-export function AboutWomanProfile({
-  profile,
-  index,
-  onOpen,
-}: AboutWomanProfileProps) {
-  const cardStyle = getAboutEthosCardStyle(index);
-
+export function AboutEthosCardBody({ profile }: AboutEthosCardBodyProps) {
   return (
-    <button
-      type="button"
-      className="about-ethos-card"
-      style={{ background: cardStyle.background, color: cardStyle.color }}
-      onClick={onOpen}
-      aria-haspopup="dialog"
-    >
+    <>
       <div className="about-ethos-card__media">
         <AboutImagePlaceholder
           accent={ACCENTS[profile.accent]}
@@ -62,6 +48,36 @@ export function AboutWomanProfile({
         Read more
         <ArrowRight className="about-ethos-card__arrow" aria-hidden="true" />
       </span>
+    </>
+  );
+}
+
+type AboutWomanProfileProps = {
+  profile: AboutProfile;
+  index: number;
+  presented?: boolean;
+  revealing?: boolean;
+  onOpen: () => void;
+};
+
+export function AboutWomanProfile({
+  profile,
+  index,
+  presented = false,
+  revealing = false,
+  onOpen,
+}: AboutWomanProfileProps) {
+  const cardStyle = getAboutEthosCardStyle(index);
+
+  return (
+    <button
+      type="button"
+      className={`about-ethos-card${presented ? " about-ethos-card--presented" : ""}${revealing ? " about-ethos-card--reveal" : ""}`}
+      style={{ background: cardStyle.background, color: cardStyle.color }}
+      onClick={onOpen}
+      aria-haspopup="dialog"
+    >
+      <AboutEthosCardBody profile={profile} />
     </button>
   );
 }

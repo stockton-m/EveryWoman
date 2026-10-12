@@ -169,7 +169,7 @@ export function PostsPage() {
         </section>
 
         <section className="mt-16 md:mt-20" aria-labelledby="all-posts-heading">
-          <div className="mb-3 flex items-end justify-between gap-4">
+          <div className="mb-3 flex items-end justify-between gap-4 md:items-start">
             <h2
               id="all-posts-heading"
               className="font-bold"

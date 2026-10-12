@@ -350,7 +350,7 @@
 }
 
 .about-ethos-card__name {
-  margin: 0 0 0.85rem;
+  margin: 0 0 1.275rem;
   font-size: clamp(1.45rem, 2vw, 1.8rem);
   font-weight: 700;
   line-height: 1.05;
@@ -393,6 +393,23 @@
 @media (prefers-reduced-motion: reduce) {
   .about-ethos-card__more {
     transition: none;
+  }
+
+  .about-ethos-card--reveal .about-ethos-card__media,
+  .about-ethos-card--reveal .about-ethos-card__copy,
+  .about-ethos-card--reveal .about-ethos-card__more {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+@keyframes about-card-content-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
   }
 }
 
@@ -784,6 +801,11 @@
     padding-inline: 1.25rem;
   }
 
+  .about-ethos {
+    margin-top: 3rem;
+    padding-top: 1.875rem;
+  }
+
   .about-ethos__intro {
     margin-top: 0;
     margin-left: 0;
@@ -798,8 +820,112 @@
     width: min(100%, 22rem);
   }
 
+  .about-ethos-card__name {
+    margin-bottom: 1.275rem;
+  }
+
+  .about-ethos-card__copy {
+    padding-bottom: 3.15rem;
+  }
+
+  .about-ethos-card__more {
+    right: 0.8rem;
+    bottom: 0.8rem;
+    left: 0.8rem;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1;
+    transform: none;
+  }
+
+  .about-ethos-card__arrow {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .about-ethos-card:nth-child(3n + 1) .about-ethos-card__more,
+  .about-ethos-card:nth-child(3n) .about-ethos-card__more {
+    background-color: var(--cream);
+    color: var(--brown);
+  }
+
+  .about-ethos-card:nth-child(3n + 2) .about-ethos-card__more {
+    background-color: var(--brown);
+    color: var(--cream);
+  }
+
+  .about-ethos-card:hover .about-ethos-card__more,
+  .about-ethos-card:focus-visible .about-ethos-card__more {
+    transform: none;
+  }
+
+  .about-ethos-modal {
+    height: min(42rem, calc(100dvh - 3rem));
+    touch-action: none;
+    user-select: none;
+  }
+
+  .about-ethos-card--presented {
+    visibility: hidden;
+  }
+
+  .about-ethos-modal:focus {
+    outline: none;
+  }
+
+  .about-ethos-modal .pill-btn--icon {
+    display: none;
+  }
+
+  .about-ethos-modal--returning .about-ethos-modal__layout {
+    opacity: 0;
+    transition: opacity 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .about-ethos-card--reveal .about-ethos-card__media,
+  .about-ethos-card--reveal .about-ethos-card__copy,
+  .about-ethos-card--reveal .about-ethos-card__more {
+    opacity: 0;
+    animation: about-card-content-in 280ms ease forwards;
+  }
+
+  .about-ethos-modal__layout {
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+    min-height: 0;
+    padding-top: 0;
+  }
+
+  .about-ethos-modal__image {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    margin-inline: 0;
+  }
+
+  .about-ethos-modal__copy {
+    align-self: stretch;
+    min-height: 0;
+    max-height: none;
+    padding-top: 0;
+  }
+
+  .about-collage__title {
+    margin-top: 2rem;
+    font-size: clamp(2.05rem, 7.5vw, 2.65rem);
+    white-space: normal;
+  }
+
+  .about-collage__title em {
+    display: block;
+  }
+
   .about-collage-section {
-    padding-top: 2rem;
+    padding-top: 1rem;
     padding-bottom: 6rem;
   }
 

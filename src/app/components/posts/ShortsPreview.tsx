@@ -10,10 +10,17 @@ import {
 import { createPortal } from "react-dom";
 import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import {
+  InstagramIcon,
+  SubstackIcon,
+  TikTokIcon,
+} from "@/app/components/posts/PlatformIcons";
+import {
   getEmbedUrl,
+  getPlatformLabel,
   getPostLabel,
   getPostThumbnail,
   type ArchivePost,
+  type PostSource,
 } from "@/app/content/posts";
 import { SANS } from "@/app/constants";
 import logoImage from "@/imports/logo.png";
@@ -41,6 +48,12 @@ type DragState = {
   moved: boolean;
   height: number;
 };
+
+function OpenPlatformIcon({ source }: { source: PostSource }) {
+  if (source === "instagram") return <InstagramIcon />;
+  if (source === "tiktok") return <TikTokIcon />;
+  return <SubstackIcon />;
+}
 
 function blurFocus() {
   const active = document.activeElement;
@@ -536,7 +549,12 @@ export function ShortsPreview({
                     aria-hidden="true"
                   >
                     <Volume2 className="shorts-preview__unmute-icon" />
-                    Tap to unmute
+                    <span className="shorts-preview__unmute-copy">
+                      <span>Tap to unmute</span>
+                      <span className="shorts-preview__unmute-note">
+                        TikTok posts are muted by default.
+                      </span>
+                    </span>
                   </div>
                 ) : null}
                 <div className="shorts-preview__caption">
@@ -579,6 +597,15 @@ export function ShortsPreview({
         >
           <X className="h-7 w-7" />
         </button>
+        <a
+          className="shorts-preview__open"
+          href={post.sourceUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Open on ${getPlatformLabel(post.source)}`}
+        >
+          <OpenPlatformIcon source={post.source} />
+        </a>
         <button
           type="button"
           className="shorts-preview__caret"

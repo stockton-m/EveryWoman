@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent, TransitionEvent } from "react";
 import { createPortal } from "react-dom";
 import { AboutImagePlaceholder } from "@/app/components/about/AboutImagePlaceholder";
 import { getAboutEthosCardStyle } from "@/app/components/about/AboutWomanProfile";
@@ -13,11 +14,87 @@ const ACCENTS = {
 } as const;
 
 const TITLE_ID = "about-woman-modal-title";
+const DISMISS_DISTANCE = 120;
+const FLICK_PX_PER_MS = 0.45;
+const TAP_SLOP = 10;
+const BACKDROP_ALPHA = 0.62;
+
+type DragState = {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  lastX: number;
+  lastY: number;
+  lastTime: number;
+  velocityX: number;
+  velocityY: number;
+  moved: boolean;
+};
+
+type CardMotion = {
+  x: number;
+  y: number;
+  scaleX: number;
+  scaleY: number;
+  animate: boolean;
+  backdrop: number;
+};
+
+const REST_MOTION: CardMotion = {
+  x: 0,
+  y: 0,
+  scaleX: 1,
+  scaleY: 1,
+  animate: false,
+  backdrop: BACKDROP_ALPHA,
+};
+
+function motionTransform(motion: CardMotion) {
+  const shifted = motion.x !== 0 || motion.y !== 0;
+  const scaled = motion.scaleX !== 1 || motion.scaleY !== 1;
+  if (!motion.animate && !shifted && !scaled) return undefined;
+  return `translate(${motion.x}px, ${motion.y}px) scale(${motion.scaleX}, ${motion.scaleY})`;
+}
+
+function motionBackToCard(dialog: HTMLElement, index: number): CardMotion | null {
+  const source = document.querySelectorAll<HTMLElement>(".about-ethos-card")[index];
+  if (!source) return null;
+
+  const target = source.getBoundingClientRect();
+  const width = dialog.offsetWidth;
+  const height = dialog.offsetHeight;
+  if (!width || !height || !target.width || !target.height) return null;
+
+  const visual = dialog.getBoundingClientRect();
+  const painted = getComputedStyle(dialog).transform;
+  const matrix = painted && painted !== "none" ? new DOMMatrix(painted) : new DOMMatrix();
+  const restLeft = visual.left - matrix.e;
+  const restTop = visual.top - matrix.f;
+  const scaleX = target.width / width;
+  const scaleY = target.height / height;
+
+  return {
+    x: target.left - restLeft - (width * (1 - scaleX)) / 2,
+    y: target.top - restTop - (height * (1 - scaleY)) / 2,
+    scaleX,
+    scaleY,
+    animate: true,
+    backdrop: 0,
+  };
+}
+
+function mobileDragEnabled() {
+  return window.matchMedia("(max-width: 640px)").matches;
+}
+
+function prefersReducedMotion() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
 
 type AboutWomanModalProps = {
   profile: AboutProfile | null;
   index: number;
-  onClose: () => void;
+  onClose: (reveal?: boolean) => void;
 };
 
 export function AboutWomanModal({
@@ -25,10 +102,32 @@ export function AboutWomanModal({
   index,
   onClose,
 }: AboutWomanModalProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
   const isOpen = profile !== null;
+  const dragRef = useRef<DragState>({
+    pointerId: -1,
+    startX: 0,
+    startY: 0,
+    lastX: 0,
+    lastY: 0,
+    lastTime: 0,
+    velocityX: 0,
+    velocityY: 0,
+    moved: false,
+  });
+  const settlingRef = useRef(false);
+  const suppressBackdropRef = useRef(false);
+  const [motion, setMotion] = useState<CardMotion>(REST_MOTION);
+
+  useEffect(() => {
+    if (isOpen) return;
+    settlingRef.current = false;
+    dragRef.current.pointerId = -1;
+    setMotion(REST_MOTION);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -36,7 +135,8 @@ export function AboutWomanModal({
     const previousFocus = document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    closeButtonRef.current?.focus();
+    if (mobileDragEnabled()) dialogRef.current?.focus({ preventScroll: true });
+    else closeButtonRef.current?.focus();
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -46,7 +146,7 @@ export function AboutWomanModal({
       }
 
       if (event.key !== "Tab") return;
-      const dialog = closeButtonRef.current?.closest('[role="dialog"]');
+      const dialog = dialogRef.current;
       const focusable = dialog?.querySelectorAll<HTMLElement>(
         'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
       );
@@ -71,24 +171,156 @@ export function AboutWomanModal({
     };
   }, [isOpen]);
 
+  const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (settlingRef.current || !mobileDragEnabled()) return;
+    if (event.pointerType === "mouse") return;
+    if ((event.target as HTMLElement).closest("button")) return;
+
+    dragRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      lastX: event.clientX,
+      lastY: event.clientY,
+      lastTime: event.timeStamp,
+      velocityX: 0,
+      velocityY: 0,
+      moved: false,
+    };
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      // The pointer can already be inactive if the gesture ended early.
+    }
+  };
+
+  const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = dragRef.current;
+    if (drag.pointerId !== event.pointerId) return;
+    const deltaX = event.clientX - drag.startX;
+    const deltaY = event.clientY - drag.startY;
+    if (!drag.moved && Math.hypot(deltaX, deltaY) < TAP_SLOP) return;
+
+    drag.moved = true;
+    const dt = event.timeStamp - drag.lastTime;
+    if (dt > 0) {
+      drag.velocityX = (event.clientX - drag.lastX) / dt;
+      drag.velocityY = (event.clientY - drag.lastY) / dt;
+    }
+    drag.lastX = event.clientX;
+    drag.lastY = event.clientY;
+    drag.lastTime = event.timeStamp;
+
+    const distance = Math.hypot(deltaX, deltaY);
+    const progress = Math.min(1, distance / DISMISS_DISTANCE);
+    setMotion({
+      x: deltaX,
+      y: deltaY,
+      scaleX: 1,
+      scaleY: 1,
+      animate: false,
+      backdrop: BACKDROP_ALPHA * (1 - progress),
+    });
+  };
+
+  const releasePointer = (event: ReactPointerEvent<HTMLDivElement>) => {
+    try {
+      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+      }
+    } catch {
+      // Capture was already released with the pointer.
+    }
+  };
+
+  const onPointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = dragRef.current;
+    if (drag.pointerId !== event.pointerId) return;
+    drag.pointerId = -1;
+    releasePointer(event);
+    if (!drag.moved) return;
+
+    suppressBackdropRef.current = true;
+    window.setTimeout(() => {
+      suppressBackdropRef.current = false;
+    }, 0);
+
+    const deltaX = event.clientX - drag.startX;
+    const deltaY = event.clientY - drag.startY;
+    const distance = Math.hypot(deltaX, deltaY);
+    const idle = event.timeStamp - drag.lastTime;
+    const velocityX = idle > 80 ? 0 : drag.velocityX;
+    const velocityY = idle > 80 ? 0 : drag.velocityY;
+    const speed = Math.hypot(velocityX, velocityY);
+    const shouldDismiss = distance >= DISMISS_DISTANCE || speed >= FLICK_PX_PER_MS;
+
+    if (!shouldDismiss) {
+      setMotion({ ...REST_MOTION, animate: !prefersReducedMotion() });
+      return;
+    }
+
+    if (prefersReducedMotion()) {
+      onCloseRef.current();
+      return;
+    }
+
+    const dialog = dialogRef.current;
+    const home = dialog ? motionBackToCard(dialog, index) : null;
+    if (!home) {
+      onCloseRef.current();
+      return;
+    }
+
+    settlingRef.current = true;
+    setMotion(home);
+  };
+
+  const onPointerCancel = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = dragRef.current;
+    if (drag.pointerId !== event.pointerId) return;
+    drag.pointerId = -1;
+    releasePointer(event);
+    if (drag.moved) setMotion({ ...REST_MOTION, animate: !prefersReducedMotion() });
+  };
+
+  const onDialogTransitionEnd = (event: TransitionEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget || event.propertyName !== "transform") return;
+    if (!settlingRef.current) {
+      setMotion((current) =>
+        current.x === 0 && current.y === 0 ? { ...current, animate: false } : current,
+      );
+      return;
+    }
+    settlingRef.current = false;
+    onCloseRef.current(true);
+  };
+
   if (!profile) return null;
 
   const cardStyle = getAboutEthosCardStyle(index);
+  const returning =
+    motion.animate && (motion.scaleX !== 1 || motion.scaleY !== 1);
 
   return createPortal(
     <div
       className="fixed inset-0 z-[70] flex items-center justify-center p-3 md:p-8"
-      style={{ background: "rgba(42,31,26,0.62)" }}
+      style={{
+        background: `rgba(42,31,26,${motion.backdrop})`,
+        transition: motion.animate ? "background-color 280ms ease" : "none",
+      }}
       role="presentation"
       onMouseDown={(event) => {
+        if (suppressBackdropRef.current) return;
         if (event.target === event.currentTarget) onClose();
       }}
     >
       <div
+        ref={dialogRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-labelledby={TITLE_ID}
-        className="about-ethos-modal relative flex w-full max-w-5xl flex-col overflow-hidden rounded-[2rem] p-6 sm:p-8 md:rounded-[3rem] md:p-12"
+        className={`about-ethos-modal relative flex w-full max-w-5xl flex-col overflow-hidden rounded-[2rem] p-6 sm:p-8 md:rounded-[3rem] md:p-12${returning ? " about-ethos-modal--returning" : ""}`}
         style={{
           minHeight: "min(42rem, calc(100dvh - 3rem))",
           maxHeight: "calc(100dvh - 1.5rem)",
@@ -96,12 +328,22 @@ export function AboutWomanModal({
           boxShadow: "0 32px 90px rgba(42,31,26,0.3)",
           color: cardStyle.color,
           fontFamily: SANS,
+          transformOrigin: "center center",
+          transform: motionTransform(motion),
+          transition: motion.animate
+            ? "transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1)"
+            : "none",
         }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerCancel}
+        onTransitionEnd={onDialogTransitionEnd}
       >
         <button
           ref={closeButtonRef}
           type="button"
-          onClick={onClose}
+          onClick={() => onClose()}
           className="pill-btn pill-btn--icon absolute right-5 top-5 z-20 rounded-full p-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 md:right-8 md:top-8"
           style={{ color: cardStyle.color }}
           aria-label="Close profile"

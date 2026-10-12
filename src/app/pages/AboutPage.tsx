@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AboutCollage } from "@/app/components/about/AboutCollage";
 import { AboutGuideLine } from "@/app/components/about/AboutGuideLine";
@@ -19,6 +19,13 @@ export function AboutPage() {
   const [activeProfileIndex, setActiveProfileIndex] = useState<number | null>(
     null,
   );
+  const [revealingIndex, setRevealingIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (revealingIndex === null) return;
+    const timeout = window.setTimeout(() => setRevealingIndex(null), 280);
+    return () => window.clearTimeout(timeout);
+  }, [revealingIndex]);
 
   return (
     <div
@@ -147,6 +154,8 @@ export function AboutPage() {
                 key={`${profile.role}-${index}`}
                 profile={profile}
                 index={index}
+                presented={activeProfileIndex === index}
+                revealing={revealingIndex === index}
                 onOpen={() => setActiveProfileIndex(index)}
               />
             ))}
@@ -159,7 +168,12 @@ export function AboutPage() {
                 : ABOUT_PROFILES[activeProfileIndex]
             }
             index={activeProfileIndex ?? 0}
-            onClose={() => setActiveProfileIndex(null)}
+            onClose={(reveal) => {
+              if (reveal && activeProfileIndex !== null) {
+                setRevealingIndex(activeProfileIndex);
+              }
+              setActiveProfileIndex(null);
+            }}
           />
         </section>
 
