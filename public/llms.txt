@@ -1,0 +1,31 @@
+# EveryWoman
+
+> Strength training and movement for women navigating endometriosis, PMOS, pre/postpartum recovery, and hormonal transitions.
+
+Madeleine Stockton coaches strength training for women with endometriosis, PMOS, pre/postpartum recovery, and hormonal transitions. She is a NASM Certified Personal Trainer. Coaching is not medical care.
+
+ARE YOU AN AGENT?
+Most content of the site is mirrored in markdown for your ease of access. Where to look:
+* [Coaching services](https://everywoman.io/services.md) for who it is for and the three tiers
+* [About](https://everywoman.io/about.md) for information on Madeleine's background and her story
+* [Contact](https://everywoman.io/contact.md) for email and the free consultation
+* [Posts](https://everywoman.io/posts.md) for essays and social media posts
+
+## Pages
+
+- [EveryWoman](https://everywoman.io/index.md): Strength training and movement for women navigating endometriosis, PMOS, pre/postpartum recovery, and hormonal transitions. Includes coaching tiers, credentials, and how to get in touch.
+- [About · EveryWoman](https://everywoman.io/about.md): Madeleine Stockton's story.
+- [Coaching Services · EveryWoman](https://everywoman.io/services.md): Who coaching is for, and the Foundation, Signature, and Elevated tiers.
+- [Contact · EveryWoman](https://everywoman.io/contact.md): Email Madeleine Stockton, or book a free consultation.
+- [Posts · EveryWoman](https://everywoman.io/posts.md): Essays on endometriosis, pelvic health, and training, plus Instagram and TikTok.
+
+## Articles
+
+- [They Finally Changed the Name. Here's Why It Took 100 Years — and Why It Matters](https://everywoman.io/posts/they-finally-changed-the-name-heres.md): PCOS has finally had a glow-up.
+- [Pelvic Floor PT: What It Is, Why It Matters, and What Nobody Told You](https://everywoman.io/posts/pelvic-floor-pt-what-it-is-why-it.md): An overview, a guide, and (maybe?) a lifestyle
+- [How To Fight For Your Endometriosis/PCOS Diagnosis](https://everywoman.io/posts/how-to-fight-for-your-endometriosispcos.md): An overview of how to best advocate for yourself.
+- [PCOS and Your Body](https://everywoman.io/posts/pcos-and-your-body.md): Symptoms, diagnosis, and how to start working with your body - not against it
+- [From a Hospital Bed to the Weight Room](https://everywoman.io/posts/from-a-hospital-bed-to-the-weight.md): What movement really looks like after surgery.
+- [Your OB/GYN Is Not Enough](https://everywoman.io/posts/your-obgyn-is-not-enough.md): Why every woman needs a care team and how to build one.
+- [The Diagnosis That Changed Everything](https://everywoman.io/posts/the-diagnosis-that-changed-everything.md): My story, and why I'm starting EveryWoman.
+- [Coming soon](https://everywoman.io/posts/coming-soon.md): This is EveryWoman's Substack.
