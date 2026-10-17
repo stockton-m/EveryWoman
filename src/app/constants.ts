@@ -14,7 +14,7 @@ export const CONSULTATION_URL =
 export const SUBSTACK_URL = "https://everywomanhealth.substack.com/";
 export const INSTAGRAM_URL = "https://www.instagram.com/everywoman.io";
 export const TIKTOK_URL = "https://www.tiktok.com/@everywomanhealth";
-export const EMAIL_ADDRESS = "everywoman.io@gmail.com";
+export const EMAIL_ADDRESS = "helloeverywoman.io@gmail.com";
 export const CONTACT_INTRO =
   "Please reach out to me if you'd like to chat. I'm looking forward to connecting with you.";
 

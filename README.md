@@ -117,7 +117,7 @@ Brand colors are applied as **inline `style` props** in components, not via Tail
 - Substack: https://everywomanhealth.substack.com/
 - TikTok: @everywomanhealth
 - Instagram: everywoman.io
-- Email: everywoman.io@gmail.com
+- Email: helloeverywoman.io@gmail.com
 - Free consultation (Google Calendar): configured in `src/app/constants.ts` as `CONSULTATION_URL`
 
 ### Notes on swapping images
