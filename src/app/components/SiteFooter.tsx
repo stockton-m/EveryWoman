@@ -64,22 +64,35 @@ export function SiteFooter() {
             © {new Date().getFullYear()} EveryWoman · Madeleine Stockton ·
             everywoman.io
           </p>
-          <p>
-            A site by{" "}
-            <a
-              href="https://miko.so"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 transition-colors duration-200 hover:text-[#f5ede4]"
-            >
-              Miko
-              <img
-                src="https://miko.so/miko.png"
-                alt=""
-                className="h-7 w-7 -translate-x-0.5 -translate-y-[3px] object-contain"
-              />
-            </a>
-          </p>
+          <div className="flex flex-col items-start gap-y-1 sm:items-end">
+            <p>
+              A site by{" "}
+              <a
+                href="https://miko.so"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 transition-colors duration-200 hover:text-[#f5ede4]"
+              >
+                Miko
+                <img
+                  src="https://miko.so/miko.png"
+                  alt=""
+                  className="h-7 w-7 -translate-x-0.5 -translate-y-[3px] object-contain"
+                />
+              </a>
+            </p>
+            <p>
+              Photos by{" "}
+              <a
+                href="https://demarcoclaire.wixsite.com/mysite"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors duration-200 hover:text-[#f5ede4]"
+              >
+                Claire Demarco Photography
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </footer>
