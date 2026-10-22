@@ -84,7 +84,7 @@ export function SiteFooter() {
             <p>
               Photos by{" "}
               <a
-                href="https://demarcoclaire.wixsite.com/mysite"
+                href="https://www.clairekramerphotography.com/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="transition-colors duration-200 hover:text-[#f5ede4]"
