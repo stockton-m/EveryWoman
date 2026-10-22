@@ -1,5 +1,5 @@
 export const COACHING_INTRO_PARAGRAPHS = [
-  "Most fitness programs were designed around men's bodies and then handed to women. EveryWoman coaching starts from the opposite place. Your program is built around your hormones, your history, and your goals, whether you're training through a chronic illness (like PMOS or endometriosis), coming back after having a baby, or just want to get strong and feel at home in your body.",
+  "Most fitness programs were designed around men's bodies and then handed to women. EveryWoman coaching starts from the opposite place. Your program is built around your hormones, your history, and your goals, whether you're training through a chronic illness (like PCOS/PMOS or endometriosis), coming back after having a baby, or just want to get strong and feel at home in your body.",
   "Every coaching relationship starts with a free consultation call, so we can make sure it's the right fit and choose the level of support you need.",
 ] as const;
 

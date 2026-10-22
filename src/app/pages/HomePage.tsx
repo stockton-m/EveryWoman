@@ -31,7 +31,7 @@ const latestPosts = posts.slice(0, 3);
 const GROWTH_CARDS = [
   {
     key: "left",
-    text: "Learn to exercise with endometriosis or PMOS",
+    text: "Learn to exercise with endometriosis or PCOS/PMOS",
     wrapClass: "md:-rotate-[10deg] md:-mr-14 md:mt-16 z-20",
     background: EMBER,
     textColor: CREAM,
@@ -165,7 +165,7 @@ export function HomePage() {
               style={{ color: "rgba(245,237,228,0.78)", maxWidth: "480px" }}
             >
               Strength training and movement for women navigating endometriosis,
-              PMOS, pre/postpartum recovery, and hormonal transitions.
+              PCOS/PMOS, pre/postpartum recovery, and hormonal transitions.
             </p>
             <Link
               to="/services"
@@ -291,7 +291,7 @@ export function HomePage() {
                 <em style={{ fontStyle: "italic" }}>EveryWoman</em>{" "}
                 exists because that&apos;s not good enough — a women&apos;s
                 health and fitness platform built around strength training and
-                movement for those living with endometriosis, PCOS,
+                movement for those living with endometriosis, PCOS/PMOS,
                 pre/postpartum symptoms, and those navigating perimenopause and
                 menopause, grounded in real diagnostic experience.
               </p>

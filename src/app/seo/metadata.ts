@@ -30,11 +30,11 @@ export const OG_IMAGE_URL = `${SITE_URL}/og.png`;
 export const OG_IMAGE_WIDTH = 1200;
 export const OG_IMAGE_HEIGHT = 630;
 export const HOME_DESCRIPTION =
-  "Strength training and movement for women navigating endometriosis, PMOS, pre/postpartum recovery, and hormonal transitions.";
+  "Strength training and movement for women navigating endometriosis, PCOS/PMOS, pre/postpartum recovery, and hormonal transitions.";
 export const OG_IMAGE_ALT = `${SITE_NAME}. ${HOME_DESCRIPTION}`;
 
 const ABOUT_DESCRIPTION =
-  "Madeleine Stockton founded EveryWoman, strength training and movement for women navigating endometriosis, PMOS, pre/postpartum recovery, and hormonal transitions.";
+  "Madeleine Stockton founded EveryWoman, strength training and movement for women navigating endometriosis, PCOS/PMOS, pre/postpartum recovery, and hormonal transitions.";
 const SERVICES_DESCRIPTION =
   "Strength training built for your body, your health, and your life.";
 const CONTACT_DESCRIPTION =
@@ -46,7 +46,7 @@ const NOT_FOUND_DESCRIPTION =
   "The link may be out of date, or the page may have moved.";
 const ARTICLE_DESCRIPTION_FALLBACK = "An essay from EveryWoman.";
 const SERVICE_SCHEMA_DESCRIPTION =
-  "Strength training coaching for women navigating endometriosis, PMOS, pre/postpartum recovery, and hormonal transitions. Tiers are Foundation, Signature, and Elevated. Coaching is from a NASM Certified Personal Trainer and is not a substitute for medical care.";
+  "Strength training coaching for women navigating endometriosis, PCOS/PMOS, pre/postpartum recovery, and hormonal transitions. Tiers are Foundation, Signature, and Elevated. Coaching is from a NASM Certified Personal Trainer and is not a substitute for medical care.";
 const FACTS_PATHS = new Set(["/", "/about", "/services", "/contact"]);
 const LLMS_PAGE_NOTES: Record<string, string> = {
   "/": `${HOME_DESCRIPTION} Includes coaching tiers, credentials, and how to get in touch.`,
@@ -231,7 +231,7 @@ export function renderLlmsTxt(articles: SeoArticle[]): string {
     "",
     `> ${HOME_DESCRIPTION}`,
     "",
-    `${FOUNDER_NAME} coaches strength training for women with endometriosis, PMOS, pre/postpartum recovery, and hormonal transitions. She is a NASM Certified Personal Trainer. Coaching is not medical care.`,
+    `${FOUNDER_NAME} coaches strength training for women with endometriosis, PCOS/PMOS, pre/postpartum recovery, and hormonal transitions. She is a NASM Certified Personal Trainer. Coaching is not medical care.`,
     "",
     "ARE YOU AN AGENT?",
     "Most content of the site is mirrored in markdown for your ease of access. Where to look:",

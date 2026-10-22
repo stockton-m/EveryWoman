@@ -131,7 +131,7 @@ test("generator writes sitemap, page metadata, article HTML, and a noindex 404",
 
     const llms = await readFile(path.join(outDir, "llms.txt"), "utf8");
     assert.match(llms, /# EveryWoman/);
-    assert.match(llms, /endometriosis, PMOS, pre\/postpartum recovery/);
+    assert.match(llms, /endometriosis, PCOS\/PMOS, pre\/postpartum recovery/);
     assert.match(llms, /NASM Certified Personal Trainer/);
     assert.match(llms, /Coaching is not medical care/);
     assert.match(llms, /ARE YOU AN AGENT\?/);

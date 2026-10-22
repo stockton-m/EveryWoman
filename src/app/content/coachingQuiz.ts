@@ -47,7 +47,7 @@ export const COACHING_ARCHETYPES = {
       "Pelvic symptoms, fatigue, or flare patterns shape how you approach movement.",
   },
   "pcos-energy": {
-    label: "PCOS Energy Balancer",
+    label: "PCOS/PMOS Energy Balancer",
     description:
       "Energy, recovery, and sustainable consistency are central to your training.",
   },
@@ -376,7 +376,7 @@ export const COACHING_QUIZ_QUESTIONS: CoachingQuizQuestion[] = [
       },
       {
         id: "pcos-metabolic",
-        label: "PCOS or related energy and metabolic patterns are part of my story",
+        label: "PCOS/PMOS or related energy and metabolic patterns are part of my story",
         tierWeights: weights(0, 2, 3),
         archetypeWeights: {
           "pcos-energy": 3,
