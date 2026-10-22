@@ -7,10 +7,10 @@
     "node": ">=20.12"
   },
   "scripts": {
-    "build": "vite build",
+    "build": "tsx scripts/cli.ts build",
     "content:sync": "tsx scripts/content/sync.ts",
-    "dev": "vite",
-    "test": "tsx --test scripts/content/__tests__/*.test.ts scripts/seo/__tests__/*.test.ts",
+    "dev": "tsx scripts/cli.ts dev",
+    "test": "tsx --test scripts/__tests__/*.test.ts scripts/content/__tests__/*.test.ts scripts/seo/__tests__/*.test.ts scripts/experimental/__tests__/*.test.ts",
     "typecheck:content": "tsc -p tsconfig.content.json"
   },
   "dependencies": {

@@ -1,3 +1,5 @@
+// @experimental
+import "@/styles/testimonials.css";
 import { useEffect, useRef } from "react";
 import { TESTIMONIALS } from "@/app/content/testimonials";
 import { BLUSH, BROWN, CREAM, EMBER, SANS, SAGE, SERIF } from "@/app/constants";

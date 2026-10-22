@@ -36,14 +36,17 @@ _Note:_ There is a second author, Will Carhart, who also works on the site. He i
    ```
 3. Open your browser to `http://localhost:5173` to see the site. Visit `http://localhost:5173/about` for the About page or `http://localhost:5173/services` for the services page.
 
+`pnpm dev` omits experimental sections, like the testimonial section on the `/services` page. Use `-e`/`--include-experimental-content` to include experimental sections.
+
 ### How to build for deployment
 ```
 pnpm build
 ```
-This creates a `dist/` folder. Drag that folder onto Netlify, or deploy via the Netlify CLI:
+This creates a `dist/` folder. `pnpm build` leaves experimental content out of that folder (Use `-e`/`--include-experimental-content` to include it). Netlify deploys with `pnpm build`, so the testimonials section is not on the production site. Drag `dist/` onto Netlify, or deploy via the Netlify CLI:
 ```
 npx netlify-cli deploy --dir=dist --prod
 ```
+Netlify also autodeploys to https://everywoman.io upon push to the default Git branch.
 
 **Netlify routing:** `public/_redirects` is copied into `dist/` on build. Known routes such as `/services` rewrite to `index.html` with status 200. Any other path serves `dist/404.html` (a copy of the built `index.html`) with status 404, and the app renders the not-found page. `pnpm dev` shows that same page for unknown paths through the client-side catch-all route.
 
