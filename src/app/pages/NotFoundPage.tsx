@@ -1,5 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { AboutImagePlaceholder } from "@/app/components/about/AboutImagePlaceholder";
 import { NotFoundGuideLine } from "@/app/components/notFound/NotFoundGuideLine";
 import { SiteFooter } from "@/app/components/SiteFooter";
 import { SiteNav } from "@/app/components/SiteNav";
@@ -22,6 +23,13 @@ export function NotFoundPage() {
 
       <main className="not-found-page__main">
         <section className="not-found-hero">
+          <AboutImagePlaceholder
+            accent={EMBER}
+            shape="circle"
+            className="not-found-hero__portrait"
+            label="Placeholder portrait"
+          />
+
           <h1
             className="not-found-hero__title"
             style={{ color: EMBER, fontFamily: SERIF }}

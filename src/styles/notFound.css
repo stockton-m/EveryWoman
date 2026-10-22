@@ -69,8 +69,13 @@
     clamp(4rem, 10vh, 6.5rem);
 }
 
+.not-found-hero__portrait {
+  width: min(72vw, 22rem);
+  aspect-ratio: 1;
+}
+
 .not-found-hero__title {
-  margin: 0;
+  margin: clamp(1.75rem, 4vw, 2.5rem) 0 0;
   font-size: clamp(2.4rem, 5vw, 3.75rem);
   font-weight: 700;
   letter-spacing: -0.03em;
