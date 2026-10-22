@@ -1,7 +1,7 @@
 import { ArrowRight, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
-import { AboutImagePlaceholder } from "@/app/components/about/AboutImagePlaceholder";
 import { ContactGuideLine } from "@/app/components/contact/ContactGuideLine";
+import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import {
   InstagramIcon,
   SubstackIcon,
@@ -21,6 +21,7 @@ import {
   SUBSTACK_URL,
   TIKTOK_URL,
 } from "@/app/constants";
+import contactPortrait from "@/imports/contact.webp";
 
 const SOCIAL_LINKS = [
   { name: "Substack", href: SUBSTACK_URL, Icon: SubstackIcon },
@@ -45,12 +46,16 @@ export function ContactPage() {
 
       <main className="contact-page__main">
         <section className="contact-hero">
-          <AboutImagePlaceholder
-            accent={EMBER}
-            shape="circle"
-            className="contact-hero__portrait"
-            label="Placeholder portrait"
-          />
+          <div
+            className="about-image-placeholder about-image-placeholder--circle contact-hero__portrait relative"
+            style={{ borderColor: EMBER }}
+          >
+            <ImageWithFallback
+              src={contactPortrait}
+              alt="Madeleine Stockton"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          </div>
 
           <h1
             className="contact-hero__title"

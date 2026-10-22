@@ -5,7 +5,7 @@ import {
   type CoachingQuizHandle,
 } from "@/app/components/CoachingQuiz";
 import { ExternalLink } from "@/app/components/ExternalLink";
-import { PortraitPlaceholder } from "@/app/components/PortraitPlaceholder";
+import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import { QuizTierCallout } from "@/app/components/services/QuizTierCallout";
 import { ServicesGuideLine } from "@/app/components/services/ServicesGuideLine";
 import { SiteFooter } from "@/app/components/SiteFooter";
@@ -20,6 +20,15 @@ import {
   NASM_URL,
 } from "@/app/content/coaching";
 import { CONSULTATION_URL, SANS, SERIF, STONE } from "@/app/constants";
+import servicesCenter from "@/imports/services0.webp";
+import servicesLeft from "@/imports/services1.webp";
+import servicesRight from "@/imports/services2.webp";
+
+const SERVICE_PORTRAITS = [
+  { src: servicesLeft, alt: "Madeleine Stockton", place: "left" },
+  { src: servicesCenter, alt: "Madeleine Stockton", place: "center" },
+  { src: servicesRight, alt: "Madeleine Stockton", place: "right" },
+] as const;
 
 export function ServicesPage() {
   const quizRef = useRef<CoachingQuizHandle>(null);
@@ -50,7 +59,20 @@ export function ServicesPage() {
 
       <main className="services-page__main max-w-7xl mx-auto px-6 md:px-10 pt-10 pb-20">
         <div className="flex flex-col items-center text-center mb-6">
-          <PortraitPlaceholder className="services-page__portrait mb-8" />
+          <div className="services-page__portraits mb-8">
+            {SERVICE_PORTRAITS.map((portrait) => (
+              <div
+                key={portrait.place}
+                className={`services-page__portrait services-page__portrait--${portrait.place}`}
+              >
+                <ImageWithFallback
+                  src={portrait.src}
+                  alt={portrait.alt}
+                  className="block h-full w-full object-cover"
+                />
+              </div>
+            ))}
+          </div>
 
           <h1
             className="font-bold mb-4"

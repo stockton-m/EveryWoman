@@ -1,7 +1,6 @@
 import { useState, type CSSProperties } from "react";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { AboutImagePlaceholder } from "@/app/components/about/AboutImagePlaceholder";
 import { ExternalLink } from "@/app/components/ExternalLink";
 import { EmbedModal } from "@/app/components/posts/EmbedModal";
 import { FollowColumn } from "@/app/components/posts/FollowColumn";
@@ -10,7 +9,8 @@ import { ShortsPreview } from "@/app/components/posts/ShortsPreview";
 import { SiteFooter } from "@/app/components/SiteFooter";
 import { SiteNav } from "@/app/components/SiteNav";
 import { NASM_URL } from "@/app/content/coaching";
-import { getPostLabel, getPostThumbnail, posts } from "@/app/content/posts";
+import { groupLabel, newerPost } from "@/app/content/postGroups";
+import { getPostThumbnail, groupedPosts } from "@/app/content/posts";
 import {
   BLUSH,
   BROWN,
@@ -24,9 +24,11 @@ import {
 import { useMediaQuery } from "@/app/hooks/useMediaQuery";
 import { useScrollToHash } from "@/app/hooks/useScrollToHash";
 import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
-import madeleinePortrait from "@/imports/profile.png";
+import madeleinePortrait from "@/imports/profile.webp";
+import getInTouchPortrait from "@/imports/getintouch.webp";
 
-const latestPosts = posts.slice(0, 3);
+const latestGroups = groupedPosts.slice(0, 3);
+const latestPosts = latestGroups.map((group) => newerPost(group.members));
 
 const GROWTH_CARDS = [
   {
@@ -120,8 +122,8 @@ export function HomePage() {
   useScrollToHash();
   const isMobile = useMediaQuery("(max-width: 767px)");
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const activePost =
-    activeIndex === null ? null : (latestPosts[activeIndex] ?? null);
+  const activeGroup =
+    activeIndex === null ? null : (latestGroups[activeIndex] ?? null);
 
   return (
     <div style={{ fontFamily: SANS, minHeight: "100vh" }}>
@@ -183,7 +185,7 @@ export function HomePage() {
       </section>
 
       <section
-        className="relative pb-10 md:pb-28"
+        className="relative overflow-x-clip pb-10 md:pb-28"
         style={{
           background: "#f5ede4",
           zIndex: 10,
@@ -396,14 +398,15 @@ export function HomePage() {
             <span style={{ color: EMBER }}>@everywoman.io</span>
           </p>
           <div className="home-latest__row grid grid-cols-3 gap-0.5 md:hidden">
-            {latestPosts.map((post, index) => {
-              const thumbnail = getPostThumbnail(post);
+            {latestGroups.map((group, index) => {
+              const lead = latestPosts[index];
+              const thumbnail = getPostThumbnail(lead);
               return (
                 <button
-                  key={post.id}
+                  key={group.id}
                   type="button"
                   className="home-latest__thumb"
-                  aria-label={getPostLabel(post)}
+                  aria-label={groupLabel(group.members)}
                   onClick={() => setActiveIndex(index)}
                 >
                   {thumbnail ? (
@@ -418,17 +421,20 @@ export function HomePage() {
             })}
           </div>
           <div className="hidden md:grid md:grid-cols-3 md:gap-5">
-            {latestPosts.map((post, index) => (
-              <PostCard
-                key={post.id}
-                label={getPostLabel(post)}
-                members={[post]}
-                onOpen={() => setActiveIndex(index)}
-                publishedAt={post.publishedAt}
-                thumbnailPost={post}
-                variant="featured"
-              />
-            ))}
+            {latestGroups.map((group, index) => {
+              const lead = latestPosts[index];
+              return (
+                <PostCard
+                  key={group.id}
+                  label={groupLabel(group.members)}
+                  members={group.members}
+                  onOpen={() => setActiveIndex(index)}
+                  publishedAt={lead.publishedAt}
+                  thumbnailPost={lead}
+                  variant="featured"
+                />
+              );
+            })}
           </div>
           <div className="mt-10 flex justify-center">
             <Link
@@ -458,17 +464,21 @@ export function HomePage() {
           </h2>
           <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-3 md:gap-10">
             <div className="home-contact-portrait-wrap">
-              <AboutImagePlaceholder
-                accent={CREAM}
-                shape="circle"
-                className="home-contact-portrait"
-                label="Placeholder portrait"
-              />
+              <div
+                className="about-image-placeholder about-image-placeholder--circle home-contact-portrait relative"
+                style={{ borderColor: CREAM }}
+              >
+                <ImageWithFallback
+                  src={getInTouchPortrait}
+                  alt="Madeleine Stockton"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              </div>
             </div>
             <div className="home-contact-copy">
               <p
                 className="text-base leading-relaxed md:text-[17px]"
-                style={{ color: CREAM }}
+                style={{ color: BROWN }}
               >
                 I can&apos;t wait to hear from you. My goal is to provide
                 tailored coaching for every woman based on her lifestyle,
@@ -502,15 +512,15 @@ export function HomePage() {
       ) : (
         <EmbedModal
           filter={null}
-          hasNext={activeIndex !== null && activeIndex < latestPosts.length - 1}
+          hasNext={activeIndex !== null && activeIndex < latestGroups.length - 1}
           hasPrevious={activeIndex !== null && activeIndex > 0}
-          members={activePost ? [activePost] : []}
+          members={activeGroup?.members ?? []}
           onClose={() => setActiveIndex(null)}
           onNext={() =>
             setActiveIndex((index) =>
               index === null
                 ? index
-                : Math.min(index + 1, latestPosts.length - 1),
+                : Math.min(index + 1, latestGroups.length - 1),
             )
           }
           onPrevious={() =>

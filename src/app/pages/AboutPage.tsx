@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { AboutCollage } from "@/app/components/about/AboutCollage";
 import { AboutGuideLine } from "@/app/components/about/AboutGuideLine";
 import { AboutImagePlaceholder } from "@/app/components/about/AboutImagePlaceholder";
+import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import { AboutWomanModal } from "@/app/components/about/AboutWomanModal";
 import { AboutWomanProfile } from "@/app/components/about/AboutWomanProfile";
 import { SiteFooter } from "@/app/components/SiteFooter";
@@ -14,6 +15,7 @@ import {
   ABOUT_PROFILES,
 } from "@/app/content/about";
 import { BROWN, CREAM, EMBER, SANS, SAGE, SERIF } from "@/app/constants";
+import aboutPortrait from "@/imports/about.webp";
 
 export function AboutPage() {
   const [activeProfileIndex, setActiveProfileIndex] = useState<number | null>(
@@ -43,12 +45,16 @@ export function AboutPage() {
 
       <main className="about-page__main">
         <section className="about-section about-page__inner about-hero">
-          <AboutImagePlaceholder
-            accent={EMBER}
-            shape="circle"
-            className="about-hero__portrait"
-            label="Placeholder portrait of Madeleine"
-          />
+          <div
+            className="about-image-placeholder about-image-placeholder--circle about-hero__portrait"
+            style={{ borderColor: EMBER }}
+          >
+            <ImageWithFallback
+              src={aboutPortrait}
+              alt="Madeleine Stockton"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          </div>
 
           <div className="about-hero__copy">
             <p

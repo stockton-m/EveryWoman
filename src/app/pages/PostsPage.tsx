@@ -15,7 +15,6 @@ import { ShortsPreview } from "@/app/components/posts/ShortsPreview";
 import { SiteFooter } from "@/app/components/SiteFooter";
 import { SiteNav } from "@/app/components/SiteNav";
 import {
-  groupCrossPlatformPosts,
   groupLabel,
   newerPost,
   type PostGroup,
@@ -23,10 +22,9 @@ import {
 import {
   getPlatformColor,
   getPlatformLabel,
-  getPostLabel,
   getPostThumbnail,
-  posts,
-  recentPosts,
+  groupedPosts,
+  RECENT_POST_COUNT,
   type ArchivePost,
   type PostSource,
 } from "@/app/content/posts";
@@ -47,7 +45,8 @@ const platformFilters: { source: PostSource; Icon: typeof TikTokIcon }[] = [
   { source: "substack", Icon: SubstackIcon },
 ];
 
-const groups = groupCrossPlatformPosts(posts);
+const groups = groupedPosts;
+const recentGroups = groups.slice(0, RECENT_POST_COUNT);
 
 function comesBefore(
   left: { id: string; publishedAt: string },
@@ -241,27 +240,33 @@ export function PostsPage() {
           </p>
           <div className="flex flex-col items-start gap-10 lg:flex-row lg:gap-8">
             <div className="posts-thumb-row grid grid-cols-2 gap-0.5 md:hidden">
-              {recentPosts.map((post) => (
-                <PostThumb
-                  key={post.id}
-                  label={getPostLabel(post)}
-                  onOpen={() => openPost(post)}
-                  post={post}
-                />
-              ))}
+              {recentGroups.map((group) => {
+                const lead = newerPost(group.members);
+                return (
+                  <PostThumb
+                    key={group.id}
+                    label={groupLabel(group.members)}
+                    onOpen={() => openPost(lead)}
+                    post={lead}
+                  />
+                );
+              })}
             </div>
             <div className="hidden w-full min-w-0 flex-1 grid-cols-2 gap-4 md:grid lg:w-auto">
-              {recentPosts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  label={getPostLabel(post)}
-                  members={[post]}
-                  onOpen={() => openPost(post)}
-                  publishedAt={post.publishedAt}
-                  thumbnailPost={post}
-                  variant="featured"
-                />
-              ))}
+              {recentGroups.map((group) => {
+                const lead = newerPost(group.members);
+                return (
+                  <PostCard
+                    key={group.id}
+                    label={groupLabel(group.members)}
+                    members={group.members}
+                    onOpen={() => openPost(lead)}
+                    publishedAt={lead.publishedAt}
+                    thumbnailPost={lead}
+                    variant="featured"
+                  />
+                );
+              })}
             </div>
             <FollowColumn
               hideHeading={isMobile}

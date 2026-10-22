@@ -1,10 +1,11 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import { AboutImagePlaceholder } from "@/app/components/about/AboutImagePlaceholder";
+import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import { NotFoundGuideLine } from "@/app/components/notFound/NotFoundGuideLine";
 import { SiteFooter } from "@/app/components/SiteFooter";
 import { SiteNav } from "@/app/components/SiteNav";
 import { BROWN, CREAM, EMBER, SANS, SERIF } from "@/app/constants";
+import notFoundPortrait from "@/imports/404.webp";
 
 export function NotFoundPage() {
   return (
@@ -23,12 +24,16 @@ export function NotFoundPage() {
 
       <main className="not-found-page__main">
         <section className="not-found-hero">
-          <AboutImagePlaceholder
-            accent={EMBER}
-            shape="circle"
-            className="not-found-hero__portrait"
-            label="Placeholder portrait"
-          />
+          <div
+            className="about-image-placeholder about-image-placeholder--circle not-found-hero__portrait relative"
+            style={{ borderColor: EMBER }}
+          >
+            <ImageWithFallback
+              src={notFoundPortrait}
+              alt="Madeleine Stockton"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          </div>
 
           <h1
             className="not-found-hero__title"

@@ -98,7 +98,7 @@ See `.github/workflows/sync-content.yml` for the scheduled GitHub Action. The ac
 - **External content archive:** `src/data/content-archive.json`
 - **Content synchronizer:** `scripts/content/`
 - **Constants (URLs, colors):** `src/app/constants.ts`
-- **Images:** `src/imports/` — `logo.png` (nav/footer) and `profile.png` (about card portrait). Services sections use `PortraitPlaceholder` until a dedicated photo is added.
+- **Images:** `src/imports/`
 - **Styles:** `src/styles/` — `index.css` imports `fonts.css`, `tailwind.css`, and `theme.css`. Brand colors are defined as CSS variables in `theme.css` and applied as inline `style` props in components.
 - **Image helper:** `src/app/components/figma/ImageWithFallback.tsx` — a wrapper around `<img>` that shows a placeholder if an image fails to load.
 - **Path alias:** `@` maps to `src/`
@@ -124,4 +124,8 @@ Brand colors are applied as **inline `style` props** in components, not via Tail
 - Free consultation (Google Calendar): configured in `src/app/constants.ts` as `CONSULTATION_URL`
 
 ### Notes on swapping images
-To change an image, copy the new file over the existing one in `src/imports/`. The logo is `logo.png`. The portrait in the about card is `profile.png`. For services, replace `PortraitPlaceholder` usage with a real image import when ready. The `ImageWithFallback` component handles broken images gracefully.
+Images were professionally taken by [Claire Kramer Photography](https://www.clairekramerphotography.com/). Given they're high resolution originals, crop them and then resize them before checking them in via:
+```bash
+magick image.jpg -resize '2000x2000>' -quality 85 output.webp
+```
+The output image format (in most cases) should be WebP, and we use `2000x2000>` as the maximum resolution allowed (the `>` prevents image upscaling).

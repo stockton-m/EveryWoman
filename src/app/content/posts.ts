@@ -1,6 +1,9 @@
 import logoImage from "@/imports/logo-full.png";
 import archiveFile from "@/data/content-archive.json";
-import { postDisplayTitle } from "@/app/content/postGroups";
+import {
+  groupCrossPlatformPosts,
+  postDisplayTitle,
+} from "@/app/content/postGroups";
 import { BLUSH, EMBER, SAGE } from "@/app/constants";
 
 export type PostSource = "instagram" | "substack" | "tiktok";
@@ -54,9 +57,9 @@ function byNewest(a: ArchivePost, b: ArchivePost): number {
 
 export const posts: ArchivePost[] = [...archive.posts].sort(byNewest);
 
-export const RECENT_POST_COUNT = 4;
+export const groupedPosts = groupCrossPlatformPosts(posts);
 
-export const recentPosts = posts.slice(0, RECENT_POST_COUNT);
+export const RECENT_POST_COUNT = 4;
 
 export function isSubstackPost(post: ArchivePost): post is SubstackArticle {
   return (

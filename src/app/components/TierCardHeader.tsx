@@ -32,13 +32,12 @@ export function TierCardHeader({
         equalHeight ? "min-h-[26rem] flex flex-col" : ""
       }`}
     >
-      <div className="flex items-start justify-between gap-4 mb-5">
+      <div className="tier-card-header__row flex items-start justify-between gap-4 mb-5">
         <h3
-          className="font-bold"
+          className="tier-card-header__title font-bold"
           style={{
             fontFamily: SERIF,
             color: "#2a1f1a",
-            fontSize: "clamp(1.5rem, 2vw, 1.75rem)",
           }}
         >
           {tier.name}
