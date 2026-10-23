@@ -82,7 +82,7 @@ function Player({ post, label }: { post: ArchivePost; label: string }) {
         <PlayerSpinner />
         <ImageWithFallback
           src={thumbnail}
-          alt=""
+          alt={label}
           className="h-full w-full object-cover"
         />
       </>

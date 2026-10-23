@@ -76,7 +76,7 @@ export function SiteFooter() {
                 Miko
                 <img
                   src="https://miko.so/miko.png"
-                  alt=""
+                  alt="Miko logo"
                   className="h-7 w-7 -translate-x-0.5 -translate-y-[3px] object-contain"
                 />
               </a>

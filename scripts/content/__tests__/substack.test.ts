@@ -34,6 +34,7 @@ test("Substack RSS preserves meaningful article HTML and removes promotional UI"
   assert.match(post.bodyHtml, /<ul>/);
   assert.match(post.bodyHtml, /<blockquote>/);
   assert.match(post.bodyHtml, /<img[^>]+article\.jpg/);
+  assert.match(post.bodyHtml, /alt="A useful diagram"/);
   assert.match(post.bodyHtml, /https:\/\/example\.com\/research\?a=1&amp;b=2/);
   assert.match(post.bodyHtml, /noopener noreferrer/);
   assert.match(post.bodyHtml, /<h3>Sources<\/h3>/);
@@ -44,6 +45,24 @@ test("Substack RSS preserves meaningful article HTML and removes promotional UI"
   assert.doesNotMatch(post.bodyHtml, /onerror/);
   assert.doesNotMatch(post.bodyHtml, /<script/);
   assert.doesNotMatch(post.bodyHtml, /&amp;amp;/);
+});
+
+test("Substack sanitizer fills an empty image alt from the figure caption", () => {
+  const body = sanitizeSubstackHtml(
+    '<figure><img src="https://example.com/diagram.png" alt=""><figcaption>A labeled diagram &amp; note</figcaption></figure><p>Notes.</p>',
+  );
+
+  assert.match(body, /alt="A labeled diagram &amp; note"/);
+  assert.doesNotMatch(body, /alt=""/);
+  assert.doesNotMatch(body, /&amp;amp;/);
+});
+
+test("Substack sanitizer uses a fallback when a figure image has no caption", () => {
+  const body = sanitizeSubstackHtml(
+    '<figure><img src="https://example.com/photo.png"></figure><p>Notes.</p>',
+  );
+
+  assert.match(body, /alt="Article image"/);
 });
 
 test("Substack sanitizer handles HTML entities without double encoding", () => {

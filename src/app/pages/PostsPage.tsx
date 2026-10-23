@@ -116,7 +116,7 @@ function PostThumb({
       {thumbnail ? (
         <ImageWithFallback
           src={thumbnail}
-          alt=""
+          alt={label}
           className="h-full w-full object-cover"
         />
       ) : null}

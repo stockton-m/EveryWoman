@@ -412,7 +412,7 @@ export function HomePage() {
                   {thumbnail ? (
                     <ImageWithFallback
                       src={thumbnail}
-                      alt=""
+                      alt={groupLabel(group.members)}
                       className="h-full w-full object-cover"
                     />
                   ) : null}

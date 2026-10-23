@@ -650,7 +650,7 @@ export function ShortsPreview({
                 ) : thumbnail ? (
                   <ImageWithFallback
                     src={thumbnail}
-                    alt=""
+                    alt={label}
                     className="shorts-preview__image"
                   />
                 ) : (
@@ -688,7 +688,7 @@ export function ShortsPreview({
                     <div className="shorts-preview__logo">
                       <ImageWithFallback
                         src={logoImage}
-                        alt=""
+                        alt="EveryWoman logo"
                         className="h-7 w-7 object-contain"
                       />
                     </div>

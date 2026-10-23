@@ -212,7 +212,47 @@ export function sanitizeSubstackHtml(html: string): string {
       "Invalid Substack feed: content:encoded has no meaningful article body.",
     );
   }
-  return sanitized;
+  return fillEmptyFigureAlts(sanitized);
+}
+
+function escapeHtmlAttribute(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+function imageAltValue(tag: string): string | undefined {
+  const match = tag.match(/\balt\s*=\s*(?:"([^"]*)"|'([^']*)')/i);
+  if (!match) return undefined;
+  return decode(match[1] ?? match[2] ?? "");
+}
+
+function setImageAlt(tag: string, alt: string): string {
+  const escaped = escapeHtmlAttribute(alt);
+  if (/\balt\s*=/i.test(tag)) {
+    return tag.replace(
+      /\balt\s*=\s*(?:"[^"]*"|'[^']*')/i,
+      `alt="${escaped}"`,
+    );
+  }
+  return tag.replace(/\s*\/?>$/, ` alt="${escaped}"$&`);
+}
+
+function fillEmptyFigureAlts(html: string): string {
+  return html.replace(/<figure\b[^>]*>[\s\S]*?<\/figure>/gi, (figure) => {
+    const captionMatch = figure.match(
+      /<figcaption\b[^>]*>([\s\S]*?)<\/figcaption>/i,
+    );
+    const caption = captionMatch ? plainText(captionMatch[1]) : undefined;
+    const alt = caption ?? "Article image";
+    return figure.replace(/<img\b[^>]*>/gi, (tag) => {
+      const current = imageAltValue(tag);
+      if (current !== undefined && current.trim() !== "") return tag;
+      return setImageAlt(tag, alt);
+    });
+  });
 }
 
 function parseCoverImage(item: Record<string, unknown>): ArchiveMedia[] {
