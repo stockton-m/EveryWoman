@@ -114,11 +114,24 @@ test("strips the services page testimonials section", async () => {
   assert.equal(sourceSyntaxError(stripped), "");
 });
 
+test("strips the benefit detail modal from the coaching tier grid", async () => {
+  const importer = path.join(REPOSITORY_ROOT, "src", "app", "components", "TierComparisonGrid.tsx");
+  const source = await readFile(importer, "utf8");
+  const stripped = stripExperimentalImports(source, importer, REPOSITORY_ROOT);
+  assert.equal(stripped.includes("BenefitDetailModal"), false);
+  assert.match(stripped, /BenefitCell/);
+  assert.match(stripped, /onMouseEnter/);
+  assert.match(stripped, /onMouseLeave/);
+  assert.match(stripped, /onBenefitClick/);
+  assert.equal(sourceSyntaxError(stripped), "");
+});
+
 test("excludes experimental modules from the tailwind source scan", async () => {
   const cssFile = path.join(REPOSITORY_ROOT, "src", "styles", "tailwind.css");
   const css = await readFile(cssFile, "utf8");
   const next = withExperimentalSourceExclusions(css, REPOSITORY_ROOT, cssFile);
   assert.match(next, /@source not '\.\.\/app\/components\/TestimonialMarquee\.tsx';/);
+  assert.match(next, /@source not '\.\.\/app\/components\/BenefitDetailModal\.tsx';/);
   assert.equal(
     withExperimentalSourceExclusions(next, REPOSITORY_ROOT, cssFile),
     next,

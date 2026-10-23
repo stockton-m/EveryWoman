@@ -1,3 +1,4 @@
+// @experimental
 import { X } from "lucide-react";
 import { useEffect } from "react";
 import { TierIconNameTooltip } from "@/app/components/TierIconNameTooltip";
