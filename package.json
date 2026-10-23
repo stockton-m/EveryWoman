@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "engines": {
-    "node": ">=20.12"
+    "node": ">=24.12"
   },
   "scripts": {
     "build": "tsx scripts/cli.ts build",
@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.1.12",
-    "@types/node": "^20.19.43",
+    "@types/node": "^24",
     "@types/sanitize-html": "^2.16.2",
     "@vitejs/plugin-react": "4.7.0",
     "tailwindcss": "4.1.12",
