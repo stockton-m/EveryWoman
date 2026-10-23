@@ -1,6 +1,7 @@
-import { AboutImagePlaceholder } from "@/app/components/about/AboutImagePlaceholder";
 import { AboutInlines } from "@/app/components/about/AboutInlines";
+import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import { ABOUT_COLLAGE_ITEMS } from "@/app/content/about";
+import { ABOUT_COLLAGE_IMAGES } from "@/app/content/aboutCollageImages";
 import { BLUSH, BROWN, CREAM, EMBER, SAGE, SERIF } from "@/app/constants";
 
 const ACCENTS = {
@@ -21,11 +22,16 @@ export function AboutCollage() {
             key={item.id}
             className={`about-collage__item about-collage__item--${item.layout}`}
           >
-            <AboutImagePlaceholder
-              accent={accent}
-              className="about-collage__image"
-              label={`Placeholder image for ${item.title}`}
-            />
+            <div
+              className="about-image-placeholder about-image-placeholder--squircle about-collage__image"
+              style={{ borderColor: accent }}
+            >
+              <ImageWithFallback
+                src={ABOUT_COLLAGE_IMAGES[item.id]}
+                alt={item.title}
+                className="about-collage__photo"
+              />
+            </div>
             <div className="about-collage__caption">
               <h3
                 className="mb-1 font-bold leading-tight"
