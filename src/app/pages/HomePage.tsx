@@ -185,7 +185,7 @@ export function HomePage() {
       </section>
 
       <section
-        className="relative overflow-x-clip pb-10 md:pb-28"
+        className="relative md:overflow-x-clip pb-10 md:pb-28"
         style={{
           background: "#f5ede4",
           zIndex: 10,

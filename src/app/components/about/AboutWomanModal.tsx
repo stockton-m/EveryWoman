@@ -485,11 +485,13 @@ export function AboutWomanModal({
             slide === "none" ? "" : ` about-ethos-modal__layout--${slide}`
           }`}
         >
-          <ImageWithFallback
-            src={profile.modalImage}
-            alt={profile.name}
-            className={`about-ethos-modal__image${profile.modalImageClassName ? ` ${profile.modalImageClassName}` : ""}`}
-          />
+          <div className="about-ethos-modal__media">
+            <ImageWithFallback
+              src={profile.modalImage}
+              alt={profile.name}
+              className={`about-ethos-modal__image${profile.modalImageClassName ? ` ${profile.modalImageClassName}` : ""}`}
+            />
+          </div>
 
           <div className="about-ethos-modal__copy">
             <p
