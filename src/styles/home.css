@@ -1,0 +1,268 @@
+.home-about__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.35rem;
+}
+
+.home-about__title--mobile {
+  width: 100%;
+  margin: 1.25rem 0 0;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.home-about__portrait {
+  flex-shrink: 0;
+  width: clamp(6rem, 12vw, 9rem);
+  height: clamp(6rem, 12vw, 9rem);
+  margin-top: 0.25rem;
+  overflow: hidden;
+  border: 5px solid var(--ember);
+  border-radius: 9999px;
+}
+
+.home-latest__title {
+  font-size: 2.5rem;
+  line-height: 1.05;
+}
+
+.home-latest__row {
+  width: calc(100% + 3rem);
+  margin-inline: -1.5rem;
+}
+
+.home-latest__thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 19.5;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: rgba(42, 31, 26, 0.08);
+  cursor: pointer;
+  touch-action: pan-y;
+}
+
+.home-orbit {
+  position: relative;
+  width: 100%;
+  margin-top: 0.25rem;
+  padding-top: 3.35rem;
+}
+
+.home-orbit__note {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  width: min(100%, 22rem);
+  height: 3.35rem;
+  margin-inline: auto;
+  right: 0;
+  color: #f5ede4;
+  pointer-events: none;
+}
+
+.home-orbit__note-text {
+  position: absolute;
+  top: 0.2rem;
+  left: 0.15rem;
+  font-family: "Kristi", cursive;
+  font-size: 2.075rem;
+  line-height: 0.8;
+  transform: rotate(-8deg);
+  transform-origin: left center;
+}
+
+.home-orbit__note-arrow {
+  position: absolute;
+  top: 1.15rem;
+  left: 3.55rem;
+  width: 4.2rem;
+  height: 2.85rem;
+  overflow: visible;
+}
+
+.home-orbit__stage {
+  position: relative;
+  width: min(100%, 22rem);
+  margin-inline: auto;
+  aspect-ratio: 1;
+}
+
+.home-orbit__ring {
+  position: absolute;
+  inset: 0;
+  animation: home-orbit-spin 36s linear infinite;
+}
+
+.home-orbit__slot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 64%;
+  height: 64%;
+  margin-top: -32%;
+  margin-left: -32%;
+  transform: rotate(var(--angle)) translateY(-38%);
+  animation-name: home-orbit-stack;
+  animation-duration: 36s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-delay: calc(var(--angle) * -36s / 360deg);
+}
+
+.home-orbit__counter {
+  width: 100%;
+  height: 100%;
+  animation: home-orbit-spin 36s linear infinite reverse;
+}
+
+.home-orbit__circle {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  padding: 0.7rem;
+  box-shadow:
+    0 16px 36px rgba(0, 0, 0, 0.22),
+    0 2px 8px rgba(0, 0, 0, 0.12);
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(1.05rem, 4vw, 1.35rem);
+  font-weight: 500;
+  line-height: 1.15;
+  text-align: center;
+  text-decoration: none;
+  text-wrap: balance;
+  touch-action: manipulation;
+  transform: rotate(calc(var(--angle) * -1));
+}
+
+.home-orbit__label {
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes home-orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Stacking follows the clockwise orbit. Each circle climbs in front as it
+   comes up the left side, is in front at the top, then falls back on the right
+   so the next circle can cover it. */
+@keyframes home-orbit-stack {
+  0% { z-index: 19; }
+  2.78% { z-index: 18; }
+  5.56% { z-index: 17; }
+  8.33% { z-index: 16; }
+  11.11% { z-index: 14; }
+  13.89% { z-index: 12; }
+  16.67% { z-index: 11; }
+  19.44% { z-index: 9; }
+  22.22% { z-index: 7; }
+  25% { z-index: 6; }
+  27.78% { z-index: 4; }
+  30.56% { z-index: 3; }
+  33.33% { z-index: 2; }
+  36.11% { z-index: 1; }
+  41.67% { z-index: 1; }
+  47.22% { z-index: 2; }
+  50% { z-index: 3; }
+  52.78% { z-index: 4; }
+  55.56% { z-index: 5; }
+  58.33% { z-index: 6; }
+  61.11% { z-index: 8; }
+  63.89% { z-index: 10; }
+  66.67% { z-index: 11; }
+  69.44% { z-index: 13; }
+  72.22% { z-index: 15; }
+  75% { z-index: 16; }
+  77.78% { z-index: 18; }
+  80.56% { z-index: 19; }
+  83.33% { z-index: 20; }
+  86.11% { z-index: 21; }
+  94.44% { z-index: 21; }
+  97.22% { z-index: 20; }
+  100% { z-index: 19; }
+}
+
+@media (min-width: 768px) {
+  .home-about__header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .home-about__title--desktop {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .home-about__portrait {
+    order: 2;
+    position: relative;
+    z-index: 2;
+    width: clamp(12rem, 24vw, 18rem);
+    height: clamp(12rem, 24vw, 18rem);
+    margin-top: calc(0.25rem - clamp(6rem, 12vw, 9rem));
+    margin-right: calc(-1 * clamp(6rem, 12vw, 9rem) + 2rem);
+  }
+
+  .home-latest__title {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+  }
+}
+
+@media (max-width: 767px) {
+  .home-grow__intro {
+    margin-bottom: 0.35rem;
+  }
+
+  /* 2.25rem offsets the portrait's upward shift. The rest opens space
+     between the hero content and the portrait. */
+  #hero {
+    padding-bottom: 5.25rem;
+  }
+
+  #about {
+    overflow: visible;
+  }
+
+  .home-about__portrait {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    z-index: 2;
+    width: clamp(13.5rem, 27vw, 20.25rem);
+    height: clamp(13.5rem, 27vw, 20.25rem);
+    margin-top: 0;
+    transform: translate(-50%, calc(-50% - 2.25rem));
+  }
+
+  .home-about__title--mobile {
+    margin-top: 3.4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-orbit__ring,
+  .home-orbit__counter,
+  .home-orbit__slot {
+    animation: none;
+  }
+
+  .home-orbit__slot:first-child {
+    z-index: 3;
+  }
+}

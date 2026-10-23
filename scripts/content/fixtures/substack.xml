@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/"
+  xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title><![CDATA[EveryWoman's Substack]]></title>
+    <link>https://everywomanhealth.substack.com</link>
+    <item>
+      <title><![CDATA[Women & Health — Today]]></title>
+      <description><![CDATA[An evidence-based overview &amp; practical guide.]]></description>
+      <link>https://everywomanhealth.substack.com/p/women-and-health</link>
+      <guid isPermaLink="false">post-guid-123</guid>
+      <dc:creator><![CDATA[Madeleine Stockton]]></dc:creator>
+      <pubDate>Sun, 20 Sep 2026 15:00:00 GMT</pubDate>
+      <enclosure
+        url="https://substackcdn.com/images/cover.jpg"
+        length="0"
+        type="image/jpeg"
+      />
+      <content:encoded><![CDATA[
+        <h2>Women &amp; Health &#8212; Today</h2>
+        <p>A paragraph with <strong>bold</strong>, <em>emphasis</em>, and a <a target="_blank" href="https://example.com/research?a=1&amp;b=2">source link</a>.</p>
+        <ul>
+          <li>First item</li>
+          <li>Second item</li>
+        </ul>
+        <blockquote><p>Useful context.</p></blockquote>
+        <figure>
+          <img src="https://substackcdn.com/images/article.jpg" width="1200" height="800" alt="A useful diagram" onerror="alert('nope')">
+          <figcaption>Figure one</figcaption>
+        </figure>
+        <p class="button-wrapper" data-component-name="ButtonCreateButton"><a class="button primary" href="https://everywomanhealth.substack.com/subscribe">Subscribe now</a></p>
+        <p class="button-wrapper" data-component-name="ButtonCreateButton"><a class="button primary" href="https://everywomanhealth.substack.com/p/women-and-health/comments">Leave a comment</a></p>
+        <h3>Sources</h3>
+        <ol><li><a href="https://example.org/citation">A retained citation</a></li></ol>
+        <script>alert("removed")</script>
+      ]]></content:encoded>
+    </item>
+  </channel>
+</rss>

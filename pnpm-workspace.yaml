@@ -1,2 +1,4 @@
-packages:
-  - '.'
+# Single-package app. pnpm 12 reads project settings from this file.
+allowBuilds:
+  '@tailwindcss/oxide': true
+  esbuild: true
