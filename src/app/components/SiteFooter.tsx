@@ -64,20 +64,20 @@ export function SiteFooter() {
             © {new Date().getFullYear()} EveryWoman · Madeleine Stockton ·
             everywoman.io
           </p>
-          <div className="flex flex-col items-start gap-y-1 sm:items-end">
+          <div className="flex flex-col-reverse items-start gap-y-1 sm:flex-col sm:items-end">
             <p>
               A site by{" "}
               <a
                 href="https://miko.so"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 transition-colors duration-200 hover:text-[#f5ede4]"
+                className="inline-flex items-start gap-1 transition-colors duration-200 hover:text-[#f5ede4] sm:items-center"
               >
                 Miko
                 <img
                   src="https://miko.so/miko.png"
                   alt="Miko logo"
-                  className="h-7 w-7 -translate-x-0.5 -translate-y-[3px] object-contain"
+                  className="h-7 w-7 -translate-x-0.5 -translate-y-[6.25px] object-contain sm:-translate-y-[3px]"
                 />
               </a>
             </p>

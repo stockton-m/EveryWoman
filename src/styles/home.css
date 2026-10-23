@@ -229,6 +229,12 @@
     margin-bottom: 0.35rem;
   }
 
+  /* 2.25rem offsets the portrait's upward shift. The rest opens space
+     between the hero content and the portrait. */
+  #hero {
+    padding-bottom: 5.25rem;
+  }
+
   #about {
     overflow: visible;
   }
@@ -238,10 +244,10 @@
     top: 0;
     left: 50%;
     z-index: 2;
-    width: clamp(9rem, 18vw, 13.5rem);
-    height: clamp(9rem, 18vw, 13.5rem);
+    width: clamp(13.5rem, 27vw, 20.25rem);
+    height: clamp(13.5rem, 27vw, 20.25rem);
     margin-top: 0;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, calc(-50% - 2.25rem));
   }
 
   .home-about__title--mobile {

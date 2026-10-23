@@ -421,7 +421,7 @@ export function AboutWomanModal({
         aria-labelledby={TITLE_ID}
         className={`about-ethos-modal-frame${returning ? " about-ethos-modal-frame--returning" : ""}`}
         style={{
-          width: "min(64rem, calc(100vw - 8rem))",
+          width: "min(64rem, var(--about-modal-frame-width, calc(100vw - 8rem)))",
           height: "min(42rem, calc(100dvh - 4rem))",
           maxWidth: "100%",
         }}

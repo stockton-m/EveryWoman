@@ -1311,6 +1311,20 @@
     display: none;
   }
 
+  .about-ethos-modal__nav,
+  .about-ethos-modal__scroll-hint {
+    display: none;
+  }
+
+  .about-ethos-modal-frame {
+    --about-modal-frame-width: calc(100vw - 1.5rem);
+  }
+
+  .about-ethos-modal__actions {
+    top: 2.6rem;
+    right: 2.6rem;
+  }
+
   .about-ethos-modal--returning .about-ethos-modal__layout {
     opacity: 0;
     transition: opacity 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -1337,12 +1351,17 @@
     margin-inline: 0;
   }
 
+  .about-ethos-modal__image--matte {
+    object-position: center top;
+  }
+
   .about-ethos-modal__copy {
     align-self: stretch;
     min-height: 0;
     max-height: none;
     overflow-y: auto;
     padding-top: 0;
+    padding-left: 0;
   }
 
   .about-collage__title {
