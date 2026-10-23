@@ -176,6 +176,14 @@
   .home-contact-copy {
     margin-left: -1.75rem;
   }
+
+  .home-contact-copy-panel {
+    border-bottom-left-radius: 0;
+    clip-path: inset(
+      0 round var(--home-contact-squircle) var(--home-contact-squircle)
+        var(--home-contact-squircle) 0
+    );
+  }
 }
 
 @media (max-width: 767px) {
