@@ -1,4 +1,4 @@
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent, TransitionEvent } from "react";
 import { createPortal } from "react-dom";
@@ -6,7 +6,7 @@ import { AboutInlines } from "@/app/components/about/AboutInlines";
 import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import { getAboutEthosCardStyle } from "@/app/components/about/AboutWomanProfile";
 import type { AboutProfileWithPortrait } from "@/app/content/aboutPortraits";
-import { MONO, SANS, SERIF } from "@/app/constants";
+import { CREAM, MONO, SANS, SERIF } from "@/app/constants";
 
 const TITLE_ID = "about-woman-modal-title";
 const DISMISS_DISTANCE = 120;
@@ -169,7 +169,7 @@ export function AboutWomanModal({
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (settlingRef.current || !mobileDragEnabled()) return;
     if (event.pointerType === "mouse") return;
-    if ((event.target as HTMLElement).closest("button")) return;
+    if ((event.target as HTMLElement).closest("button, a")) return;
 
     dragRef.current = {
       pointerId: event.pointerId,
@@ -336,16 +336,31 @@ export function AboutWomanModal({
         onPointerCancel={onPointerCancel}
         onTransitionEnd={onDialogTransitionEnd}
       >
-        <button
-          ref={closeButtonRef}
-          type="button"
-          onClick={() => onClose()}
-          className="about-ethos-modal__close pill-btn pill-btn--icon absolute right-5 top-5 z-20 rounded-full p-2 md:right-8 md:top-8"
-          style={{ color: cardStyle.color }}
-          aria-label="Close profile"
-        >
-          <X className="h-6 w-6" />
-        </button>
+        <div className="about-ethos-modal__actions absolute right-5 top-5 z-20 flex items-center gap-2 md:right-8 md:top-8">
+          <a
+            href={profile.website}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`about-ethos-modal__site ${
+              cardStyle.color === CREAM
+                ? "about-ethos-modal__site--cream"
+                : "about-ethos-modal__site--brown"
+            }`}
+            aria-label={`Visit ${profile.name}'s website`}
+          >
+            <ArrowUpRight className="about-ethos-modal__site-icon" aria-hidden="true" />
+          </a>
+          <button
+            ref={closeButtonRef}
+            type="button"
+            onClick={() => onClose()}
+            className="about-ethos-modal__close pill-btn pill-btn--icon rounded-full"
+            style={{ color: cardStyle.color }}
+            aria-label="Close profile"
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
 
         <div className="about-ethos-modal__layout">
           <ImageWithFallback

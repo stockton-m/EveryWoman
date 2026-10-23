@@ -508,7 +508,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .about-ethos-card__more {
+  .about-ethos-card__more,
+  .about-ethos-modal__site {
     transition: none;
   }
 
@@ -541,6 +542,65 @@
 .about-ethos-modal .about-ethos-modal__close:focus-visible {
   outline: none;
   background-color: transparent;
+}
+
+.about-ethos-modal__site,
+.about-ethos-modal__close {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.about-ethos-modal__site {
+  border-radius: 50%;
+  transition: background-color 180ms ease;
+}
+
+.about-ethos-modal__site--cream {
+  background-color: var(--cream);
+  color: var(--brown);
+}
+
+.about-ethos-modal__site--brown {
+  background-color: var(--brown);
+  color: var(--cream);
+}
+
+.about-ethos-modal__site-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.about-ethos-modal__site:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 0.25rem;
+}
+
+.about-ethos-modal__site--cream:focus-visible {
+  background-color: color-mix(in srgb, var(--cream) 88%, black);
+}
+
+.about-ethos-modal__site--brown:focus-visible {
+  background-color: color-mix(in srgb, var(--brown) 72%, var(--cream));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .about-ethos-modal__site--cream:hover {
+    background-color: color-mix(in srgb, var(--cream) 88%, black);
+  }
+
+  .about-ethos-modal__site--brown:hover {
+    background-color: color-mix(in srgb, var(--brown) 72%, var(--cream));
+  }
+}
+
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .about-ethos-modal .about-ethos-modal__close:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
 }
 
 .about-ethos-modal__layout {
@@ -578,7 +638,7 @@
   max-height: 100%;
   overflow-y: auto;
   padding-top: 1.25rem;
-  padding-right: 2.5rem;
+  padding-right: 5rem;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }

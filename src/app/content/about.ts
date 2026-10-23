@@ -13,6 +13,7 @@ export type AboutBlock =
 export type AboutProfile = {
   role: string;
   name: string;
+  website: string;
   paragraphs: AboutInline[][];
   accent: "orange" | "green" | "pink";
 };
@@ -109,6 +110,7 @@ export const ABOUT_PROFILES: AboutProfile[] = [
   {
     role: "Coach & Collaborator",
     name: "Loretta Hogg",
+    website: "https://www.lorettaloveslifting.com/",
     accent: "green",
     paragraphs: [
       [
@@ -132,6 +134,7 @@ export const ABOUT_PROFILES: AboutProfile[] = [
   {
     role: "Mentor & Investor",
     name: "La Keisha Landrum Pierre",
+    website: "https://www.emmelineventures.vc/about",
     accent: "orange",
     paragraphs: [
       [
@@ -160,6 +163,7 @@ export const ABOUT_PROFILES: AboutProfile[] = [
   {
     role: "Inspiration",
     name: "Dr. Stacy Sims",
+    website: "https://www.drstacysims.com/",
     accent: "pink",
     paragraphs: [
       [
