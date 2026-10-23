@@ -1,17 +1,12 @@
-import { X } from "lucide-react";
+import { ArrowLeft, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent, TransitionEvent } from "react";
 import { createPortal } from "react-dom";
-import { AboutImagePlaceholder } from "@/app/components/about/AboutImagePlaceholder";
+import { AboutInlines } from "@/app/components/about/AboutInlines";
+import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import { getAboutEthosCardStyle } from "@/app/components/about/AboutWomanProfile";
-import type { AboutProfile } from "@/app/content/about";
-import { BLUSH, EMBER, MONO, SAGE, SANS, SERIF } from "@/app/constants";
-
-const ACCENTS = {
-  orange: EMBER,
-  green: SAGE,
-  pink: BLUSH,
-} as const;
+import type { AboutProfileWithPortrait } from "@/app/content/aboutPortraits";
+import { MONO, SANS, SERIF } from "@/app/constants";
 
 const TITLE_ID = "about-woman-modal-title";
 const DISMISS_DISTANCE = 120;
@@ -92,7 +87,7 @@ function prefersReducedMotion() {
 }
 
 type AboutWomanModalProps = {
-  profile: AboutProfile | null;
+  profile: AboutProfileWithPortrait | null;
   index: number;
   onClose: (reveal?: boolean) => void;
 };
@@ -136,7 +131,7 @@ export function AboutWomanModal({
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     if (mobileDragEnabled()) dialogRef.current?.focus({ preventScroll: true });
-    else closeButtonRef.current?.focus();
+    else closeButtonRef.current?.focus({ preventScroll: true, focusVisible: false });
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -320,10 +315,11 @@ export function AboutWomanModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={TITLE_ID}
-        className={`about-ethos-modal relative flex w-full max-w-5xl flex-col overflow-hidden rounded-[2rem] p-6 sm:p-8 md:rounded-[3rem] md:p-12${returning ? " about-ethos-modal--returning" : ""}`}
+        className={`about-ethos-modal relative flex min-w-0 shrink-0 flex-col overflow-hidden rounded-[2rem] p-6 sm:p-8 md:rounded-[3rem] md:p-12${returning ? " about-ethos-modal--returning" : ""}`}
         style={{
-          minHeight: "min(42rem, calc(100dvh - 3rem))",
-          maxHeight: "calc(100dvh - 1.5rem)",
+          width: "min(64rem, calc(100vw - 4rem))",
+          height: "min(42rem, calc(100dvh - 4rem))",
+          maxWidth: "100%",
           background: cardStyle.background,
           boxShadow: "0 32px 90px rgba(42,31,26,0.3)",
           color: cardStyle.color,
@@ -344,7 +340,7 @@ export function AboutWomanModal({
           ref={closeButtonRef}
           type="button"
           onClick={() => onClose()}
-          className="pill-btn pill-btn--icon absolute right-5 top-5 z-20 rounded-full p-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 md:right-8 md:top-8"
+          className="about-ethos-modal__close pill-btn pill-btn--icon absolute right-5 top-5 z-20 rounded-full p-2 md:right-8 md:top-8"
           style={{ color: cardStyle.color }}
           aria-label="Close profile"
         >
@@ -352,10 +348,10 @@ export function AboutWomanModal({
         </button>
 
         <div className="about-ethos-modal__layout">
-          <AboutImagePlaceholder
-            accent={ACCENTS[profile.accent]}
-            className="about-ethos-modal__image"
-            label={`Placeholder portrait for ${profile.name}`}
+          <ImageWithFallback
+            src={profile.modalImage}
+            alt={profile.name}
+            className={`about-ethos-modal__image${profile.modalImageClassName ? ` ${profile.modalImageClassName}` : ""}`}
           />
 
           <div className="about-ethos-modal__copy">
@@ -372,8 +368,19 @@ export function AboutWomanModal({
             >
               {profile.name}
             </h2>
-            <p className="about-ethos-modal__desc">{profile.description}</p>
+            <div className="about-ethos-modal__desc">
+              {profile.paragraphs.map((paragraph, paragraphIndex) => (
+                <p key={paragraphIndex}>
+                  <AboutInlines content={paragraph} />
+                </p>
+              ))}
+            </div>
           </div>
+
+          <p className="about-ethos-modal__scroll-hint">
+            <ArrowLeft className="about-ethos-modal__scroll-arrow" aria-hidden="true" />
+            Scroll for more
+          </p>
         </div>
       </div>
     </div>,

@@ -1,4 +1,5 @@
 import { AboutImagePlaceholder } from "@/app/components/about/AboutImagePlaceholder";
+import { AboutInlines } from "@/app/components/about/AboutInlines";
 import { ABOUT_COLLAGE_ITEMS } from "@/app/content/about";
 import { BLUSH, BROWN, CREAM, EMBER, SAGE, SERIF } from "@/app/constants";
 
@@ -36,7 +37,7 @@ export function AboutCollage() {
                 {item.title}
               </h3>
               <p className="text-sm leading-relaxed" style={{ color: CREAM }}>
-                {item.description}
+                <AboutInlines content={item.description} />
               </p>
             </div>
           </article>

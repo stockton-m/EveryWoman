@@ -11,6 +11,8 @@ import {
   ABOUT_COLLAGE_ITEMS,
   ABOUT_ETHOS_INTRO,
   ABOUT_PROFILES,
+  type AboutBlock,
+  type AboutInline,
 } from "../content/about";
 import {
   COACHING_BENEFITS,
@@ -522,23 +524,63 @@ function coachingFactsMarkdown(options: { benefits: boolean }): string {
   ].join("\n");
 }
 
+function aboutInlineHtml(content: AboutInline[]): string {
+  return content
+    .map((part) => {
+      if (typeof part === "string") return escapeHtml(part);
+      if (part.kind === "em") return `<em>${escapeHtml(part.text)}</em>`;
+      return `<a href="${escapeHtml(part.href)}">${escapeHtml(part.text)}</a>`;
+    })
+    .join("");
+}
+
+function aboutInlineMarkdown(content: AboutInline[]): string {
+  return content
+    .map((part) => {
+      if (typeof part === "string") return part;
+      if (part.kind === "em") return `*${part.text}*`;
+      return `[${part.text}](${part.href})`;
+    })
+    .join("");
+}
+
+function aboutBlocksHtml(blocks: AboutBlock[]): string {
+  return blocks
+    .map((block) => {
+      if (block.kind === "image") return "";
+      if (block.kind === "heading") return `<h3>${escapeHtml(block.text)}</h3>`;
+      return `<p>${aboutInlineHtml(block.content)}</p>`;
+    })
+    .join("");
+}
+
+function aboutBlocksMarkdown(blocks: AboutBlock[]): string {
+  return blocks
+    .flatMap((block) => {
+      if (block.kind === "image") return [];
+      if (block.kind === "heading") return [`### ${block.text}`];
+      return [aboutInlineMarkdown(block.content)];
+    })
+    .join("\n\n");
+}
+
 function aboutStoryHtml(): string {
   const lead = `${ABOUT_BACKGROUND.lead.before}<em>${escapeHtml(ABOUT_BACKGROUND.lead.emphasis)}</em>${escapeHtml(ABOUT_BACKGROUND.lead.after)}`;
-  const paragraphs = [...ABOUT_BACKGROUND.left, ...ABOUT_BACKGROUND.right]
-    .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
-    .join("");
-  const profiles = ABOUT_PROFILES.map(
-    (profile) =>
-      `<section><h3>${escapeHtml(profile.name)}</h3><p>${escapeHtml(profile.role)}</p><p>${escapeHtml(profile.description)}</p></section>`,
-  ).join("");
+  const profiles = ABOUT_PROFILES.map((profile) => {
+    const paragraphs = profile.paragraphs
+      .map((paragraph) => `<p>${aboutInlineHtml(paragraph)}</p>`)
+      .join("");
+    return `<section><h3>${escapeHtml(profile.name)}</h3><p>${escapeHtml(profile.role)}</p>${paragraphs}</section>`;
+  }).join("");
   const collage = ABOUT_COLLAGE_ITEMS.map(
     (item) =>
-      `<li><strong>${escapeHtml(item.title)}</strong> ${escapeHtml(item.description)}</li>`,
+      `<li><strong>${escapeHtml(item.title)}</strong> ${aboutInlineHtml(item.description)}</li>`,
   ).join("");
   return [
     "<section>",
     `<p>${lead}</p>`,
-    paragraphs,
+    aboutBlocksHtml(ABOUT_BACKGROUND.left),
+    aboutBlocksHtml(ABOUT_BACKGROUND.right),
     `<p>${escapeHtml(ABOUT_BACKGROUND.signoff)}</p>`,
     `<p>${escapeHtml(ABOUT_ETHOS_INTRO)}</p>`,
     profiles,
@@ -549,20 +591,23 @@ function aboutStoryHtml(): string {
 
 function aboutStoryMarkdown(): string {
   const lead = `${ABOUT_BACKGROUND.lead.before}${ABOUT_BACKGROUND.lead.emphasis}${ABOUT_BACKGROUND.lead.after}`;
-  const profiles = ABOUT_PROFILES.map(
-    (profile) => `### ${profile.name}\n\n${profile.role}\n\n${profile.description}`,
-  ).join("\n\n");
+  const profiles = ABOUT_PROFILES.map((profile) => {
+    const paragraphs = profile.paragraphs
+      .map((paragraph) => aboutInlineMarkdown(paragraph))
+      .join("\n\n");
+    return `### ${profile.name}\n\n${profile.role}\n\n${paragraphs}`;
+  }).join("\n\n");
   const collage = ABOUT_COLLAGE_ITEMS.map(
-    (item) => `- **${item.title}** ${item.description}`,
+    (item) => `- **${item.title}** ${aboutInlineMarkdown(item.description)}`,
   ).join("\n");
   return [
     "## Madeleine",
     "",
     lead,
     "",
-    ABOUT_BACKGROUND.left.join("\n\n"),
+    aboutBlocksMarkdown(ABOUT_BACKGROUND.left),
     "",
-    ABOUT_BACKGROUND.right.join("\n\n"),
+    aboutBlocksMarkdown(ABOUT_BACKGROUND.right),
     "",
     ABOUT_BACKGROUND.signoff,
     "",

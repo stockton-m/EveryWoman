@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AboutCollage } from "@/app/components/about/AboutCollage";
 import { AboutGuideLine } from "@/app/components/about/AboutGuideLine";
-import { AboutImagePlaceholder } from "@/app/components/about/AboutImagePlaceholder";
+import { AboutInlines } from "@/app/components/about/AboutInlines";
 import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import { AboutWomanModal } from "@/app/components/about/AboutWomanModal";
 import { AboutWomanProfile } from "@/app/components/about/AboutWomanProfile";
@@ -12,10 +12,52 @@ import { SiteNav } from "@/app/components/SiteNav";
 import {
   ABOUT_BACKGROUND,
   ABOUT_ETHOS_INTRO,
-  ABOUT_PROFILES,
+  type AboutBlock,
 } from "@/app/content/about";
+import { ABOUT_PROFILES_WITH_PORTRAITS } from "@/app/content/aboutPortraits";
 import { BROWN, CREAM, EMBER, SANS, SAGE, SERIF } from "@/app/constants";
 import aboutPortrait from "@/imports/about.webp";
+import startedBecausePortrait from "@/imports/istartedeverywomanbecause.webp";
+
+function AboutBackgroundColumn({ blocks }: { blocks: AboutBlock[] }) {
+  return blocks.map((block, index) => {
+    if (block.kind === "image") {
+      return (
+        <div
+          key={`image-${index}`}
+          className="about-image-placeholder about-image-placeholder--squircle about-background__portrait"
+          style={{ borderColor: SAGE }}
+        >
+          <ImageWithFallback
+            src={startedBecausePortrait}
+            alt="Madeleine Stockton"
+            className="about-background__portrait-image"
+          />
+        </div>
+      );
+    }
+    if (block.kind === "heading") {
+      return (
+        <h3
+          key={block.text}
+          className="about-background__subhead"
+          style={{ color: CREAM, fontFamily: SERIF }}
+        >
+          {block.text}
+        </h3>
+      );
+    }
+    return (
+      <p
+        key={index}
+        className="text-base md:text-[17px]"
+        style={{ color: CREAM }}
+      >
+        <AboutInlines content={block.content} />
+      </p>
+    );
+  });
+}
 
 export function AboutPage() {
   const [activeProfileIndex, setActiveProfileIndex] = useState<number | null>(
@@ -91,38 +133,11 @@ export function AboutPage() {
                 <em>{ABOUT_BACKGROUND.lead.emphasis}</em>
                 {ABOUT_BACKGROUND.lead.after}
               </h2>
-              {ABOUT_BACKGROUND.left.map((paragraph) => (
-                <p
-                  key={paragraph}
-                  className="text-base md:text-[17px]"
-                  style={{ color: CREAM }}
-                >
-                  {paragraph}
-                </p>
-              ))}
+              <AboutBackgroundColumn blocks={ABOUT_BACKGROUND.left} />
             </div>
 
             <div className="about-background__column about-background__column--right">
-              <p
-                className="text-base md:text-[17px]"
-                style={{ color: CREAM }}
-              >
-                {ABOUT_BACKGROUND.right[0]}
-              </p>
-              <AboutImagePlaceholder
-                accent={SAGE}
-                className="about-background__portrait"
-                label="Second placeholder portrait of Madeleine"
-              />
-              {ABOUT_BACKGROUND.right.slice(1).map((paragraph) => (
-                <p
-                  key={paragraph}
-                  className="text-base md:text-[17px]"
-                  style={{ color: CREAM }}
-                >
-                  {paragraph}
-                </p>
-              ))}
+              <AboutBackgroundColumn blocks={ABOUT_BACKGROUND.right} />
               <p
                 className="about-background__lead about-background__signoff"
                 style={{ color: CREAM, fontFamily: SERIF }}
@@ -155,7 +170,7 @@ export function AboutPage() {
           </div>
 
           <div className="about-ethos-cards">
-            {ABOUT_PROFILES.map((profile, index) => (
+            {ABOUT_PROFILES_WITH_PORTRAITS.map((profile, index) => (
               <AboutWomanProfile
                 key={`${profile.role}-${index}`}
                 profile={profile}
@@ -171,7 +186,7 @@ export function AboutPage() {
             profile={
               activeProfileIndex === null
                 ? null
-                : ABOUT_PROFILES[activeProfileIndex]
+                : ABOUT_PROFILES_WITH_PORTRAITS[activeProfileIndex]
             }
             index={activeProfileIndex ?? 0}
             onClose={(reveal) => {

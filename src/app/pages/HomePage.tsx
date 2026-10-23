@@ -450,7 +450,7 @@ export function HomePage() {
       </section>
 
       <section
-        className="pb-12 pt-20 md:pb-14 md:pt-28"
+        className="home-contact pb-12 pt-20 md:pb-14 md:pt-28"
         style={{ background: EMBER }}
         aria-labelledby="get-in-touch-heading"
       >
@@ -462,7 +462,7 @@ export function HomePage() {
           >
             Get in touch
           </h2>
-          <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-3 md:gap-10">
+          <div className="home-contact-layout grid grid-cols-1 items-center gap-8 md:grid-cols-3 md:gap-10">
             <div className="home-contact-portrait-wrap">
               <div
                 className="about-image-placeholder about-image-placeholder--circle home-contact-portrait relative"
@@ -476,15 +476,17 @@ export function HomePage() {
               </div>
             </div>
             <div className="home-contact-copy">
-              <p
-                className="text-base leading-relaxed md:text-[17px]"
-                style={{ color: BROWN }}
-              >
-                I can&apos;t wait to hear from you. My goal is to provide
-                tailored coaching for every woman based on her lifestyle,
-                diagnoses, and training history. Please reach out to me to get
-                started.
-              </p>
+              <div className="home-contact-copy-panel">
+                <p
+                  className="text-base leading-relaxed md:text-[17px]"
+                  style={{ color: CREAM }}
+                >
+                  I can&apos;t wait to hear from you. My goal is to provide
+                  tailored coaching for every woman based on her lifestyle,
+                  diagnoses, and training history. Please reach out to me to get
+                  started.
+                </p>
+              </div>
               <Link
                 to="/contact"
                 className="pill-btn pill-btn--cream-solid mt-6 inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-semibold"
