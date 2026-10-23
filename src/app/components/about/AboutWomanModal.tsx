@@ -17,6 +17,9 @@ const DISMISS_DISTANCE = 120;
 const FLICK_PX_PER_MS = 0.45;
 const TAP_SLOP = 10;
 const BACKDROP_ALPHA = 0.62;
+const SCROLL_EDGE = 1;
+
+type DragMode = "undecided" | "scroll" | "modal";
 
 type DragState = {
   pointerId: number;
@@ -28,6 +31,10 @@ type DragState = {
   velocityX: number;
   velocityY: number;
   moved: boolean;
+  mode: DragMode;
+  copy: HTMLElement | null;
+  modalOriginX: number;
+  modalOriginY: number;
 };
 
 type CardMotion = {
@@ -88,6 +95,35 @@ function mobileDragEnabled() {
 
 function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function canScrollCopy(copy: HTMLElement, deltaY: number) {
+  const maxScroll = copy.scrollHeight - copy.clientHeight;
+  if (maxScroll <= SCROLL_EDGE) return false;
+  if (deltaY > 0) return copy.scrollTop > SCROLL_EDGE;
+  if (deltaY < 0) return copy.scrollTop < maxScroll - SCROLL_EDGE;
+  return false;
+}
+
+/** Finger movement still unused after scrolling. Finger up is a negative delta. */
+function consumeCopyScroll(copy: HTMLElement, frameY: number) {
+  const maxScroll = Math.max(0, copy.scrollHeight - copy.clientHeight);
+  const before = copy.scrollTop;
+  copy.scrollTop = Math.min(maxScroll, Math.max(0, before - frameY));
+  return frameY + (copy.scrollTop - before);
+}
+
+function modalMotion(x: number, y: number): CardMotion {
+  const distance = Math.hypot(x, y);
+  const progress = Math.min(1, distance / DISMISS_DISTANCE);
+  return {
+    x,
+    y,
+    scaleX: 1,
+    scaleY: 1,
+    animate: false,
+    backdrop: BACKDROP_ALPHA * (1 - progress),
+  };
 }
 
 type SlideDirection = "next" | "prev" | "none";
@@ -191,6 +227,10 @@ export function AboutWomanModal({
     velocityX: 0,
     velocityY: 0,
     moved: false,
+    mode: "undecided",
+    copy: null,
+    modalOriginX: 0,
+    modalOriginY: 0,
   });
   const settlingRef = useRef(false);
   const suppressBackdropRef = useRef(false);
@@ -266,7 +306,8 @@ export function AboutWomanModal({
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (settlingRef.current || !mobileDragEnabled()) return;
     if (event.pointerType === "mouse") return;
-    if ((event.target as HTMLElement).closest("button, a")) return;
+    const target = event.target as HTMLElement | null;
+    if (target?.closest("button, a")) return;
 
     dragRef.current = {
       pointerId: event.pointerId,
@@ -278,6 +319,10 @@ export function AboutWomanModal({
       velocityX: 0,
       velocityY: 0,
       moved: false,
+      mode: "undecided",
+      copy: target?.closest<HTMLElement>(".about-ethos-modal__copy") ?? null,
+      modalOriginX: event.clientX,
+      modalOriginY: event.clientY,
     };
     try {
       event.currentTarget.setPointerCapture(event.pointerId);
@@ -293,7 +338,38 @@ export function AboutWomanModal({
     const deltaY = event.clientY - drag.startY;
     if (!drag.moved && Math.hypot(deltaX, deltaY) < TAP_SLOP) return;
 
-    drag.moved = true;
+    if (!drag.moved) {
+      drag.moved = true;
+      const horizontal = Math.abs(deltaX) > Math.abs(deltaY);
+      if (!drag.copy || horizontal || !canScrollCopy(drag.copy, deltaY)) {
+        drag.mode = "modal";
+        drag.modalOriginX = drag.startX;
+        drag.modalOriginY = drag.startY;
+      } else {
+        drag.mode = "scroll";
+      }
+    }
+
+    if (drag.mode === "scroll" && drag.copy) {
+      const unusedY = consumeCopyScroll(drag.copy, event.clientY - drag.lastY);
+      if (Math.abs(unusedY) < 0.5) {
+        drag.lastX = event.clientX;
+        drag.lastY = event.clientY;
+        drag.lastTime = event.timeStamp;
+        return;
+      }
+      drag.mode = "modal";
+      drag.velocityX = 0;
+      drag.velocityY = 0;
+      drag.modalOriginX = event.clientX;
+      drag.modalOriginY = event.clientY - unusedY;
+      drag.lastX = event.clientX;
+      drag.lastY = event.clientY;
+      drag.lastTime = event.timeStamp;
+      setMotion(modalMotion(0, unusedY));
+      return;
+    }
+
     const dt = event.timeStamp - drag.lastTime;
     if (dt > 0) {
       drag.velocityX = (event.clientX - drag.lastX) / dt;
@@ -303,16 +379,9 @@ export function AboutWomanModal({
     drag.lastY = event.clientY;
     drag.lastTime = event.timeStamp;
 
-    const distance = Math.hypot(deltaX, deltaY);
-    const progress = Math.min(1, distance / DISMISS_DISTANCE);
-    setMotion({
-      x: deltaX,
-      y: deltaY,
-      scaleX: 1,
-      scaleY: 1,
-      animate: false,
-      backdrop: BACKDROP_ALPHA * (1 - progress),
-    });
+    setMotion(
+      modalMotion(event.clientX - drag.modalOriginX, event.clientY - drag.modalOriginY),
+    );
   };
 
   const releasePointer = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -337,8 +406,10 @@ export function AboutWomanModal({
       suppressBackdropRef.current = false;
     }, 0);
 
-    const deltaX = event.clientX - drag.startX;
-    const deltaY = event.clientY - drag.startY;
+    if (drag.mode !== "modal") return;
+
+    const deltaX = event.clientX - drag.modalOriginX;
+    const deltaY = event.clientY - drag.modalOriginY;
     const distance = Math.hypot(deltaX, deltaY);
     const idle = event.timeStamp - drag.lastTime;
     const velocityX = idle > 80 ? 0 : drag.velocityX;
@@ -372,7 +443,9 @@ export function AboutWomanModal({
     if (drag.pointerId !== event.pointerId) return;
     drag.pointerId = -1;
     releasePointer(event);
-    if (drag.moved) setMotion({ ...REST_MOTION, animate: !prefersReducedMotion() });
+    if (drag.moved && drag.mode === "modal") {
+      setMotion({ ...REST_MOTION, animate: !prefersReducedMotion() });
+    }
   };
 
   const onDialogTransitionEnd = (event: TransitionEvent<HTMLDivElement>) => {
