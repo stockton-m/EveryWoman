@@ -89,7 +89,7 @@ export function SiteFooter() {
                 rel="noopener noreferrer"
                 className="transition-colors duration-200 hover:text-[#f5ede4]"
               >
-                Claire Demarco Photography
+                Claire Kramer Photography
               </a>
             </p>
           </div>
