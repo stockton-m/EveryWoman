@@ -212,13 +212,29 @@
   padding-bottom: 13.5rem;
 }
 
-.about-hero__portrait {
+.about-hero__frame {
+  --about-ring-pad: 40px;
+  position: relative;
+  z-index: 1;
   width: min(100%, 22rem);
   aspect-ratio: 1;
   justify-self: end;
-  position: relative;
-  z-index: 1;
   transform: translateX(-2.25rem);
+}
+
+.about-hero__ring {
+  position: absolute;
+  inset: calc(var(--about-ring-pad) * -1);
+  width: calc(100% + var(--about-ring-pad) * 2);
+  height: calc(100% + var(--about-ring-pad) * 2);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.about-hero__portrait {
+  position: absolute;
+  inset: 0;
+  border: none;
 }
 
 .about-hero__copy {
@@ -883,7 +899,7 @@
     text-align: center;
   }
 
-  .about-hero__portrait {
+  .about-hero__frame {
     width: min(72vw, 22rem);
     justify-self: center;
     transform: none;

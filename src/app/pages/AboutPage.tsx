@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AboutCollage } from "@/app/components/about/AboutCollage";
 import { AboutGuideLine } from "@/app/components/about/AboutGuideLine";
+import { AboutHeroRing } from "@/app/components/about/AboutHeroRing";
 import { AboutInlines } from "@/app/components/about/AboutInlines";
 import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import { AboutWomanModal } from "@/app/components/about/AboutWomanModal";
@@ -87,15 +88,15 @@ export function AboutPage() {
 
       <main className="about-page__main">
         <section className="about-section about-page__inner about-hero">
-          <div
-            className="about-image-placeholder about-image-placeholder--circle about-hero__portrait"
-            style={{ borderColor: EMBER }}
-          >
-            <ImageWithFallback
-              src={aboutPortrait}
-              alt="Madeleine Stockton"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
+          <div className="about-hero__frame">
+            <AboutHeroRing />
+            <div className="about-image-placeholder about-image-placeholder--circle about-hero__portrait">
+              <ImageWithFallback
+                src={aboutPortrait}
+                alt="Madeleine Stockton"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            </div>
           </div>
 
           <div className="about-hero__copy">
