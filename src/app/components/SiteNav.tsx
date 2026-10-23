@@ -9,6 +9,7 @@ import {
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
+import { TierIconNameTooltip } from "@/app/components/TierIconNameTooltip";
 import { CREAM, EMBER, SANS, SERIF, SUBSTACK_URL } from "@/app/constants";
 import logoImage from "@/imports/logo.png";
 
@@ -80,16 +81,37 @@ function HexMark({ color, spun }: { color: string; spun: boolean }) {
 function NavPill({
   item,
   onNavigate,
+  menu = false,
 }: {
   item: (typeof NAV_ITEMS)[number];
   onNavigate?: () => void;
+  menu?: boolean;
 }) {
   if (item.placeholder) {
-    return (
-      <span className={navPillClass} style={{ fontFamily: SANS }} aria-disabled="true">
-        {item.label}
+    const pill = (
+      <span
+        className={`${navPillClass} site-nav__soon`}
+        style={{ fontFamily: SANS }}
+        aria-disabled="true"
+      >
+        {menu ? (
+          <span className="site-nav__soon-copy">
+            <span className="site-nav__soon-title">{item.label}</span>
+            <span className="site-nav__soon-note">Coming soon!</span>
+          </span>
+        ) : (
+          item.label
+        )}
         <ArrowUpRight className="w-3.5 h-3.5" />
       </span>
+    );
+
+    if (menu) return pill;
+
+    return (
+      <TierIconNameTooltip content="Coming soon!" placement="below" shape="pill">
+        {pill}
+      </TierIconNameTooltip>
     );
   }
 
@@ -321,7 +343,7 @@ export function SiteNav({ variant = "hero" }: SiteNavProps) {
                     className="site-nav__menu-item"
                     style={{ "--i": index } as CSSProperties}
                   >
-                    <NavPill item={item} onNavigate={closeMenu} />
+                    <NavPill item={item} menu onNavigate={closeMenu} />
                   </div>
                 ))}
               </div>

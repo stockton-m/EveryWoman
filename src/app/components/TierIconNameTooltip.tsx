@@ -4,7 +4,7 @@ import { BROWN, CREAM, SANS } from "@/app/constants";
 
 const ARROW_GAP_PX = 6;
 
-type TooltipPlacement = "before" | "after";
+type TooltipPlacement = "before" | "after" | "below";
 type TooltipShape = "point" | "pill";
 
 type TierIconNameTooltipProps = {
@@ -22,6 +22,13 @@ function updatePosition(
   setCoords: (coords: { top: number; left: number }) => void,
 ) {
   const rect = anchor.getBoundingClientRect();
+  if (placement === "below") {
+    setCoords({
+      top: rect.bottom + ARROW_GAP_PX,
+      left: rect.left + rect.width / 2,
+    });
+    return;
+  }
   setCoords({
     top: rect.top + rect.height / 2,
     left:
@@ -43,6 +50,7 @@ export function TierIconNameTooltip({
   const [visible, setVisible] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0 });
   const after = placement === "after";
+  const below = placement === "below";
   const pill = shape === "pill";
 
   const show = useCallback(() => {
@@ -81,8 +89,10 @@ export function TierIconNameTooltip({
           <div
             role="tooltip"
             aria-hidden={false}
-            className={`pointer-events-none fixed -translate-y-1/2 ${
-              after ? "" : "z-[60] -translate-x-full"
+            className={`pointer-events-none fixed ${
+              below
+                ? "-translate-x-1/2"
+                : `-translate-y-1/2 ${after ? "" : "z-[60] -translate-x-full"}`
             }`}
             style={{ top: coords.top, left: coords.left, zIndex }}
           >
