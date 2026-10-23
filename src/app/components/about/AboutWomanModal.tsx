@@ -1,6 +1,10 @@
-import { ArrowLeft, ArrowUpRight, X } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import type { PointerEvent as ReactPointerEvent, TransitionEvent } from "react";
+import type {
+  CSSProperties,
+  PointerEvent as ReactPointerEvent,
+  TransitionEvent,
+} from "react";
 import { createPortal } from "react-dom";
 import { AboutInlines } from "@/app/components/about/AboutInlines";
 import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
@@ -86,22 +90,97 @@ function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
+type SlideDirection = "next" | "prev" | "none";
+
 type AboutWomanModalProps = {
   profile: AboutProfileWithPortrait | null;
   index: number;
+  count: number;
   onClose: (reveal?: boolean) => void;
+  onPrevious: () => void;
+  onNext: () => void;
 };
+
+function slideDirection(
+  previousIndex: number,
+  nextIndex: number,
+  wasOpen: boolean,
+  isOpen: boolean,
+): SlideDirection {
+  if (!wasOpen || !isOpen || previousIndex === nextIndex) return "none";
+  return nextIndex > previousIndex ? "next" : "prev";
+}
+
+function ProfileNavButton({
+  direction,
+  disabled,
+  fill,
+  onDark,
+  onNavigate,
+}: {
+  direction: "previous" | "next";
+  disabled: boolean;
+  fill: string;
+  onDark: boolean;
+  onNavigate: () => void;
+}) {
+  const Icon = direction === "previous" ? ChevronLeft : ChevronRight;
+
+  return (
+    <button
+      type="button"
+      className={`about-ethos-modal__nav about-ethos-modal__nav--${
+        direction === "previous" ? "prev" : "next"
+      } ${onDark ? "about-ethos-modal__nav--on-dark" : "about-ethos-modal__nav--on-light"}`}
+      style={{ "--about-modal-fill": fill } as CSSProperties}
+      onClick={onNavigate}
+      disabled={disabled}
+      aria-label={direction === "previous" ? "Previous woman" : "Next woman"}
+    >
+      <Icon className="about-ethos-modal__nav-icon" aria-hidden="true" />
+    </button>
+  );
+}
 
 export function AboutWomanModal({
   profile,
   index,
+  count,
   onClose,
+  onPrevious,
+  onNext,
 }: AboutWomanModalProps) {
+  const frameRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const onCloseRef = useRef(onClose);
+  const onPreviousRef = useRef(onPrevious);
+  const onNextRef = useRef(onNext);
   onCloseRef.current = onClose;
+  onPreviousRef.current = onPrevious;
+  onNextRef.current = onNext;
   const isOpen = profile !== null;
+  const hasPrevious = index > 0;
+  const hasNext = index < count - 1;
+  const hasPreviousRef = useRef(hasPrevious);
+  const hasNextRef = useRef(hasNext);
+  hasPreviousRef.current = hasPrevious;
+  hasNextRef.current = hasNext;
+  const [nav, setNav] = useState<{
+    index: number;
+    open: boolean;
+    direction: SlideDirection;
+  }>({
+    index,
+    open: isOpen,
+    direction: "none",
+  });
+  const changingSlide = slideDirection(nav.index, index, nav.open, isOpen);
+  const slide =
+    nav.index === index && nav.open === isOpen ? nav.direction : changingSlide;
+  if (nav.index !== index || nav.open !== isOpen) {
+    setNav({ index, open: isOpen, direction: changingSlide });
+  }
   const dragRef = useRef<DragState>({
     pointerId: -1,
     startX: 0,
@@ -130,7 +209,7 @@ export function AboutWomanModal({
     const previousFocus = document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    if (mobileDragEnabled()) dialogRef.current?.focus({ preventScroll: true });
+    if (mobileDragEnabled()) frameRef.current?.focus({ preventScroll: true });
     else closeButtonRef.current?.focus({ preventScroll: true, focusVisible: false });
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -140,8 +219,26 @@ export function AboutWomanModal({
         return;
       }
 
+      if (
+        (event.key === "ArrowLeft" || event.key === "ArrowRight") &&
+        !event.altKey &&
+        !event.metaKey &&
+        !event.ctrlKey &&
+        !event.shiftKey
+      ) {
+        event.preventDefault();
+        if (settlingRef.current || dragRef.current.pointerId !== -1) return;
+        if (event.key === "ArrowLeft" && hasPreviousRef.current) {
+          onPreviousRef.current();
+        }
+        if (event.key === "ArrowRight" && hasNextRef.current) {
+          onNextRef.current();
+        }
+        return;
+      }
+
       if (event.key !== "Tab") return;
-      const dialog = dialogRef.current;
+      const dialog = frameRef.current;
       const focusable = dialog?.querySelectorAll<HTMLElement>(
         'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
       );
@@ -295,6 +392,13 @@ export function AboutWomanModal({
   const cardStyle = getAboutEthosCardStyle(index);
   const returning =
     motion.animate && (motion.scaleX !== 1 || motion.scaleY !== 1);
+  const onDark = cardStyle.color === CREAM;
+  const transition = [
+    motion.animate ? "transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1)" : null,
+    prefersReducedMotion() ? null : "background-color 280ms ease, color 280ms ease",
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   return createPortal(
     <div
@@ -310,32 +414,45 @@ export function AboutWomanModal({
       }}
     >
       <div
-        ref={dialogRef}
+        ref={frameRef}
         tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-labelledby={TITLE_ID}
-        className={`about-ethos-modal relative flex min-w-0 shrink-0 flex-col overflow-hidden rounded-[2rem] p-6 sm:p-8 md:rounded-[3rem] md:p-12${returning ? " about-ethos-modal--returning" : ""}`}
+        className={`about-ethos-modal-frame${returning ? " about-ethos-modal-frame--returning" : ""}`}
         style={{
-          width: "min(64rem, calc(100vw - 4rem))",
+          width: "min(64rem, calc(100vw - 8rem))",
           height: "min(42rem, calc(100dvh - 4rem))",
           maxWidth: "100%",
-          background: cardStyle.background,
-          boxShadow: "0 32px 90px rgba(42,31,26,0.3)",
-          color: cardStyle.color,
-          fontFamily: SANS,
-          transformOrigin: "center center",
-          transform: motionTransform(motion),
-          transition: motion.animate
-            ? "transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1)"
-            : "none",
         }}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerCancel}
-        onTransitionEnd={onDialogTransitionEnd}
       >
+        <ProfileNavButton
+          direction="previous"
+          disabled={!hasPrevious}
+          fill={cardStyle.background}
+          onDark={onDark}
+          onNavigate={onPrevious}
+        />
+        <div
+          ref={dialogRef}
+          className={`about-ethos-modal relative flex min-w-0 shrink-0 flex-col overflow-hidden rounded-[2rem] p-6 sm:p-8 md:rounded-[3rem] md:p-12${returning ? " about-ethos-modal--returning" : ""}`}
+          style={{
+            width: "100%",
+            height: "100%",
+            background: cardStyle.background,
+            boxShadow: "0 32px 90px rgba(42,31,26,0.3)",
+            color: cardStyle.color,
+            fontFamily: SANS,
+            transformOrigin: "center center",
+            transform: motionTransform(motion),
+            transition: transition || "none",
+          }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerCancel}
+          onTransitionEnd={onDialogTransitionEnd}
+        >
         <div className="about-ethos-modal__actions absolute right-5 top-5 z-20 flex items-center gap-2 md:right-8 md:top-8">
           <a
             href={profile.website}
@@ -362,7 +479,12 @@ export function AboutWomanModal({
           </button>
         </div>
 
-        <div className="about-ethos-modal__layout">
+        <div
+          key={index}
+          className={`about-ethos-modal__layout${
+            slide === "none" ? "" : ` about-ethos-modal__layout--${slide}`
+          }`}
+        >
           <ImageWithFallback
             src={profile.modalImage}
             alt={profile.name}
@@ -397,6 +519,14 @@ export function AboutWomanModal({
             Scroll for more
           </p>
         </div>
+      </div>
+      <ProfileNavButton
+        direction="next"
+        disabled={!hasNext}
+        fill={cardStyle.background}
+        onDark={onDark}
+        onNavigate={onNext}
+      />
       </div>
     </div>,
     document.body,

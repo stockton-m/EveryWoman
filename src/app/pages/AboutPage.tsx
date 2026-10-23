@@ -190,11 +190,25 @@ export function AboutPage() {
                 : ABOUT_PROFILES_WITH_PORTRAITS[activeProfileIndex]
             }
             index={activeProfileIndex ?? 0}
+            count={ABOUT_PROFILES_WITH_PORTRAITS.length}
             onClose={(reveal) => {
               if (reveal && activeProfileIndex !== null) {
                 setRevealingIndex(activeProfileIndex);
               }
               setActiveProfileIndex(null);
+            }}
+            onPrevious={() => {
+              setActiveProfileIndex((current) =>
+                current === null || current <= 0 ? current : current - 1,
+              );
+            }}
+            onNext={() => {
+              setActiveProfileIndex((current) =>
+                current === null ||
+                current >= ABOUT_PROFILES_WITH_PORTRAITS.length - 1
+                  ? current
+                  : current + 1,
+              );
             }}
           />
         </section>
