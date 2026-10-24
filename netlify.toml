@@ -4,3 +4,6 @@
   # .github/workflows/sync-content.yml. Build hooks are not cancelled
   # by this command. Human commits do not match and still build from Git.
   ignore = "git log -1 --format='%an' | grep -F -q 'github-actions[bot]'"
+
+[functions]
+  directory = "netlify/functions"

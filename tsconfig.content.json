@@ -10,5 +10,5 @@
     "target": "ES2022",
     "types": ["node"]
   },
-  "include": ["scripts/content/**/*.ts"]
+  "include": ["scripts/content/**/*.ts", "netlify/functions/**/*.ts"]
 }

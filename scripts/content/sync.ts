@@ -1,3 +1,4 @@
+import { appendFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { loadEnvFile } from "node:process";
@@ -16,6 +17,9 @@ import type {
   ContentSource,
   SourceReconciliationStats,
 } from "./types.js";
+
+const SUBSTACK_UNAVAILABLE_MESSAGE =
+  "Substack was unavailable. Archived Substack posts were left unchanged.";
 
 const REPOSITORY_ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const ARCHIVE_PATH = join(
@@ -95,7 +99,13 @@ async function main(): Promise<void> {
     providers: [
       {
         source: "substack",
-        fetchPosts: fetchSubstackPosts,
+        fetchPosts: () => {
+          const proxyUrl = process.env.SUBSTACK_PROXY_URL?.trim();
+          return fetchSubstackPosts({
+            proxyToken: process.env.SUBSTACK_PROXY_TOKEN,
+            ...(proxyUrl ? { proxyUrl } : {}),
+          });
+        },
       },
       {
         source: "instagram",
@@ -112,7 +122,28 @@ async function main(): Promise<void> {
     ],
   });
 
+  if (result.unavailableSources.includes("substack")) {
+    console.warn(`::warning::${SUBSTACK_UNAVAILABLE_MESSAGE}`);
+    console.warn(
+      "\nSubstack:\n  Unavailable. Archived posts were left unchanged.",
+    );
+    const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+    if (summaryPath) {
+      try {
+        await appendFile(summaryPath, `${SUBSTACK_UNAVAILABLE_MESSAGE}\n`);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        console.warn(
+          `Unable to update the GitHub Actions step summary: ${message}`,
+        );
+      }
+    }
+  }
+
   for (const source of ["substack", "instagram", "tiktok"] as const) {
+    if (result.unavailableSources.includes(source)) {
+      continue;
+    }
     printSourceSummary(sourceLabel(source), result.stats.bySource[source]);
   }
 

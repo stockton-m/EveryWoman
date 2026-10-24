@@ -4,9 +4,12 @@ import {
   writeArchiveAtomic,
 } from "./archive.js";
 import { reconcile } from "./reconcile.js";
+import { SubstackUnavailableError } from "./substack-fetch.js";
 import type {
+  ArchivePost,
   ContentArchive,
   ContentProvider,
+  ContentSource,
   ReconciliationStats,
 } from "./types.js";
 
@@ -28,6 +31,7 @@ export interface SynchronizeContentResult {
   changed: boolean;
   dryRun: boolean;
   stats: ReconciliationStats;
+  unavailableSources: ContentSource[];
   wroteArchive: boolean;
 }
 
@@ -41,24 +45,56 @@ export async function synchronizeContent({
   const { archive: existingArchive, raw: existingRaw } =
     await readArchive(archivePath);
 
-  const providerResults = await Promise.all(
+  const providerResults = await Promise.allSettled(
     providers.map(async (provider) => {
-      const posts = await provider.fetchPosts();
-      for (const post of posts) {
-        if (post.source !== provider.source) {
-          throw new Error(
-            `${provider.source} provider returned a ${post.source} record.`,
-          );
+      try {
+        const posts = await provider.fetchPosts();
+        for (const post of posts) {
+          if (post.source !== provider.source) {
+            throw new Error(
+              `${provider.source} provider returned a ${post.source} record.`,
+            );
+          }
         }
+        return { posts, unavailable: false as const };
+      } catch (error) {
+        if (
+          provider.source === "substack" &&
+          error instanceof SubstackUnavailableError
+        ) {
+          return { posts: [] as ArchivePost[], unavailable: true as const };
+        }
+        throw error;
       }
-      return posts;
     }),
   );
 
-  const { archive, stats } = reconcile(
-    existingArchive,
-    providerResults.flat(),
-  );
+  const fatalErrors: unknown[] = [];
+  const incomingPosts: ArchivePost[] = [];
+  const unavailableSources: ContentSource[] = [];
+  for (const result of providerResults) {
+    if (result.status === "rejected") {
+      fatalErrors.push(result.reason);
+      continue;
+    }
+    if (result.value.unavailable) {
+      unavailableSources.push("substack");
+      continue;
+    }
+    incomingPosts.push(...result.value.posts);
+  }
+  if (fatalErrors.length === 1) {
+    throw fatalErrors[0];
+  }
+  if (fatalErrors.length > 1) {
+    throw new Error(
+      fatalErrors
+        .map((error) => (error instanceof Error ? error.message : String(error)))
+        .join("; "),
+    );
+  }
+
+  const { archive, stats } = reconcile(existingArchive, incomingPosts);
   const serializedArchive = serializeArchive(archive);
   const changed = serializedArchive !== existingRaw;
 
@@ -71,6 +107,7 @@ export async function synchronizeContent({
     changed,
     dryRun,
     stats,
+    unavailableSources,
     wroteArchive: changed && !dryRun,
   };
 }

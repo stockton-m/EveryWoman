@@ -46,6 +46,7 @@ jobs:
           APIFY_TASK_ID: ${{ secrets.APIFY_TASK_ID }}
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
           BEHOLD_FEED_URL: ${{ secrets.BEHOLD_FEED_URL }}
+          SUBSTACK_PROXY_TOKEN: ${{ secrets.SUBSTACK_PROXY_TOKEN }}
 
       - name: Detect archive changes
         id: changes

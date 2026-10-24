@@ -13,14 +13,20 @@ flowchart TD
   substackFeed["Substack RSS everywomanhealth.substack.com/feed"]
 
   cron["GitHub Actions cron 11:23 UTC daily, or workflow_dispatch"] --> checkout["Checkout the default branch"]
-  checkout --> syncCmd["pnpm content:sync with BEHOLD_FEED_URL, APIFY_TOKEN, APIFY_TASK_ID"]
+  checkout --> syncCmd["pnpm content:sync with Behold, Apify, and optional SUBSTACK_PROXY_TOKEN"]
 
-  syncCmd --> validateEnv["Validate the three secrets before any request"]
+  syncCmd --> validateEnv["Validate Behold and Apify secrets before any request"]
   validateEnv --> readArchive["Read src/data/content-archive.json"]
   readArchive --> fetchParallel["Fetch Behold, the Apify dataset, and Substack in parallel"]
 
   beholdFeed --> fetchParallel
-  substackFeed --> fetchParallel
+  substackFeed --> directRss["Direct Substack GET, six browser profiles"]
+  directRss -->|RSS| fetchParallel
+  directRss -->|"403, 429, 5xx, timeout, or challenge"| proxyRss["POST Netlify substack-rss, six profiles, one upstream fetch each"]
+  directRss -->|other 4xx| skipSubstack["Warn. Leave archived Substack posts unchanged."]
+  proxyRss -->|RSS| fetchParallel
+  proxyRss -->|"auth, config, or retries exhausted"| skipSubstack
+  skipSubstack --> fetchParallel
 
   apifyTask --> lastRun["GET the latest SUCCEEDED run, then that run dataset"]
   lastRun --> datasetAge{"Dataset available, and how old?"}
@@ -30,9 +36,9 @@ flowchart TD
   warnStale --> fetchParallel
   failTikTok --> abortSync["Stop before reconcile or write. Nothing is committed."]
 
-  fetchParallel --> anyFailed{"Did any provider fail?"}
-  anyFailed -->|yes| abortSync
-  anyFailed -->|no| reconcile["Reconcile in memory. See the merge diagram below."]
+  fetchParallel --> requiredFailed{"Did Instagram, TikTok, or Substack parsing fail?"}
+  requiredFailed -->|yes| abortSync
+  requiredFailed -->|no| reconcile["Reconcile in memory. See the merge diagram below."]
 
   reconcile --> dryRun{"Dry run?"}
   dryRun -->|yes| dryReport["Print added, updated, and missing-thumbnail counts. Skip writes and downloads."]
@@ -65,11 +71,17 @@ flowchart TD
 
 The GitHub Action is [`.github/workflows/sync-content.yml`](../.github/workflows/sync-content.yml). It commits with `github-actions[bot]` and the message `[AUTO] sync external posts` only when the archive JSON or `public/tiktok/` changed, then pushes the default branch. After that push succeeds, a second job POSTs to the `NETLIFY_BUILD_HOOK` repository secret. That secret is the bare build-hook URL from Netlify, created for the production branch (`main`). The synchronizer does not read it, and a local `pnpm content:sync` does not call it.
 
+Substack requests use six fixed browser header profiles instead of the synchronizer user agent. `Accept-Encoding` is left unset so Node's `fetch` can decompress the body. The direct fetch runs immediately, then retries after 1, 5, 10, 30, and 60 seconds. HTTP 403, 429, 5xx, timeouts, network failures, and HTML challenge pages are retried. `Retry-After` on a 429 or 503 can lengthen that wait up to 60 seconds. Any other 4xx stops the direct phase without calling the proxy. When the retryable failures are exhausted, the sync POSTs `https://everywoman.io/.netlify/functions/substack-rss?profile=0` through `profile=5` with `Authorization: Bearer $SUBSTACK_PROXY_TOKEN`, on the same schedule. [`netlify/functions/substack-rss.ts`](../netlify/functions/substack-rss.ts) checks that bearer token and fetches the fixed Substack URL once. It does not sleep or retry. Each profile index selects a header set stored in the repository. Caller-supplied URLs and headers are ignored. If `SUBSTACK_PROXY_TOKEN` is unset, the proxy phase is skipped and logged.
+
+An unavailable Substack fetch logs `Substack was unavailable. Archived Substack posts were left unchanged.`, emits a GitHub Actions `::warning::`, and appends that sentence to the step summary. It is not recorded as a successful fetch of zero posts. Archived Substack posts, slugs, and bodies stay as they are. Instagram and TikTok still reconcile, and a changed archive is still committed and deployed through the existing build hook. A real RSS document that fails article validation still aborts the run before writing, as do Instagram and TikTok failures.
+
+Generate the proxy token with `openssl rand -base64 32` and do not commit it. Store the same value as the GitHub Actions secret `SUBSTACK_PROXY_TOKEN` and as a Netlify production environment variable named `SUBSTACK_PROXY_TOKEN`, marked secret and available to Functions. Merge the function in a human commit so Netlify deploys it, set the Netlify variable, redeploy if that variable was added after the deploy, then set the GitHub secret. CI does not receive the token. Local `pnpm content:sync` does not need it when the direct feed succeeds. Set it in `.env`, and optionally `SUBSTACK_PROXY_URL`, only to call the proxy. After deploy, `POST` the function without a token and confirm the body is 401 JSON. If the response is the site HTML 404 page, `public/_redirects` is shadowing `/.netlify/functions/*`; add a more specific rewrite above the splat and redeploy. The `netlify.toml` ignore rule is unchanged, so a later `github-actions[bot]` archive commit still skips the duplicate Git-triggered build.
+
 Netlify still builds ordinary pushes through its Git connection. [`netlify.toml`](../netlify.toml) tells Netlify to skip the Git-triggered build when the commit author is `github-actions[bot]`, so a content-sync push is not built twice. The ignore command does not cancel a build started by the hook. A sync that exits early, a dry run, or a run with an empty diff does not commit and does not call the hook, so the live site stays as it is. If the hook POST fails after the push, re-run the failed job; re-running the whole workflow usually finds no new diff and will not call the hook again.
 
 ## Merge into the archive
 
-Reconciliation in [`scripts/content/reconcile.ts`](../scripts/content/reconcile.ts) matches on `id`, which is `source:sourceId`. The archive is append-only: posts that fall out of a feed stay until someone deletes them by hand.
+Reconciliation in [`scripts/content/reconcile.ts`](../scripts/content/reconcile.ts) matches on `id`, which is `source:sourceId`. The archive is append-only: posts that fall out of a feed stay until someone deletes them by hand. A failed Substack fetch contributes no incoming Substack posts, so those archived records stay unchanged while other providers are still merged. A successful Substack response with zero items is different: the fetch counts as successful, and the same append-only rule keeps older posts.
 
 ```mermaid
 flowchart TD

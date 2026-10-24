@@ -4,10 +4,13 @@ import { XMLParser } from "fast-xml-parser";
 import { decode } from "html-entities";
 import sanitizeHtml from "sanitize-html";
 
+import {
+  fetchSubstackFeedXml,
+  type FetchSubstackFeedOptions,
+} from "../substack-fetch.js";
 import type { ArchiveMedia, SubstackPost } from "../types.js";
 
-export const SUBSTACK_FEED_URL =
-  "https://everywomanhealth.substack.com/feed";
+export { SUBSTACK_FEED_URL } from "../substack-profiles.js";
 
 const XML_PARSER = new XMLParser({
   ignoreAttributes: false,
@@ -345,26 +348,8 @@ export function parseSubstackFeed(xml: string): SubstackPost[] {
 }
 
 export async function fetchSubstackPosts(
-  fetchImpl: typeof fetch = fetch,
+  options: FetchSubstackFeedOptions = {},
 ): Promise<SubstackPost[]> {
-  let response: Response;
-  try {
-    response = await fetchImpl(SUBSTACK_FEED_URL, {
-      headers: {
-        accept: "application/rss+xml, application/xml;q=0.9, text/xml;q=0.8",
-        "user-agent": "EveryWoman content synchronizer",
-      },
-    });
-  } catch (error) {
-    throw new Error("Unable to fetch the public Substack RSS feed.", {
-      cause: error,
-    });
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      `Substack feed request failed with HTTP ${response.status}.`,
-    );
-  }
-  return parseSubstackFeed(await response.text());
+  const xml = await fetchSubstackFeedXml(options);
+  return parseSubstackFeed(xml);
 }

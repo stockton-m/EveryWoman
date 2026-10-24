@@ -62,10 +62,12 @@ For testing locally, create an `.env` file and set:
 * `BEHOLD_FEED_URL`, which looks like `https://feeds.behold.so/YOUR_FEED_ID`. The URL itself is the only identifier Behold needs. Behold updates the feed on their backend, and the URL can be accessed by anyone. You should still treat the URL as a secret because under Behold's free tier the URL only allows 1200 views per month.
 * `APIFY_TOKEN`, an Apify API token.
 * `APIFY_TASK_ID`, normally `everywoman~everywoman-tiktok`. `everywoman/everywoman-tiktok` is accepted and normalized to the tilde form Apify expects.
+* `SUBSTACK_PROXY_TOKEN`, optional locally. The direct Substack fetch still runs without it. Set the same value in `.env` only when you want a blocked direct fetch to fall back to the deployed Netlify proxy. Generate it with `openssl rand -base64 32` and do not commit it. GitHub Actions needs this repository secret, and Netlify needs the same value as a production environment variable available to Functions.
+* `SUBSTACK_PROXY_URL`, optional. It overrides the default proxy endpoint, `https://everywoman.io/.netlify/functions/substack-rss`.
 
 `NETLIFY_BUILD_HOOK` is not a local `.env` value and `pnpm content:sync` does not read it. It is a GitHub Actions repository secret: the bare Netlify build hook URL from Project configuration > Developer settings > Continuous deployment > Build hooks. Create that hook for the `main` branch. The content-sync workflow POSTs to it only after it has pushed new archive commits.
 
-The synchronizer performs no Git operations. It validates every source before reconciling in memory, writes once only after every provider succeeds, keeps records that are no longer in a recent-content feed, and preserves an archived Substack slug when upstream titles or URLs change. Keep in mind that additions and edits to known posts will update the archive, but deletion is manual - the compilation logic is _greedy_. When a post falls off one of the content sources, it isn't automatically deleted from the checked-in archive. A missing, failed, or expired Apify dataset fails the sync instead of being treated as an empty TikTok feed. A successful dataset older than three days logs a warning; one older than seven days (Apify's retention window) fails the sync.
+The synchronizer performs no Git operations. It validates the Behold and Apify configuration before reconciling in memory. Instagram and TikTok failures still stop the run before anything is written. Substack is requested with six browser header profiles, immediately and then after 1, 5, 10, 30, and 60 seconds. If those direct attempts are exhausted by HTTP 403, 429, 5xx, a timeout, a network error, or an HTML challenge, the sync repeats that schedule through the Netlify function at `/.netlify/functions/substack-rss`. The function fetches the fixed Substack feed once per call. If Substack is still unavailable, the run logs a warning, leaves archived Substack posts unchanged, and still reconciles Instagram and TikTok. That failure is not treated as a successful fetch of zero posts. A Substack response that is real RSS but fails article validation still aborts the whole run. The archive keeps records that are no longer in a recent-content feed, and it preserves an archived Substack slug when upstream titles or URLs change. Additions and edits to known posts update the archive, but deletion is manual. When a post falls off one of the content sources, it isn't automatically deleted from the checked-in archive. A missing, failed, or expired Apify dataset fails the sync instead of being treated as an empty TikTok feed. A successful dataset older than three days logs a warning; one older than seven days (Apify's retention window) fails the sync.
 
 After that sync, TikTok posts that do not already have `metadata.thumbnailPath` are looked up through TikTok's public oEmbed endpoint. A JPEG, PNG, or WebP thumbnail is saved at `public/tiktok/{sourceId}.ext` and that path is recorded on the post. Posts that already have a thumbnail are left alone, including when TikTok rotates the signed image URL. If a thumbnail cannot be downloaded, that post stays unchanged and `/posts` uses the existing EveryWoman logo until a later sync succeeds. `--dry-run` reports how many thumbnails are missing and does not download them.
 
@@ -73,6 +75,7 @@ Recommended local validation:
 
 ```bash
 # Create .env and add BEHOLD_FEED_URL, APIFY_TOKEN, and APIFY_TASK_ID
+# Optional: SUBSTACK_PROXY_TOKEN and SUBSTACK_PROXY_URL for the Netlify RSS proxy
 
 # validate env
 pnpm test
@@ -88,7 +91,7 @@ git diff -- src/data/content-archive.json public/tiktok
 # if you run pnpm content:sync again within a few seconds, there should be no diff
 ```
 
-See `.github/workflows/sync-content.yml` for the scheduled GitHub Action. The action commits the archive JSON and any new TikTok thumbnails when there are changes, pushes that commit to the default branch, and then POSTs `NETLIFY_BUILD_HOOK` so Netlify builds it. `netlify.toml` skips the duplicate Git-triggered build for those `github-actions[bot]` commits. A human push to the default branch still starts a Netlify build through the existing Git connection, and it does not run the content-sync workflow. GitHub needs repository secrets named `BEHOLD_FEED_URL`, `APIFY_TOKEN`, `APIFY_TASK_ID`, and `NETLIFY_BUILD_HOOK`. Set `APIFY_TASK_ID` to `everywoman~everywoman-tiktok`. The pipeline is diagrammed in [docs/content-archive-pipeline.md](docs/content-archive-pipeline.md). `.github/workflows/ci.yml` runs `pnpm test`, `pnpm typecheck:content`, and `pnpm build` on pull requests and pushes to the default branch, and it does not use those content-sync secrets.
+See `.github/workflows/sync-content.yml` for the scheduled GitHub Action. The action commits the archive JSON and any new TikTok thumbnails when there are changes, pushes that commit to the default branch, and then POSTs `NETLIFY_BUILD_HOOK` so Netlify builds it. `netlify.toml` skips the duplicate Git-triggered build for those `github-actions[bot]` commits. A human push to the default branch still starts a Netlify build through the existing Git connection, and it does not run the content-sync workflow. GitHub needs repository secrets named `BEHOLD_FEED_URL`, `APIFY_TOKEN`, `APIFY_TASK_ID`, `NETLIFY_BUILD_HOOK`, and `SUBSTACK_PROXY_TOKEN`. Set `APIFY_TASK_ID` to `everywoman~everywoman-tiktok`. Set the same `SUBSTACK_PROXY_TOKEN` in Netlify for the production context, then redeploy so `netlify/functions/substack-rss.ts` can read it. A Substack warning does not fail the workflow when Instagram and TikTok succeed, and a changed archive is still committed and deployed. The pipeline is diagrammed in [docs/content-archive-pipeline.md](docs/content-archive-pipeline.md). `.github/workflows/ci.yml` runs `pnpm test`, `pnpm typecheck:content`, and `pnpm build` on pull requests and pushes to the default branch, and it does not use those content-sync secrets.
 
 ### Where everything lives
 - **Entry point:** `src/main.tsx` → renders `<App />` from `src/app/App.tsx` (React Router)
@@ -97,6 +100,7 @@ See `.github/workflows/sync-content.yml` for the scheduled GitHub Action. The ac
 - **Copy / tiers:** `src/app/content/coaching.ts`
 - **External content archive:** `src/data/content-archive.json`
 - **Content synchronizer:** `scripts/content/`
+- **Substack RSS proxy:** `netlify/functions/substack-rss.ts`
 - **Constants (URLs, colors):** `src/app/constants.ts`
 - **Images:** `src/imports/`
 - **Styles:** `src/styles/` — `index.css` imports `fonts.css`, `tailwind.css`, and `theme.css`. Brand colors are defined as CSS variables in `theme.css` and applied as inline `style` props in components.
