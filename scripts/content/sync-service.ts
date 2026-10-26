@@ -30,6 +30,7 @@ export interface SynchronizeContentResult {
   archive: ContentArchive;
   changed: boolean;
   dryRun: boolean;
+  fetchedPostIds: ReadonlySet<string>;
   stats: ReconciliationStats;
   unavailableSources: ContentSource[];
   wroteArchive: boolean;
@@ -106,6 +107,7 @@ export async function synchronizeContent({
     archive,
     changed,
     dryRun,
+    fetchedPostIds: new Set(incomingPosts.map((post) => post.id)),
     stats,
     unavailableSources,
     wroteArchive: changed && !dryRun,

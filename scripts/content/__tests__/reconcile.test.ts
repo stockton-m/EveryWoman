@@ -212,6 +212,37 @@ test("TikTok posts are added, updated, and left unchanged", () => {
   );
 });
 
+test("an archived Instagram thumbnail path survives a later sync", () => {
+  const original = makeInstagramPost({
+    metadata: {
+      mediaType: "IMAGE",
+      caption: "Original caption",
+      prunedCaption: "Original caption",
+      thumbnailPath: "instagram/instagram-id-1.jpg",
+    },
+  });
+  const incoming = makeInstagramPost({
+    description: "Updated caption",
+    metadata: {
+      mediaType: "IMAGE",
+      caption: "Updated caption",
+      prunedCaption: "Updated caption",
+    },
+  });
+  const result = reconcile(
+    { ...emptyArchive(), posts: [original] },
+    [incoming],
+  );
+  const post = result.archive.posts[0];
+
+  assert.equal(result.stats.bySource.instagram.updated, 1);
+  assert.equal(post?.description, "Updated caption");
+  assert.equal(
+    post?.source === "instagram" ? post.metadata.thumbnailPath : undefined,
+    "instagram/instagram-id-1.jpg",
+  );
+});
+
 test("an archived TikTok thumbnail path survives a later sync", () => {
   const original = makeTikTokPost({
     metadata: {

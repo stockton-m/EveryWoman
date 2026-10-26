@@ -10,6 +10,10 @@ import { fetchSubstackPosts } from "./providers/substack.js";
 import { fetchTikTokPosts } from "./providers/tiktok.js";
 import { synchronizeContent } from "./sync-service.js";
 import {
+  downloadMissingInstagramThumbnails,
+  instagramPostsMissingThumbnails,
+} from "./instagram-thumbnails.js";
+import {
   downloadMissingTikTokThumbnails,
   tiktokPostsMissingThumbnails,
 } from "./tiktok-thumbnails.js";
@@ -27,6 +31,11 @@ const ARCHIVE_PATH = join(
   "src",
   "data",
   "content-archive.json",
+);
+const INSTAGRAM_THUMBNAIL_DIRECTORY = join(
+  REPOSITORY_ROOT,
+  "public",
+  "instagram",
 );
 const TIKTOK_THUMBNAIL_DIRECTORY = join(REPOSITORY_ROOT, "public", "tiktok");
 
@@ -153,29 +162,61 @@ async function main(): Promise<void> {
   console.log(`  Updated: ${result.stats.totalUpdated}`);
   console.log("  Removed: 0");
 
-  const missingThumbnails = tiktokPostsMissingThumbnails(result.archive);
+  let archive = result.archive;
   let thumbnailsWritten = false;
+
+  const missingTikTokThumbnails = tiktokPostsMissingThumbnails(archive);
   if (dryRun) {
     console.log(
-      `\nTikTok thumbnails: ${missingThumbnails.length} posts still need a thumbnail. Dry run did not download them.`,
+      `\nTikTok thumbnails: ${missingTikTokThumbnails.length} posts still need a thumbnail. Dry run did not download them.`,
     );
-  } else if (missingThumbnails.length === 0) {
+  } else if (missingTikTokThumbnails.length === 0) {
     console.log("\nTikTok thumbnails are already saved.");
   } else {
     console.log(
-      `\nTikTok thumbnails: found ${missingThumbnails.length} posts without a thumbnail. Downloading them now (this may take a few seconds)...`,
+      `\nTikTok thumbnails: found ${missingTikTokThumbnails.length} posts without a thumbnail. Downloading them now (this may take a few seconds)...`,
     );
     const thumbnails = await downloadMissingTikTokThumbnails({
-      archive: result.archive,
+      archive,
       thumbnailDirectory: TIKTOK_THUMBNAIL_DIRECTORY,
     });
-    const serializedArchive = serializeArchive(thumbnails.archive);
+    archive = thumbnails.archive;
+    const serializedArchive = serializeArchive(archive);
     if (serializedArchive !== serializeArchive(result.archive)) {
       await writeArchiveAtomic(ARCHIVE_PATH, serializedArchive);
       thumbnailsWritten = true;
     }
     console.log(
       `\nTikTok thumbnails: downloaded ${thumbnails.downloaded}, failed ${thumbnails.failed}.`,
+    );
+  }
+
+  const missingInstagramThumbnails = instagramPostsMissingThumbnails(
+    archive,
+    result.fetchedPostIds,
+  );
+  if (dryRun) {
+    console.log(
+      `\nInstagram thumbnails: ${missingInstagramThumbnails.length} posts still need a thumbnail. Dry run did not download them.`,
+    );
+  } else if (missingInstagramThumbnails.length === 0) {
+    console.log("\nInstagram thumbnails are already saved.");
+  } else {
+    console.log(
+      `\nInstagram thumbnails: found ${missingInstagramThumbnails.length} posts without a thumbnail. Downloading them now (this may take a few seconds)...`,
+    );
+    const thumbnails = await downloadMissingInstagramThumbnails({
+      archive,
+      eligibleIds: result.fetchedPostIds,
+      thumbnailDirectory: INSTAGRAM_THUMBNAIL_DIRECTORY,
+    });
+    const serializedArchive = serializeArchive(thumbnails.archive);
+    if (serializedArchive !== serializeArchive(archive)) {
+      await writeArchiveAtomic(ARCHIVE_PATH, serializedArchive);
+      thumbnailsWritten = true;
+    }
+    console.log(
+      `\nInstagram thumbnails: downloaded ${thumbnails.downloaded}, failed ${thumbnails.failed}.`,
     );
   }
 

@@ -166,6 +166,7 @@ test("a Substack outage preserves archived posts while Instagram is reconciled",
     });
 
     assert.deepEqual(result.unavailableSources, ["substack"]);
+    assert.deepEqual([...result.fetchedPostIds], [instagram.id]);
     assert.equal(result.wroteArchive, true);
     assert.equal(result.stats.bySource.substack.fetched, 0);
     assert.equal(result.stats.bySource.substack.added, 0);

@@ -177,8 +177,9 @@ function assertMedia(
   }
 }
 
-function assertTikTokThumbnailPath(
+function assertSavedThumbnailPath(
   thumbnailPath: unknown,
+  directory: "instagram" | "tiktok",
   sourceId: string,
   field: string,
 ): void {
@@ -187,9 +188,9 @@ function assertTikTokThumbnailPath(
   }
 
   const allowedPaths = new Set([
-    `tiktok/${sourceId}.jpg`,
-    `tiktok/${sourceId}.png`,
-    `tiktok/${sourceId}.webp`,
+    `${directory}/${sourceId}.jpg`,
+    `${directory}/${sourceId}.png`,
+    `${directory}/${sourceId}.webp`,
   ]);
   if (typeof thumbnailPath !== "string" || !allowedPaths.has(thumbnailPath)) {
     throw new Error(
@@ -279,8 +280,9 @@ export function assertArchivePost(
         `${field}.metadata.hashtags`,
       );
     }
-    assertTikTokThumbnailPath(
+    assertSavedThumbnailPath(
       value.metadata.thumbnailPath,
+      "tiktok",
       value.sourceId,
       field,
     );
@@ -322,6 +324,12 @@ export function assertArchivePost(
       `${field}.metadata.colorPalette`,
     );
   }
+  assertSavedThumbnailPath(
+    value.metadata.thumbnailPath,
+    "instagram",
+    value.sourceId,
+    field,
+  );
   if (value.media.length === 0) {
     throw new Error(`Invalid content archive: ${field}.media must not be empty.`);
   }

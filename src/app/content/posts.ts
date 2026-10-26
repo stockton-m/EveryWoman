@@ -136,6 +136,10 @@ export function getPostThumbnail(post: ArchivePost): string | undefined {
     return logoImage;
   }
 
+  if (post.source === "instagram" && post.metadata?.thumbnailPath) {
+    return `/${post.metadata.thumbnailPath}`;
+  }
+
   const media = post.media[0];
   if (!media) return undefined;
 

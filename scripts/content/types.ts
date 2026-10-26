@@ -66,6 +66,7 @@ export interface InstagramPost extends ArchivePostBase {
     mediaType: InstagramMediaType;
     mentions?: string[];
     prunedCaption?: string;
+    thumbnailPath?: string;
   };
   source: "instagram";
 }

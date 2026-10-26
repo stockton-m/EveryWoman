@@ -44,19 +44,28 @@ flowchart TD
   dryRun -->|yes| dryReport["Print added, updated, and missing-thumbnail counts. Skip writes and downloads."]
   dryRun -->|no| writeIfChanged{"Did the serialized archive change?"}
   writeIfChanged -->|yes| atomicWrite["Atomically write src/data/content-archive.json"]
-  writeIfChanged -->|no| thumbCheck{"Any TikTok post missing metadata.thumbnailPath?"}
-  atomicWrite --> thumbCheck
+  writeIfChanged -->|no| tiktokThumbs{"Any TikTok post missing metadata.thumbnailPath?"}
+  atomicWrite --> tiktokThumbs
 
-  thumbCheck -->|yes| oembed["GET www.tiktok.com/oembed, then download thumbnail_url"]
-  thumbCheck -->|no| noThumbWork["Leave saved thumbnails in place, including when TikTok rotates the signed URL"]
+  tiktokThumbs -->|yes| oembed["GET www.tiktok.com/oembed, then download thumbnail_url"]
+  tiktokThumbs -->|no| igThumbs{"Any post from this Behold fetch missing thumbnailPath with a cover URL?"}
 
   oembed -->|"JPEG, PNG, or WebP, at most 8 MB"| saveThumb["Save public/tiktok/sourceId.ext, set thumbnailPath, and rewrite the archive"]
   oembed -->|"request, type, or size failure"| thumbFail["Warn, leave that post without thumbnailPath, and continue"]
+  saveThumb --> igThumbs
+  thumbFail --> igThumbs
 
-  saveThumb --> stageFiles["Stage src/data/content-archive.json and public/tiktok"]
+  igThumbs -->|yes| igCover["Download sizes, then thumbnailUrl, then an image mediaUrl. No oEmbed hop."]
+  igThumbs -->|no| noThumbWork["Leave saved thumbnails in place, including when a provider rotates the signed URL"]
+
+  igCover -->|"JPEG, PNG, or WebP, at most 8 MB"| saveIg["Save public/instagram/sourceId.ext, set thumbnailPath, and rewrite the archive"]
+  igCover -->|"request, type, or size failure"| igFail["Warn, leave that post without thumbnailPath, and continue"]
+
+  saveIg --> stageFiles["Stage src/data/content-archive.json, public/tiktok, and public/instagram"]
   noThumbWork --> stageFiles
-  thumbFail --> stageFiles
-  thumbFail --> logoFallback["getPostThumbnail serves src/imports/logo-full.png until a later sync saves a file"]
+  igFail --> stageFiles
+  thumbFail --> logoFallback["TikTok getPostThumbnail serves src/imports/logo-full.png until a later sync saves a file"]
+  igFail --> igRemote["Instagram getPostThumbnail keeps the remote cover until a local file is saved"]
 
   stageFiles --> hasDiff{"Staged diff empty?"}
   hasDiff -->|yes| noCommit["No commit and no push. The Netlify hook is not called."]
@@ -66,10 +75,12 @@ flowchart TD
   commitPush --> gitPush["Netlify also receives the Git push"]
   gitPush --> ignoreBot["netlify.toml ignore exits 0 and skips that Git build"]
   hook --> netlify["Netlify production build of the default branch, started by the build hook"]
-  netlify --> viteBuild["pnpm build imports the archive. public/tiktok is copied into dist."]
+  netlify --> viteBuild["pnpm build imports the archive. public/tiktok and public/instagram are copied into dist."]
 ```
 
-The GitHub Action is [`.github/workflows/sync-content.yml`](../.github/workflows/sync-content.yml). It commits with `github-actions[bot]` and the message `[AUTO] sync external posts` only when the archive JSON or `public/tiktok/` changed, then pushes the default branch. After that push succeeds, a second job POSTs to the `NETLIFY_BUILD_HOOK` repository secret. That secret is the bare build-hook URL from Netlify, created for the production branch (`main`). The synchronizer does not read it, and a local `pnpm content:sync` does not call it.
+The GitHub Action is [`.github/workflows/sync-content.yml`](../.github/workflows/sync-content.yml). It commits with `github-actions[bot]` and the message `[AUTO] sync external posts` only when the archive JSON, `public/tiktok/`, or `public/instagram/` changed, then pushes the default branch. After that push succeeds, a second job POSTs to the `NETLIFY_BUILD_HOOK` repository secret. That secret is the bare build-hook URL from Netlify, created for the production branch (`main`). The synchronizer does not read it, and a local `pnpm content:sync` does not call it.
+
+Instagram covers come from the post Behold already returned. The downloader uses `sizes.medium`, then `small`, `large`, and `full`, then `thumbnailUrl`, then an image `mediaUrl`. An `.mp4` `mediaUrl` is skipped. A carousel uses the album media first, then the first child that has one of those URLs. `thumbnailUrl` is only present on videos and points at Instagram's CDN, so it is not the first choice. Only posts in the current Behold response are downloaded. Posts that have left the latest 6 stay in the archive and are not requested again, because Behold no longer serves those images. A failure for a post still in the feed warns and retries on a later sync while that post remains in the feed. A saved `thumbnailPath` is kept when Behold rotates the remote URL.
 
 Substack requests use six fixed browser header profiles instead of the synchronizer user agent. `Accept-Encoding` is left unset so Node's `fetch` can decompress the body. The direct fetch runs immediately, then retries after 1, 5, 10, 30, and 60 seconds. HTTP 403, 429, 5xx, timeouts, network failures, and HTML challenge pages are retried. `Retry-After` on a 429 or 503 can lengthen that wait up to 60 seconds. Any other 4xx stops the direct phase without calling the proxy. When the retryable failures are exhausted, the sync POSTs `https://everywoman.io/.netlify/functions/substack-rss?profile=0` through `profile=5` with `Authorization: Bearer $SUBSTACK_PROXY_TOKEN`, on the same schedule. [`netlify/functions/substack-rss.ts`](../netlify/functions/substack-rss.ts) checks that bearer token and fetches the fixed Substack URL once. It does not sleep or retry. Each profile index selects a header set stored in the repository. Caller-supplied URLs and headers are ignored. If `SUBSTACK_PROXY_TOKEN` is unset, the proxy phase is skipped and logged.
 
