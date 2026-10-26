@@ -4,12 +4,21 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  type CSSProperties,
   type PointerEvent as ReactPointerEvent,
   type TransitionEvent,
 } from "react";
 import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
 import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
+import {
+  INSTAGRAM_EMBED_HEADER_PX,
+  instagramEmbedGestureBands,
+  instagramEmbedStage,
+  shouldMountInstagramEmbed,
+  withInstagramEmbedParams,
+  type InstagramEmbedRect,
+} from "@/app/components/posts/instagramEmbed";
 import {
   InstagramIcon,
   SubstackIcon,
@@ -70,6 +79,61 @@ function instagramVideoUrl(post: ArchivePost): string | undefined {
   const media = post.media[0];
   if (media?.mediaType === "VIDEO" && media.mediaUrl) return media.mediaUrl;
   return undefined;
+}
+
+function instagramFallbackSrc(post: ArchivePost): string | undefined {
+  const embed = getEmbedUrl(post);
+  if (!embed) return undefined;
+  return withInstagramEmbedParams(embed);
+}
+
+function InstagramFallbackFrame({
+  label,
+  onInteract,
+  src,
+  stage,
+  thumbnail,
+}: {
+  label: string;
+  onInteract: () => void;
+  src: string | undefined;
+  stage: InstagramEmbedRect | null;
+  thumbnail: string | undefined;
+}) {
+  const frameStyle = {
+    "--ig-header": `${INSTAGRAM_EMBED_HEADER_PX}px`,
+    ...(stage
+      ? {
+          width: stage.width,
+          height: stage.height,
+          top: stage.top,
+          left: stage.left,
+          transform: "none",
+        }
+      : null),
+  } as CSSProperties;
+
+  return (
+    <div className="shorts-preview__ig" style={frameStyle}>
+      {thumbnail ? (
+        <ImageWithFallback src={thumbnail} alt="" className="shorts-preview__ig-poster" />
+      ) : null}
+      {src ? (
+        <iframe
+          src={src}
+          title={label}
+          className="shorts-preview__ig-frame"
+          scrolling="no"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+          allowFullScreen
+          onLoad={(event) => {
+            event.currentTarget.classList.add("shorts-preview__ig-frame--ready");
+          }}
+          onFocus={onInteract}
+        />
+      ) : null}
+    </div>
+  );
 }
 
 function tiktokPlayerUrl(post: ArchivePost): string | undefined {
@@ -207,6 +271,8 @@ export function ShortsPreview({
   const [animate, setAnimate] = useState(false);
   const [fallbackIds, setFallbackIds] = useState<string[]>([]);
   const [unmutedIds, setUnmutedIds] = useState<Set<string>>(() => new Set());
+  const [viewport, setViewport] = useState({ width: 0, height: 0 });
+  const [playHintId, setPlayHintId] = useState<string | null>(null);
 
   onChangeRef.current = onChange;
   onCloseRef.current = onClose;
@@ -218,6 +284,14 @@ export function ShortsPreview({
   const hasPrevious = activeIndex !== null && activeIndex > 0;
   const embedFallback =
     post !== null && post.source === "instagram" && fallbackIds.includes(post.id);
+  const stage =
+    viewport.width > 0 && viewport.height > 0
+      ? instagramEmbedStage(viewport.width, viewport.height)
+      : null;
+  const gestureBands =
+    embedFallback && stage
+      ? instagramEmbedGestureBands(viewport.width, viewport.height)
+      : [];
 
   const bindVideo = (id: string) => {
     let callback = videoBind.current.get(id);
@@ -346,6 +420,31 @@ export function ShortsPreview({
   useEffect(() => {
     return () => clearSnapTimer();
   }, []);
+
+  useLayoutEffect(() => {
+    const node = viewportRef.current;
+    if (!node) return;
+    const sync = () => {
+      const width = node.clientWidth;
+      const height = node.clientHeight;
+      setViewport((current) =>
+        current.width === width && current.height === height ? current : { width, height },
+      );
+    };
+    sync();
+    const observer = new ResizeObserver(sync);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [activeIndex]);
+
+  useEffect(() => {
+    setPlayHintId(null);
+  }, [activeIndex]);
+
+  useEffect(() => {
+    if (offset === 0) return;
+    setPlayHintId((id) => (id === null ? id : null));
+  }, [offset]);
 
   useEffect(() => {
     const onMessage = (event: MessageEvent) => {
@@ -611,7 +710,10 @@ export function ShortsPreview({
             const tiktok = showMedia && !article ? tiktokPlayerUrl(item) : undefined;
             const videoUrl = showMedia && !article ? instagramVideoUrl(item) : undefined;
             const useEmbed = !tiktok && videoUrl !== undefined && fallbackIds.includes(item.id);
-            const embedUrl = useEmbed ? getEmbedUrl(item) : undefined;
+            // Removing the iframe is what stops playback. Instagram's embed has no pause API.
+            const embedSrc = shouldMountInstagramEmbed(useEmbed, index === activeIndex, offset)
+              ? instagramFallbackSrc(item)
+              : undefined;
             return (
               <div className="shorts-preview__slide" key={item.id}>
                 {article ? (
@@ -638,14 +740,13 @@ export function ShortsPreview({
                     referrerPolicy="no-referrer"
                     onError={() => markFallback(item.id)}
                   />
-                ) : embedUrl ? (
-                  <iframe
-                    key={embedUrl}
-                    src={embedUrl}
-                    title={label}
-                    className="shorts-preview__frame"
-                    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                    allowFullScreen
+                ) : useEmbed ? (
+                  <InstagramFallbackFrame
+                    label={label}
+                    onInteract={() => setPlayHintId(item.id)}
+                    src={embedSrc}
+                    stage={stage}
+                    thumbnail={thumbnail}
                   />
                 ) : thumbnail ? (
                   <ImageWithFallback
@@ -683,6 +784,21 @@ export function ShortsPreview({
                     </span>
                   </div>
                 ) : null}
+                {embedSrc !== undefined && playHintId !== item.id ? (
+                  <div
+                    className="shorts-preview__unmute"
+                    style={{ fontFamily: SANS }}
+                    aria-hidden="true"
+                  >
+                    <Volume2 className="shorts-preview__unmute-icon" />
+                    <span className="shorts-preview__unmute-copy">
+                      <span>Tap to play</span>
+                      <span className="shorts-preview__unmute-note">
+                        Older Instagram posts do not autoplay.
+                      </span>
+                    </span>
+                  </div>
+                ) : null}
                 <div className="shorts-preview__caption">
                   <div className="shorts-preview__caption-row">
                     <div className="shorts-preview__logo">
@@ -704,15 +820,31 @@ export function ShortsPreview({
       </div>
       <div
         className={
-          embedFallback
-            ? "shorts-preview__gesture shorts-preview__gesture--passthrough"
+          gestureBands.length > 0
+            ? "shorts-preview__gesture shorts-preview__gesture--embed"
             : "shorts-preview__gesture"
         }
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerCancel}
-      />
+        {...(gestureBands.length > 0
+          ? {}
+          : {
+              onPointerDown,
+              onPointerMove,
+              onPointerUp,
+              onPointerCancel,
+            })}
+      >
+        {gestureBands.map((band) => (
+          <div
+            key={`${band.top}-${band.left}-${band.width}-${band.height}`}
+            className="shorts-preview__gesture-band"
+            style={band}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerCancel}
+          />
+        ))}
+      </div>
       <div className="shorts-preview__controls">
         <button
           ref={closeRef}

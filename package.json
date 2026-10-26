@@ -10,7 +10,7 @@
     "build": "tsx scripts/cli.ts build",
     "content:sync": "tsx scripts/content/sync.ts",
     "dev": "tsx scripts/cli.ts dev",
-    "test": "tsx --test scripts/__tests__/*.test.ts scripts/content/__tests__/*.test.ts scripts/seo/__tests__/*.test.ts scripts/experimental/__tests__/*.test.ts",
+    "test": "tsx --test scripts/__tests__/*.test.ts scripts/content/__tests__/*.test.ts scripts/seo/__tests__/*.test.ts scripts/experimental/__tests__/*.test.ts src/app/components/posts/__tests__/*.test.ts",
     "typecheck:content": "tsc -p tsconfig.content.json"
   },
   "dependencies": {
